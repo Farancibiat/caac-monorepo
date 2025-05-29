@@ -1,5 +1,5 @@
 {
-  "name": "prisma-test",
+  "name": "@aachiloe/api",
   "version": "1.0.0",
   "description": "API de Reservas de Piscina",
   "main": "dist/index.js",
