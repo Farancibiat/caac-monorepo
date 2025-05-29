@@ -1,0 +1,22 @@
+enum Role {
+  ADMIN
+  TREASURER
+  USER
+}
+
+model User {
+  id                    Int           @id @default(autoincrement())
+  email                 String        @unique
+  password              String
+  name                  String
+  role                  Role          @default(USER)
+  phone                 String?
+  isActive              Boolean       @default(true)
+  createdAt             DateTime      @default(now()) @map("created_at")
+  updatedAt             DateTime      @updatedAt @map("updated_at")
+  reservations          Reservation[]
+  confirmedReservations Reservation[] @relation("PaymentConfirmations")
+  confirmedPayments     PaymentRecord[]
+
+  @@map("users")
+}
