@@ -52,7 +52,7 @@
       "forceConsistentCasingInFileNames": true,
       
       /* Advanced */
-      "typeRoots": ["./node_modules/@types", "./src/types"],
+      "typeRoots": ["./node_modules/@types", "../node_modules/@types", "./src/types"],
       "types": ["node"],
       "experimentalDecorators": false,
       "emitDecoratorMetadata": false,

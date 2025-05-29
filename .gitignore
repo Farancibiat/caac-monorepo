@@ -46,8 +46,6 @@ node_modules/
 .yarn-integrity
 
 # IDE and Editor files
-.vscode/
-.cursor/
 .idea/
 *.swp
 *.swo

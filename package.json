@@ -1,6 +1,6 @@
 {
     "name": "aachiloe-monorepo",
-    "version": "1.0.0",
+    "version": "0.0.1",
     "private": true,
     "description": "Sitio Web oficial del Club de Aguas Abiertas Chiloé - Monorepo",
     "workspaces": [
@@ -17,7 +17,12 @@
       "build:api": "npm run build --workspace=@aachiloe/api",
       "build:frontend": "npm run build --workspace=@aachiloe/frontend",
       "start:api": "npm run start --workspace=@aachiloe/api",
-      "start:frontend": "npm run start --workspace=@aachiloe/frontend"
+      "start:frontend": "npm run start --workspace=@aachiloe/frontend",
+      "db:generate": "npm run db:generate --workspace=@aachiloe/api",
+      "db:push": "npm run db:push --workspace=@aachiloe/api",
+      "db:migrate": "npm run db:migrate --workspace=@aachiloe/api",
+      "db:reset": "npm run db:reset --workspace=@aachiloe/api",
+      "db:studio": "npm run db:studio --workspace=@aachiloe/api"
     },
     "devDependencies": {
       "concurrently": "^8.2.2"
