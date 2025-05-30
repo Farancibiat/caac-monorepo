@@ -1,24 +1,30 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useAuthStore } from '@/stores/auth-store'
+import { useAuthStore } from '@/stores/auth'
 
 interface AuthProviderProps {
   children: React.ReactNode
 }
 
-export function AuthProvider({ children }: AuthProviderProps) {
-  const { loading } = useAuthStore()
+export const AuthProvider = ({ children }: AuthProviderProps) => {
+  const { loading, error } = useAuthStore()
 
-  
   useEffect(() => {
-   
-    return () => {}
-  }, [])
+    // Solo log en desarrollo, no bloquear nunca el renderizado
+    if (process.env.NODE_ENV === 'development') {
+      if (loading) {
+        console.log('🔄 Auth initializing...')
+      } else {
+        console.log('✅ Auth initialized')
+      }
+      
+      if (error) {
+        console.warn('⚠️ Auth error:', error)
+      }
+    }
+  }, [loading, error])
 
-  if (loading) {
-    return <div>Cargando...</div>
-  }
-
+  // NUNCA bloquear el renderizado - siempre mostrar children
   return <>{children}</>
 } 

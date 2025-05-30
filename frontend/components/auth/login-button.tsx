@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
-import { useAuthStore } from "@/stores/auth-store"
+import { useAuthStore } from "@/stores/auth"
 
-export function LoginButton() {
+export const LoginButton = () => {
   const { signInWithGoogle, user, signOut } = useAuthStore()
 
   return (

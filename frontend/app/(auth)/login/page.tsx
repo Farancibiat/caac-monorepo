@@ -1,11 +1,11 @@
 'use client'
 
-import { useAuthStore } from '@/stores/auth-store'
+import { useAuthStore } from '@/stores/auth/store'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Chrome } from 'lucide-react'
 
-export default function LoginPage() {
+const LoginPage = () => {
   const { signInWithGoogle, loading } = useAuthStore()
 
   const handleGoogleSignIn = async () => {
@@ -59,4 +59,6 @@ export default function LoginPage() {
       </Card>
     </div>
   )
-} 
+}
+
+export default LoginPage 

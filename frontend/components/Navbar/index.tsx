@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useAuthStore } from '@/stores/auth-store'
+import { useAuthStore } from '@/stores/auth/store'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -15,7 +15,7 @@ import {
 import { Menu, X, User, LogOut, Settings, Calendar, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-export default function NavBar() {
+const NavBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const { user, signOut } = useAuthStore()
@@ -264,4 +264,6 @@ export default function NavBar() {
       </div>
     </nav>
   )
-} 
+}
+
+export default NavBar 

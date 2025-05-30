@@ -1,37 +1,68 @@
 'use client'
 
-import { useAuthStore } from '@/stores/auth-store'
+import { useAuthStore } from '@/stores/auth/store'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { LogOut, User, Calendar, Settings } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
-export default function DashboardPage() {
-  const { user, signOut, loading } = useAuthStore()
+const DashboardPage = () => {
+  const { user, signOut, loading, error } = useAuthStore()
   const router = useRouter()
 
   useEffect(() => {
+    console.log('Dashboard - Auth state:', { user: !!user, loading, error })
+    
     if (!loading && !user) {
+      console.log('Dashboard - Redirecting to login (no user)')
       router.push('/login')
     }
-  }, [user, loading, router])
+  }, [user, loading, error, router])
 
   const handleSignOut = async () => {
     await signOut()
     router.push('/')
   }
 
+  // Mostrar error si existe
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="text-red-600 text-xl">❌ Error de Autenticación</div>
+          <p className="text-red-700">{error}</p>
+          <button 
+            onClick={() => router.push('/login')}
+            className="px-4 py-2 bg-red-600 text-white rounded"
+          >
+            Ir a Login
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-50 to-ocean-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
+          <p className="text-neutral-600">Verificando autenticación...</p>
+        </div>
       </div>
     )
   }
 
   if (!user) {
-    return null // Will redirect to login
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-yellow-100 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="text-yellow-600 text-xl">⚠️ No autenticado</div>
+          <p className="text-yellow-700">Redirigiendo al login...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -166,4 +197,6 @@ export default function DashboardPage() {
       </div>
     </div>
   )
-} 
+}
+
+export default DashboardPage 

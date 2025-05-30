@@ -6,9 +6,9 @@ import { Button } from '@/components/ui/button'
 import { Home, ArrowLeft, User } from 'lucide-react'
 import NavBar from '@/components/Navbar'
 import Footer from '@/components/Footer'
-import { useAuthStore } from '@/stores/auth-store'
+import { useAuthStore } from '@/stores/auth/store'
 
-export default function NotFound() {
+const NotFound = () => {
   const { user } = useAuthStore()
 
   return (
@@ -158,4 +158,6 @@ export default function NotFound() {
       <Footer />
     </div>
   )
-} 
+}
+
+export default NotFound 

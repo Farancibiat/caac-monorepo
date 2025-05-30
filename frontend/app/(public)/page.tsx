@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Calendar, MapPin, Users, Trophy, Camera, Waves, ArrowRight, Star, Heart, Target } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-import { useAuthStore } from "@/stores/auth-store"
+import { useAuthStore } from "@/stores/auth/store"
 
 const Home = () => {
   const { user } = useAuthStore()
