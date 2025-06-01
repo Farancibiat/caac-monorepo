@@ -4,31 +4,31 @@
     "private": true,
     "description": "Sitio Web oficial del Club de Aguas Abiertas Chiloé - Monorepo",
     "workspaces": [
-      "api",
-      "frontend"
+        "api",
+        "frontend"
     ],
     "scripts": {
-      "install:all": "npm install",
-      "clean": "rm -rf node_modules api/node_modules frontend/node_modules api/dist frontend/.next",
-      "dev": "concurrently \"npm run dev:api\" \"npm run dev:frontend\"",
-      "dev:api": "npm run dev --workspace=@aachiloe/api",
-      "dev:frontend": "npm run dev --workspace=@aachiloe/frontend",
-      "build": "npm run build:api && npm run build:frontend",
-      "build:api": "npm run build --workspace=@aachiloe/api",
-      "build:frontend": "npm run build --workspace=@aachiloe/frontend",
-      "start:api": "npm run start --workspace=@aachiloe/api",
-      "start:frontend": "npm run start --workspace=@aachiloe/frontend",
-      "db:generate": "npm run db:generate --workspace=@aachiloe/api",
-      "db:push": "npm run db:push --workspace=@aachiloe/api",
-      "db:migrate": "npm run db:migrate --workspace=@aachiloe/api",
-      "db:reset": "npm run db:reset --workspace=@aachiloe/api",
-      "db:studio": "npm run db:studio --workspace=@aachiloe/api"
+        "install:all": "npm install",
+        "clean": "rm -rf node_modules api/node_modules frontend/node_modules api/dist frontend/.next",
+        "dev": "concurrently \"npm run dev:api\" \"npm run dev:frontend\"",
+        "dev:api": "npm run dev --workspace=@aachiloe/api",
+        "dev:frontend": "npm run dev --workspace=@aachiloe/frontend",
+        "build": "npm run build:api && npm run build:frontend",
+        "build:api": "npm run build --workspace=@aachiloe/api",
+        "build:frontend": "npm run build --workspace=@aachiloe/frontend",
+        "start:api": "npm run start --workspace=@aachiloe/api",
+        "start:frontend": "npm run start --workspace=@aachiloe/frontend",
+        "db:generate": "npm run db:generate --workspace=@aachiloe/api",
+        "db:push": "npm run db:push --workspace=@aachiloe/api",
+        "db:migrate": "npm run db:migrate --workspace=@aachiloe/api",
+        "db:reset": "npm run db:reset --workspace=@aachiloe/api",
+        "db:studio": "npm run db:studio --workspace=@aachiloe/api"
     },
     "devDependencies": {
-      "concurrently": "^8.2.2"
+        "concurrently": "^8.2.2"
     },
     "engines": {
-      "node": ">=18.0.0",
-      "npm": ">=8.0.0"
+        "node": ">=18.0.0",
+        "npm": ">=8.0.0"
     }
-  }
+}

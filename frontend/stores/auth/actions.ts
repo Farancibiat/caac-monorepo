@@ -22,9 +22,8 @@ export const signInWithGoogle = async () => {
       queryParams: {
         access_type: 'offline',
         prompt: 'consent',
-        hd: 'clubaguasabiertaschiloe.com',
       },
-      scopes: 'openid email profile',
+      scopes: 'openid email profile phone',
     },
   })
 
@@ -154,7 +153,4 @@ export const signOut = async () => {
       console.error('Error during cleanup in error handler:', cleanupError)
     }
   }
-  
-  // Redirigir a la página principal después del logout
-  redirect('/')
 } 

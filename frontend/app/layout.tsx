@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/auth/auth-provider";
-
-const inter = Inter({ subsets: ["latin"] });
+import { Toaster } from "sonner";const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
@@ -43,6 +42,7 @@ const RootLayout = ({
         <AuthProvider>
           {children}
         </AuthProvider>
+        <Toaster />
       </body>
     </html>
   );

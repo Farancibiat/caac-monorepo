@@ -2,6 +2,13 @@ import { create } from 'zustand'
 import { supabaseClient } from './clients'
 import { signInWithGoogle as signInWithGoogleAction, signOut as signOutAction } from './actions'
 import type { AuthState, AuthUser, AuthSession } from './types'
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
+
+// Helper para obtener el router, ya que no podemos usar el hook directamente en el store
+let appRouter: AppRouterInstance | null = null
+export const setAppRouter = (router: AppRouterInstance) => {
+  appRouter = router
+}
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
@@ -18,7 +25,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   signInWithGoogle: async () => {
     try {
       set({ loading: true, error: null })
-      await signInWithGoogleAction()
+      await signInWithGoogleAction();
     } catch (error) {
       set({ error: error instanceof Error ? error.message : 'Error al iniciar sesión' })
       console.error('Error signing in with Google:', error)
@@ -35,13 +42,9 @@ export const useAuthStore = create<AuthState>((set) => ({
         password,
       })
 
-      if (error) throw error
-
-      // Note: onAuthStateChange will handle the state update
-      console.log('Sign in with email successful')
+      if (error) throw error;
     } catch (error) {
       set({ error: error instanceof Error ? error.message : 'Error al iniciar sesión' })
-      console.error('Error signing in with email:', error)
       throw error
     } finally {
       set({ loading: false })
@@ -72,35 +75,34 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   signOut: async () => {
+   
+    set({ user: null, session: null, isAuthenticated: false, loading: true, error: null })
+
     try {
-      set({ loading: true, error: null })
-      
-      // Limpiar usuario inmediatamente en el store
-      set({ user: null, session: null, isAuthenticated: false })
-      
-      // Ejecutar logout del servidor
+      // 2. Execute server-side logout logic (cookie clearing, Supabase logout, revalidation)
       await signOutAction()
+      console.log('Server action signOutAction completed.')
       
-      console.log('Logout completed successfully')
+      // 3. Client-side redirect after server action is successful
+      if (appRouter) {
+        appRouter.push('/') // Redirect to homepage
+        console.log('Client-side redirection to / initiated.')
+      } else {
+        console.warn('App router not available for client-side redirection. Falling back to window.location.href')
+        // Fallback if router is not set, though this is less ideal with Next.js App Router
+        if (typeof window !== 'undefined') {
+          window.location.href = '/'
+        }
+      }
     } catch (error) {
-      console.error('Error signing out:', error)
+      console.error('Error during sign out process:', error)
       set({ error: error instanceof Error ? error.message : 'Error al cerrar sesión' })
-      
-      // Asegurar que el usuario se limpie incluso si hay error
+      // Ensure user state is cleared even if there was an error
       set({ user: null, session: null, isAuthenticated: false })
       
-      // Forzar redirección manual si el server action falla
-      if (typeof window !== 'undefined') {
-        try {
-          // Limpiar localStorage/sessionStorage relacionado con auth
-          localStorage.removeItem('supabase.auth.token')
-          sessionStorage.removeItem('supabase.auth.token')
-          
-          // Redireccionar manualmente
-          window.location.href = '/'
-        } catch (clientError) {
-          console.error('Error in client-side cleanup:', clientError)
-        }
+      // Optional: Fallback redirect on error if not already handled or if appRouter fails
+      if (typeof window !== 'undefined' && !appRouter) { // Only if appRouter wasn't available
+         window.location.href = '/'; 
       }
     } finally {
       set({ loading: false })
@@ -110,7 +112,6 @@ export const useAuthStore = create<AuthState>((set) => ({
 
 let authInitialized = false
 
-// Función para obtener el estado actual del usuario y sesión
 const refreshUserState = async () => {
   try {
     console.log('🔄 Refreshing user state...')

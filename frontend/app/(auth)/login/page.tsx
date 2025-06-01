@@ -1,17 +1,9 @@
-'use client'
-
-import { useAuthStore } from '@/stores/auth/store'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Chrome } from 'lucide-react'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { LoginForm } from './LoginForm'
 
 const LoginPage = () => {
-  const { signInWithGoogle, loading } = useAuthStore()
-
-  const handleGoogleSignIn = async () => {
-    await signInWithGoogle()
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-ocean-50 to-accent-50 flex items-center justify-center p-4">
       <Card className="w-full max-w-md border-primary-200 shadow-xl">
@@ -25,22 +17,17 @@ const LoginPage = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <Button
-            onClick={handleGoogleSignIn}
-            disabled={loading}
-            className="w-full bg-primary-600 hover:bg-primary-700 text-white h-12 text-base font-medium"
-          >
-            {loading ? (
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-            ) : (
-              <Chrome className="mr-2 h-5 w-5" />
-            )}
-            {loading ? 'Iniciando sesión...' : 'Continuar con Google'}
-          </Button>
-          
+          <LoginForm />
+
           <div className="text-center">
             <p className="text-sm text-neutral-500">
-              Al iniciar sesión, aceptas nuestros términos de servicio y política de privacidad
+              ¿No tienes una cuenta?{' '}
+              <Link 
+                href="/registro" 
+                className="text-primary-600 hover:text-primary-700 font-medium"
+              >
+                Regístrate aquí
+              </Link>
             </p>
           </div>
 
