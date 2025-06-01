@@ -49,12 +49,14 @@ app/
 ├── (auth)/               # Rutas de autenticación
 │   ├── login/
 │   └── registro/
+├── auth/                 # Supabase auth callbacks
 ├── (private)/            # Rutas privadas - PRIORIDAD ALTA
 │   ├── dashboard/        # Panel usuario
 │   ├── reservas/         # Gestión reservas - CRÍTICO
 │   └── admin/           # Panel admin - CRÍTICO
 ├── globals.css
-└── layout.tsx
+├── layout.tsx
+└── not-found.tsx
 ```
 
 ### 2. Componentes Reutilizables
@@ -66,16 +68,19 @@ components/
 ├── calendar/            # Componentes de calendario
 ├── gallery/             # Componentes de galería (MOCKS)
 ├── reservations/        # Componentes de reservas - CRÍTICO
-└── admin/              # Componentes de administración - CRÍTICO
+├── admin/              # Componentes de administración - CRÍTICO
+├── providers/           # Providers (e.g. ThemeProvider)
+├── Navbar/
+└── Footer/
 ```
 
 ### 3. Estado Global con Zustand
 ```
 stores/
-├── auth-store.ts        # Estado de autenticación - PRIORIDAD ALTA
-├── user-store.ts        # Datos del usuario
-├── reservations-store.ts # Estado de reservas - CRÍTICO
-└── ui-store.ts          # Estado de UI (modals, loading)
+├── auth/                # Estado de autenticación - PRIORIDAD ALTA
+├── user-profile/        # Datos del usuario
+├── reservations-store.ts # Estado de reservas - CRÍTICO (Assuming this will be created)
+└── ui-store.ts          # Estado de UI (modals, loading) (Assuming this will be created)
 ```
 
 ## Integración con APIs

@@ -10,6 +10,8 @@ import { toast } from 'sonner'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
+import { useRouter } from 'next/navigation'
+import { SupabaseErrorCode } from '@/constants/supabaseErrors'
 
 // Esquema de validación mejorado para el formulario de login
 const loginSchema = yup.object().shape({
@@ -40,6 +42,7 @@ interface LoginFormData {
 export const LoginForm = () => {
   const { signInWithGoogle, signInWithEmail, loading } = useAuthStore()
   const [isEmailLoading, setIsEmailLoading] = useState(false)
+  const router = useRouter()
 
   const {
     register,
@@ -60,13 +63,41 @@ export const LoginForm = () => {
       await signInWithEmail(data.email, data.password)
       reset()
     } catch (error) {
-      const errorMessage = error instanceof Error 
-        ? error.message 
-        : 'Error al iniciar sesión'
-      
-      toast.error('Error de autenticación', {
-        description: errorMessage
-      })
+      interface AppError {
+        code?: string;
+        message?: string;
+      }
+      const appError = error as AppError;
+      const errorCode = appError?.code;
+
+      const errorHandlers: Record<string, () => void> = {
+        'email_not_confirmed': () => {
+          toast.info(SupabaseErrorCode.email_not_confirmed, {
+            description: 'Será redirigido para reenviar el email de confirmación.',
+          });
+          router.push('/auth/resend-confirmation');
+        },
+        // Add other specific error handlers here if needed
+        // e.g., 'invalid_credentials': () => toast.error('Error de autenticación', { description: SupabaseErrorCode.invalid_credentials })
+      };
+
+      if (errorCode && errorHandlers[errorCode]) {
+        errorHandlers[errorCode]();
+      } else {
+        // Default error handling
+        let descriptionMessage = 'Error desconocido al iniciar sesión.';
+        if (errorCode && SupabaseErrorCode[errorCode as keyof typeof SupabaseErrorCode]) {
+          descriptionMessage = SupabaseErrorCode[errorCode as keyof typeof SupabaseErrorCode];
+        } else if (appError?.message) {
+          descriptionMessage = appError.message;
+        } else if (error instanceof Error) {
+          descriptionMessage = error.message;
+        }
+
+        toast.error('Error de autenticación', {
+          description: descriptionMessage,
+        });
+      }
     } finally {
       setIsEmailLoading(false)
     }
