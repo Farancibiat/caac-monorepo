@@ -10,7 +10,7 @@ Esta guía detalla las etapas y consideraciones necesarias para implementar un s
 2.  **Validación de Email:**
     *   [x] Enviar correo de validación al usuario tras el registro vía email.
     *   [x] Bloquear el acceso a las secciones privadas del sitio si el email no ha sido validado.
-    *   [ ] Proveer un mecanismo para reenviar el correo de validación.
+    *   [x] Proveer un mecanismo para reenviar el correo de validación.
 3.  **Formulario de Perfil Básico:**
     *   [ ] Requerir la completitud de un formulario básico de perfil después del registro (tanto para email como para Google OAuth).
     *   [ ] Bloquear el acceso a las secciones privadas del sitio si el formulario básico no ha sido completado.
