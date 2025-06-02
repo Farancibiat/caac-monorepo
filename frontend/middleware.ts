@@ -87,6 +87,15 @@ export const middleware = async (request: NextRequest) => {
         loginUrl.searchParams.set('reason', 'authentication_required')
         return NextResponse.redirect(loginUrl)
       }
+
+      // Check if email is confirmed
+      if (!user.email_confirmed_at) {
+        console.log(`🚫 Access denied to ${pathname} for user ${user.email} - Email not confirmed`)
+        const resendConfirmationUrl = new URL('/resend-confirmation', request.url)
+        resendConfirmationUrl.searchParams.set('redirectTo', pathname)
+        resendConfirmationUrl.searchParams.set('reason', 'email_not_confirmed')
+        return NextResponse.redirect(resendConfirmationUrl)
+      }
       
       console.log(`✅ Access granted to ${pathname} for user: ${user.email}`)
       return response

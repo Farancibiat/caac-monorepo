@@ -5,11 +5,11 @@ Esta guía detalla las etapas y consideraciones necesarias para implementar un s
 ## Frontend
 
 1.  **Opciones de Registro:**
-    *   [ ] Implementar registro vía correo electrónico.
-    *   [ ] Implementar registro vía Google OAuth.
+    *   [x] Implementar registro vía correo electrónico.
+    *   [x] Implementar registro vía Google OAuth.
 2.  **Validación de Email:**
-    *   [ ] Enviar correo de validación al usuario tras el registro vía email.
-    *   [ ] Bloquear el acceso a las secciones privadas del sitio si el email no ha sido validado.
+    *   [x] Enviar correo de validación al usuario tras el registro vía email.
+    *   [x] Bloquear el acceso a las secciones privadas del sitio si el email no ha sido validado.
     *   [ ] Proveer un mecanismo para reenviar el correo de validación.
 3.  **Formulario de Perfil Básico:**
     *   [ ] Requerir la completitud de un formulario básico de perfil después del registro (tanto para email como para Google OAuth).
@@ -21,8 +21,8 @@ Esta guía detalla las etapas y consideraciones necesarias para implementar un s
 ## API
 
 1.  **Integración con Supabase Auth:**
-    *   [ ] Configurar y habilitar los proveedores de autenticación deseados (Email, Google OAuth) en el dashboard de Supabase.
-    *   [ ] Integrar el SDK de Supabase en el frontend para manejar los flujos de registro, inicio de sesión, cierre de sesión y validación de email.
+    *   [x] Configurar y habilitar los proveedores de autenticación deseados (Email, Google OAuth) en el dashboard de Supabase.
+    *   [x] Integrar el SDK de Supabase en el frontend para manejar los flujos de registro, inicio de sesión, cierre de sesión y validación de email.
     *   [ ] Configurar las plantillas de correo electrónico (verificación de email, restablecimiento de contraseña) en Supabase.
     *   [ ] Asegurar que los endpoints de la API personalizada estén protegidos, validando los JWT de Supabase.
 2.  **Endpoints para Gestión de Perfil:**
