@@ -7,7 +7,7 @@ import { useAuthStore } from '@/stores/auth/store'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useRouter } from 'next/navigation'
+import { useRouting } from '@/hooks/useRouting'
 import { toast } from 'sonner'
 import { AuthUser } from '@/stores/auth/types'
 
@@ -64,7 +64,7 @@ interface RegisterFormData {
 }
 
 export const RegisterForm: React.FC = () => {
-  const router = useRouter()
+  const { redirect, routes } = useRouting();
   const { signUp, signInWithGoogle } = useAuthStore()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
@@ -101,7 +101,7 @@ export const RegisterForm: React.FC = () => {
       reset()
 
       // Redirigir a página de verificación o login
-      router.push('/auth/verificacion')
+      redirect(routes.AUTH.VERIFICATION)
     } catch (error) {
       // Manejar errores de registro
       const errorMessage = error instanceof Error 

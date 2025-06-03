@@ -5,7 +5,7 @@ import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { cookies } from 'next/headers'
-
+import { ROUTES } from '@/constants/routes'
 export const signInWithGoogle = async () => {
   const supabase = await supabaseServer()
   const headersList = await headers()
@@ -18,7 +18,7 @@ export const signInWithGoogle = async () => {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${origin}/auth/callback`,
+      redirectTo: `${origin}${ROUTES.AUTH.CALLBACK}`,
       queryParams: {
         access_type: 'offline',
         prompt: 'consent',
@@ -62,7 +62,7 @@ export const signUp = async (email: string, password: string, userData?: Record<
     email,
     password,
     options: {
-      emailRedirectTo: `${origin}/auth/callback`,
+      emailRedirectTo: `${origin}${ROUTES.AUTH.CALLBACK}`,
       data: userData || {}
     }
   })

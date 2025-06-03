@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { useAuthStore } from './store'
+import { useRouting } from '@/hooks/useRouting'
+
 
 /**
  * Hook para validar si el usuario está autenticado
@@ -24,23 +26,25 @@ export const useAuth = () => {
  */
 export const useRequireAuth = () => {
   const { user, session, loading, isAuthenticated } = useAuthStore()
-  const [shouldRedirect, setShouldRedirect] = useState(false)
+  const { redirectAfterAuth } = useRouting();
+  const [shouldRedirect, setShouldRedirect] = useState(false);
 
   useEffect(() => {
     // Solo redirigir si claramente no hay usuario
     if (!loading && !isAuthenticated) {
-      setShouldRedirect(true)
+      setShouldRedirect(true);
+      redirectAfterAuth();
     } else {
-      setShouldRedirect(false)
+      setShouldRedirect(false);
     }
-  }, [isAuthenticated, loading])
+  }, [isAuthenticated, loading, redirectAfterAuth])
 
   return {
     user,
     session,
     loading,
-    shouldRedirect,
-    isAuthenticated
+    isAuthenticated,
+    shouldRedirect
   }
 }
 
@@ -49,20 +53,13 @@ export const useRequireAuth = () => {
  */
 export const useAuthRedirect = () => {
   const { user, session, loading, isAuthenticated } = useAuthStore()
+  const { redirectAfterAuth } = useRouting();
 
   useEffect(() => {
     if (!loading && isAuthenticated) {
-      // Verificar si hay una URL de redirección guardada
-      const urlParams = new URLSearchParams(window.location.search)
-      const redirectTo = urlParams.get('redirectTo')
-      
-      if (redirectTo && redirectTo !== window.location.pathname) {
-        // Limpiar el parámetro de la URL y redirigir
-        window.history.replaceState({}, '', window.location.pathname)
-        window.location.href = redirectTo
-      }
+      redirectAfterAuth();
     }
-  }, [isAuthenticated, loading])
+  }, [isAuthenticated, loading, redirectAfterAuth])
 
   return { user, session, loading, isAuthenticated }
 } 

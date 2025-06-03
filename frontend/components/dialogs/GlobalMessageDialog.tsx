@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useMessageDialogStore } from '@/stores/messageDialogStore';
 import type { MessageDialogType, MessageDialogButton } from '@/stores/messageDialogStore';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -13,6 +12,7 @@ import {
   XCircle, 
 } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { useRouting } from '@/hooks/useRouting';
 
 const typeIcons: Record<MessageDialogType, ReactNode> = {
   success: <CheckCircle2 className="h-6 w-6 text-green-500" />,
@@ -22,8 +22,9 @@ const typeIcons: Record<MessageDialogType, ReactNode> = {
   alert: <AlertCircle className="h-6 w-6 text-orange-500" />,
 };
 
-export function GlobalMessageDialog() {
-  const router = useRouter();
+export const GlobalMessageDialog = () => {
+  const { redirect } = useRouting();
+
   const {
     isOpen,
     title,
@@ -45,7 +46,7 @@ export function GlobalMessageDialog() {
       await button.onClick();
     }
     if (button.redirect) {
-      router.push(button.redirect);
+      redirect(button.redirect);
       shouldClose = true; 
     }
     if (shouldClose) {

@@ -10,8 +10,9 @@ import { toast } from 'sonner'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
-import { useRouter } from 'next/navigation'
 import { SupabaseErrorCode } from '@/constants/supabaseErrors'
+import { useRouting } from '@/hooks/useRouting'
+import { useAuthRedirect } from '@/stores/auth/hooks'
 
 // Esquema de validación mejorado para el formulario de login
 const loginSchema = yup.object().shape({
@@ -42,7 +43,10 @@ interface LoginFormData {
 export const LoginForm = () => {
   const { signInWithGoogle, signInWithEmail, loading } = useAuthStore()
   const [isEmailLoading, setIsEmailLoading] = useState(false)
-  const router = useRouter()
+  const { redirect, routes } = useRouting();
+  
+  // Hook para manejar redirección automática después del login
+  useAuthRedirect();
 
   const {
     register,
@@ -75,7 +79,7 @@ export const LoginForm = () => {
           toast.info(SupabaseErrorCode.email_not_confirmed, {
             description: 'Será redirigido para reenviar el email de confirmación.',
           });
-          router.push('/auth/resend-confirmation');
+          redirect(routes.AUTH.RESEND_CONFIRMATION);
         },
         // Add other specific error handlers here if needed
         // e.g., 'invalid_credentials': () => toast.error('Error de autenticación', { description: SupabaseErrorCode.invalid_credentials })
@@ -128,7 +132,7 @@ export const LoginForm = () => {
           <div className="flex justify-between items-center">
             <Label htmlFor="password" className="text-neutral-700">Contraseña</Label>
             <Link 
-              href="/auth/recuperar-password"
+              href={routes.AUTH.RECOVERY}
               className="text-sm text-primary-600 hover:text-primary-700"
             >
               ¿Olvidaste tu contraseña?

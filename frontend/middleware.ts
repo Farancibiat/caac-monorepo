@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { ROUTES } from '@/constants/routes';
 
 // Función helper para crear cliente Supabase en middleware
 // Nota: No podemos usar supabaseServer de stores/auth/clients.ts aquí 
@@ -46,8 +47,8 @@ export const middleware = async (request: NextRequest) => {
   const { pathname } = request.nextUrl
 
   // Configuración de rutas
-  const protectedRoutes = ['/dashboard', '/reservas', '/admin']
-  const authRoutes = ['/login', '/registro']
+  const protectedRoutes = [ROUTES.DASHBOARD, ROUTES.RESERVATIONS, ROUTES.ADMIN, ROUTES.PROFILE.COMPLETE, ROUTES.PROFILE.EDIT];
+  const authRoutes = [ROUTES.AUTH.LOGIN, ROUTES.AUTH.REGISTER];
   
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))
   const isAuthRoute = authRoutes.some(route => pathname.startsWith(route))
@@ -82,19 +83,19 @@ export const middleware = async (request: NextRequest) => {
     if (isProtectedRoute) {
       if (!user) {
         console.log(`🚫 Access denied to ${pathname} - No authenticated user`)
-        const loginUrl = new URL('/login', request.url)
-        loginUrl.searchParams.set('redirectTo', pathname)
-        loginUrl.searchParams.set('reason', 'authentication_required')
+        const loginUrl = new URL(ROUTES.AUTH.LOGIN, request.url);
+        loginUrl.searchParams.set(ROUTES.PARAMS.REDIRECT_TO, pathname);
+        loginUrl.searchParams.set(ROUTES.PARAMS.REASON, 'authentication_required');
         return NextResponse.redirect(loginUrl)
       }
 
       // Check if email is confirmed
       if (!user.email_confirmed_at) {
         console.log(`🚫 Access denied to ${pathname} for user ${user.email} - Email not confirmed`)
-        const resendConfirmationUrl = new URL('/resend-confirmation', request.url)
-        resendConfirmationUrl.searchParams.set('redirectTo', pathname)
-        resendConfirmationUrl.searchParams.set('reason', 'email_not_confirmed')
-        return NextResponse.redirect(resendConfirmationUrl)
+        const resendConfirmationUrl = new URL(ROUTES.AUTH.RESEND_CONFIRMATION, request.url);
+        resendConfirmationUrl.searchParams.set(ROUTES.PARAMS.REDIRECT_TO, pathname);
+        resendConfirmationUrl.searchParams.set(ROUTES.PARAMS.REASON, 'email_not_confirmed');
+        return NextResponse.redirect(resendConfirmationUrl);
       }
       
       console.log(`✅ Access granted to ${pathname} for user: ${user.email}`)
@@ -105,7 +106,7 @@ export const middleware = async (request: NextRequest) => {
     if (isAuthRoute) {
       if (user) {
         console.log(`🔄 User ${user.email} accessing auth route, redirecting to dashboard`)
-        const redirectTo = request.nextUrl.searchParams.get('redirectTo') || '/dashboard'
+        const redirectTo = request.nextUrl.searchParams.get(ROUTES.PARAMS.REDIRECT_TO) || ROUTES.DASHBOARD
         return NextResponse.redirect(new URL(redirectTo, request.url))
       }
       
@@ -118,10 +119,10 @@ export const middleware = async (request: NextRequest) => {
     
     // En caso de error, si es ruta protegida, redirigir a login
     if (isProtectedRoute) {
-      const loginUrl = new URL('/login', request.url)
-      loginUrl.searchParams.set('redirectTo', pathname)
-      loginUrl.searchParams.set('reason', 'middleware_error')
-      return NextResponse.redirect(loginUrl)
+      const loginUrl = new URL(ROUTES.AUTH.LOGIN, request.url);
+      loginUrl.searchParams.set(ROUTES.PARAMS.REDIRECT_TO, pathname);
+      loginUrl.searchParams.set(ROUTES.PARAMS.REASON, 'middleware_error');
+      return NextResponse.redirect(loginUrl);
     }
   }
 

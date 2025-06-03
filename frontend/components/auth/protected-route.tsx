@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { useRequireAuth } from '@/stores/auth'
+import { ROUTES } from '@/constants/routes'
+import { useRouting } from '@/hooks/useRouting'
 
 interface ProtectedRouteProps {
   children: React.ReactNode
@@ -20,19 +21,21 @@ interface ProtectedRouteProps {
 export const ProtectedRoute = ({ 
   children, 
   fallback,
-  redirectTo = '/login' 
+  redirectTo = ROUTES.AUTH.LOGIN 
 }: ProtectedRouteProps) => {
   const { user, loading, shouldRedirect } = useRequireAuth()
-  const router = useRouter()
+  const { redirect } = useRouting()
 
   useEffect(() => {
     if (shouldRedirect) {
       const currentPath = window.location.pathname
-      const loginUrl = `${redirectTo}?redirectTo=${encodeURIComponent(currentPath)}`
-      console.log('🔒 Redirecting to login:', loginUrl)
-      router.push(loginUrl)
+      redirect(redirectTo, { 
+        preserveQuery: true, 
+        reason: 'authentication_required' 
+      })
+      console.log('🔒 Redirecting to login from protected route:', currentPath)
     }
-  }, [shouldRedirect, redirectTo, router])
+  }, [shouldRedirect, redirectTo, redirect])
 
   // Mostrar loading mientras se valida la autenticación
   if (loading) {

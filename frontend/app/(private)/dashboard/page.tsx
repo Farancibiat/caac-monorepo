@@ -4,25 +4,24 @@ import { useAuthStore } from '@/stores/auth/store'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { LogOut, User, Calendar, Settings } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
-
+import { useRouting } from '@/hooks/useRouting'
 const DashboardPage = () => {
   const { user, signOut, loading, error } = useAuthStore()
-  const router = useRouter()
+  const { redirect, routes } = useRouting();
 
   useEffect(() => {
     console.log('Dashboard - Auth state:', { user: !!user, loading, error })
     
     if (!loading && !user) {
       console.log('Dashboard - Redirecting to login (no user)')
-      router.push('/login')
+      redirect(routes.AUTH.LOGIN)
     }
-  }, [user, loading, error, router])
+  }, [user, loading, error, redirect, routes.AUTH.LOGIN])
 
   const handleSignOut = async () => {
     await signOut()
-    router.push('/')
+    redirect(routes.HOME)
   }
 
   // Mostrar error si existe
@@ -33,7 +32,7 @@ const DashboardPage = () => {
           <div className="text-red-600 text-xl">❌ Error de Autenticación</div>
           <p className="text-red-700">{error}</p>
           <button 
-            onClick={() => router.push('/login')}
+            onClick={() => redirect(routes.AUTH.LOGIN)}
             className="px-4 py-2 bg-red-600 text-white rounded"
           >
             Ir a Login

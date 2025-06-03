@@ -11,6 +11,7 @@ export interface MessageDialogButton {
   redirect?: string;
   variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
   closesDialog?: boolean; // If true, dialog closes after onClick or redirect. Defaults to true.
+  preserveQuery?: boolean;
 }
 
 export interface MessageDialogState {
