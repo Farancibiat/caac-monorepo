@@ -22,9 +22,9 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(cors({
   origin: [
-    'https://farancibiat.cl',
-    'https://www.farancibiat.cl',
-    'https://swim.farancibiat.cl'
+    'https://aguasabiertaschile.cl',
+    'https://www.aguasabiertaschile.cl',
+    'http://localhost:3000'
   ],
   credentials: true
 }));

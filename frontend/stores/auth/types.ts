@@ -4,6 +4,7 @@ export type AuthUser = SupabaseUser & {
   role?: 'ADMIN' | 'TREASURER' | 'USER'
   phone?: string
   isActive?: boolean
+  profileCompleted?: boolean
 }
 
 export type AuthSession = SupabaseSession
@@ -14,6 +15,8 @@ export interface AuthState {
   loading: boolean
   error: string | null
   isAuthenticated: boolean
+  profileCompleted: boolean
+  shouldCompleteProfile: boolean
   
   // Actions
   signInWithGoogle: () => Promise<void>

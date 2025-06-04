@@ -6,8 +6,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { LogOut, User, Calendar, Settings } from 'lucide-react'
 import { useEffect } from 'react'
 import { useRouting } from '@/hooks/useRouting'
+import RedirectMsj from '@/components/RedirectMsj'
+
 const DashboardPage = () => {
-  const { user, signOut, loading, error } = useAuthStore()
+  const { user, signOut, loading, error, shouldCompleteProfile } = useAuthStore()
   const { redirect, routes } = useRouting();
 
   useEffect(() => {
@@ -27,40 +29,43 @@ const DashboardPage = () => {
   // Mostrar error si existe
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="text-red-600 text-xl">❌ Error de Autenticación</div>
-          <p className="text-red-700">{error}</p>
-          <button 
-            onClick={() => redirect(routes.AUTH.LOGIN)}
-            className="px-4 py-2 bg-red-600 text-white rounded"
-          >
-            Ir a Login
-          </button>
-        </div>
-      </div>
+      <RedirectMsj 
+        message={`Error de Autenticación: ${error}`}
+        location="login"
+        variant="error"
+        showSpinner={false}
+      />
     )
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary-50 to-ocean-50 flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
-          <p className="text-neutral-600">Verificando autenticación...</p>
-        </div>
-      </div>
+      <RedirectMsj 
+        message="Verificando autenticación"
+        location="dashboard"
+        variant="loading"
+      />
     )
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-yellow-100 flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="text-yellow-600 text-xl">⚠️ No autenticado</div>
-          <p className="text-yellow-700">Redirigiendo al login...</p>
-        </div>
-      </div>
+      <RedirectMsj 
+        message="No autenticado"
+        location="login"
+        variant="warning"
+      />
+    )
+  }
+
+  // Si debe redirigir a complete-profile, mostrar loading (la redirección se maneja en el store)
+  if (shouldCompleteProfile) {
+    return (
+      <RedirectMsj 
+        message="Redirigiendo para completar perfil"
+        location="complete-profile"
+        variant="warning"
+      />
     )
   }
 
@@ -181,6 +186,10 @@ const DashboardPage = () => {
               <div className="flex items-center justify-between">
                 <span>✅ Autenticación con Google</span>
                 <span className="text-primary-600 font-semibold">Activo</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span>✅ Perfil Completo</span>
+                <span className="text-green-600 font-semibold">Completado</span>
               </div>
               <div className="flex items-center justify-between">
                 <span>🔄 Sistema de Reservas</span>

@@ -1,4 +1,6 @@
-import React, { useEffect } from 'react';
+'use client';
+
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -32,6 +34,9 @@ import {
   FormDescription,
 } from '@/components/ui/form';
 import { cn } from '@/lib/shadcn-util';
+import { useAuthStore } from '@/stores/auth/store';
+import { supabaseClient } from '@/stores/auth/clients';
+import { reqClient } from '@/lib/api-client';
 
 // Define el esquema de validación con Yup
 const profileSchema = yup.object({
@@ -49,6 +54,20 @@ const profileSchema = yup.object({
 
 type ProfileFormData = yup.InferType<typeof profileSchema>;
 
+// Tipo para la respuesta de la API del perfil
+interface ProfileApiResponse {
+  nombre: string;
+  primerApellido: string;
+  segundoApellido: string;
+  fechaNacimiento: string | Date;
+  telefono: string;
+  direccion: string;
+  comuna: string;
+  region: string;
+  sexo: string;
+  club?: string;
+}
+
 interface ProfileFormProps {
   mode: 'registro' | 'edicion';
   userId?: string;
@@ -56,6 +75,8 @@ interface ProfileFormProps {
 }
 
 const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) => {
+  const { user, setUser } = useAuthStore();
+  
   const form = useForm<ProfileFormData>({
     resolver: yupResolver(profileSchema),
     defaultValues: {
@@ -78,15 +99,22 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
     if (mode === 'edicion') {
       const fetchProfileData = async () => {
         try {
-          // TODO: Reemplazar fetch por fetchAPI
-          const res = await fetch('/api/user/profile');
-          if (!res.ok) throw new Error('No se pudo cargar el perfil');
-          const data = await res.json();
-          // Convertir fechaNacimiento a Date si es string
-          if (data.fechaNacimiento) {
-            data.fechaNacimiento = new Date(data.fechaNacimiento);
+          const response = await reqClient.get('/api/user/profile');
+          
+          if (!response.ok) {
+            throw new Error(response.error || 'No se pudo cargar el perfil');
           }
-          reset(data);
+          
+          const data = response.data;
+          // Convertir fechaNacimiento a Date si es string
+          if (data && typeof data === 'object' && 'fechaNacimiento' in data && data.fechaNacimiento) {
+            const profileData = data as ProfileApiResponse;
+            if (typeof profileData.fechaNacimiento === 'string') {
+              profileData.fechaNacimiento = new Date(profileData.fechaNacimiento);
+            }
+          }
+          
+          reset(data as ProfileFormData);
           toast.success('Datos del perfil cargados.');
         } catch (error) {
           console.error("Error fetching profile data:", error);
@@ -103,28 +131,102 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
 
   const onSubmit = async (data: ProfileFormData) => {
     try {
-        // TODO: Reemplazar fetch por fetchAPI
-      const res = await fetch('/api/user/profile', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) throw new Error('No se pudo guardar el perfil');
+      // Paso 1: Guardar el perfil en la API
+      const response = await reqClient.put('/api/user/profile', data);
+      
+      if (!response.ok) {
+        throw new Error(response.error || 'Error al guardar el perfil');
+      }
+      
+      console.log('✅ Profile saved to API successfully');
+      
+      // Paso 2: Si estamos en modo registro, marcar el perfil como completado en Supabase
+      if (mode === 'registro' && user) {
+        try {
+          console.log('🔄 Updating user metadata in Supabase...');
+          
+          const { error: updateError } = await supabaseClient.auth.updateUser({
+            data: {
+              ...user.user_metadata,
+              profileCompleted: true
+            }
+          });
+
+          if (updateError) {
+            console.error('❌ Error updating user metadata:', updateError);
+            throw new Error(`Error al marcar perfil como completado: ${updateError.message}`);
+          }
+          
+          // Actualizar el estado local del usuario solo si la operación fue exitosa
+          const updatedUser = {
+            ...user,
+            user_metadata: {
+              ...user.user_metadata,
+              profileCompleted: true
+            }
+          };
+          setUser(updatedUser);
+          console.log('✅ Profile marked as completed in Supabase');
+          
+        } catch (metadataError) {
+          console.error('❌ Critical error updating profile completion status:', metadataError);
+          
+          // Mostrar error específico para el usuario
+          const errorMessage = metadataError instanceof Error 
+            ? metadataError.message 
+            : 'Error al marcar el perfil como completado';
+            
+          toast.error(errorMessage, {
+            icon: <AlertTriangle className="h-5 w-5 text-red-500" />,
+            description: 'Los datos se guardaron pero hay un problema con el estado de completitud. Intenta nuevamente.'
+          });
+          
+          // NO llamar onSuccess si hay error en metadata
+          return;
+        }
+      }
+
+      // Paso 3: Solo si llegamos aquí, todas las operaciones fueron exitosas
       toast.success('Perfil guardado con éxito!', {
-        icon: <CheckCircle className="h-5 w-5 text-green-500" />, 
+        icon: <CheckCircle className="h-5 w-5 text-green-500" />,
+        description: mode === 'registro' ? 'Tu registro ha sido completado exitosamente' : 'Los cambios se han guardado'
       });
+      
+      // Solo llamar onSuccess si TODO fue exitoso
       if (onSuccess) {
+        console.log('✅ All operations successful, calling onSuccess');
         onSuccess(data);
       }
+      
     } catch (error: unknown) {
-      console.error("Error submitting form:", error);
-      let errorMessage = 'Ocurrió un error al guardar.';
+      console.error("❌ Error in form submission:", error);
+      
+      // Determinar mensaje de error específico
+      let errorMessage = 'Ocurrió un error al guardar el perfil';
+      let description = 'Por favor, revisa los datos e intenta nuevamente';
+      
       if (error instanceof Error) {
         errorMessage = error.message;
+        
+        // Personalizar descripción según el tipo de error
+        if (error.message.includes('network') || error.message.includes('fetch')) {
+          description = 'Problema de conexión. Verifica tu internet e intenta nuevamente.';
+        } else if (error.message.includes('validation')) {
+          description = 'Algunos datos no son válidos. Revisa el formulario.';
+        } else if (error.message.includes('Supabase') || error.message.includes('metadata')) {
+          description = 'Error en la autenticación. Intenta cerrar sesión y volver a entrar.';
+        }
       }
+      
+      // Mostrar error al usuario con descripción útil
       toast.error(errorMessage, {
-        icon: <AlertTriangle className="h-5 w-5 text-red-500" />, 
+        icon: <AlertTriangle className="h-5 w-5 text-red-500" />,
+        description: description,
+        duration: 6000 // Más tiempo para leer el error
       });
+      
+      // NO llamar onSuccess si hay cualquier error
+      // El usuario permanece en la página para reintentar
     }
   };
 

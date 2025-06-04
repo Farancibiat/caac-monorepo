@@ -16,8 +16,29 @@ export const useAuthStore = create<AuthState>((set) => ({
   loading: true,
   error: null,
   isAuthenticated: false,
+  profileCompleted: false,
+  shouldCompleteProfile: false,
 
-  setUser: (user) => set({ user, isAuthenticated: !!user }),
+  setUser: (user) => {
+    // Si no hay usuario, profileCompleted es false
+    // Si hay usuario pero no tiene el campo definido, es false (compatibilidad hacia atrás)
+    // Solo es true si está explícitamente definido como true
+    const profileCompleted = user?.user_metadata?.profileCompleted === true
+    const shouldCompleteProfile = user ? !profileCompleted : false
+    
+    set({ 
+      user, 
+      isAuthenticated: !!user,
+      profileCompleted,
+      shouldCompleteProfile
+    })
+    
+
+    if (shouldCompleteProfile) {
+      console.log('🔄 Profile not completed - state updated for potential redirect')
+    }
+  },
+  
   setSession: (session) => set({ session }),
   setLoading: (loading) => set({ loading }),
   setError: (error) => set({ error }),
@@ -58,7 +79,10 @@ export const useAuthStore = create<AuthState>((set) => ({
         email,
         password,
         options: {
-          data: userData || {}
+          data: {
+            profileCompleted: false, // Siempre inicializar como false para nuevos usuarios
+            ...userData
+          }
         }
       })
 
@@ -76,7 +100,15 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   signOut: async () => {
    
-    set({ user: null, session: null, isAuthenticated: false, loading: true, error: null })
+    set({ 
+      user: null, 
+      session: null, 
+      isAuthenticated: false, 
+      loading: true, 
+      error: null,
+      profileCompleted: false,
+      shouldCompleteProfile: false
+    })
 
     try {
       // 2. Execute server-side logout logic (cookie clearing, Supabase logout, revalidation)
@@ -98,7 +130,13 @@ export const useAuthStore = create<AuthState>((set) => ({
       console.error('Error during sign out process:', error)
       set({ error: error instanceof Error ? error.message : 'Error al cerrar sesión' })
       // Ensure user state is cleared even if there was an error
-      set({ user: null, session: null, isAuthenticated: false })
+      set({ 
+        user: null, 
+        session: null, 
+        isAuthenticated: false,
+        profileCompleted: false,
+        shouldCompleteProfile: false
+      })
       
       // Optional: Fallback redirect on error if not already handled or if appRouter fails
       if (typeof window !== 'undefined' && !appRouter) { // Only if appRouter wasn't available
@@ -199,6 +237,5 @@ const initializeAuth = async () => {
 
 // Solo inicializar si estamos en el cliente
 if (typeof window !== 'undefined') {
-  // Pequeño delay para evitar race conditions
-  setTimeout(initializeAuth, 50)
+  initializeAuth()
 }

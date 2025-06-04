@@ -5,7 +5,7 @@ import { ROUTES } from '@/constants/routes';
 // Función helper para crear cliente Supabase en middleware
 // Nota: No podemos usar supabaseServer de stores/auth/clients.ts aquí 
 // porque el middleware corre en edge runtime con limitaciones de imports
-const createMiddlewareSupabaseClient = (request: NextRequest, response: NextResponse) => {
+const createMiddlewareSupabaseClient = (request: NextRequest) => {
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -15,10 +15,13 @@ const createMiddlewareSupabaseClient = (request: NextRequest, response: NextResp
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            request.cookies.set(name, value)
-            response.cookies.set({ name, value, ...options })
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+          const newResponse = NextResponse.next({
+            request,
           })
+          cookiesToSet.forEach(({ name, value, options }) =>
+            newResponse.cookies.set(name, value, options)
+          )
         },
       },
     }
@@ -27,20 +30,17 @@ const createMiddlewareSupabaseClient = (request: NextRequest, response: NextResp
 
 // Función helper para limpiar cookies de Supabase
 const clearSupabaseCookies = (request: NextRequest, response: NextResponse) => {
-  const supabaseCookies = request.cookies.getAll().filter(cookie => 
+  const cookiesToClear = request.cookies.getAll().filter(cookie => 
     cookie.name.startsWith('sb-') || 
-    cookie.name.includes('supabase')
+    cookie.name.includes('supabase') ||
+    cookie.name.includes('auth-token')
   )
   
-  supabaseCookies.forEach(cookie => {
-    response.cookies.delete({
-      name: cookie.name,
-      domain: request.nextUrl.hostname,
-      path: '/'
-    })
+  cookiesToClear.forEach(cookie => {
+    response.cookies.delete(cookie.name)
   })
   
-  return supabaseCookies.length
+  return cookiesToClear.length
 }
 
 export const middleware = async (request: NextRequest) => {
@@ -52,6 +52,7 @@ export const middleware = async (request: NextRequest) => {
   
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))
   const isAuthRoute = authRoutes.some(route => pathname.startsWith(route))
+  const isCompleteProfileRoute = pathname.startsWith(ROUTES.PROFILE.COMPLETE)
 
   // Si es una ruta pública, continuar sin validación
   if (!isProtectedRoute && !isAuthRoute) {
@@ -67,7 +68,7 @@ export const middleware = async (request: NextRequest) => {
 
   try {
     // Crear cliente Supabase
-    const supabase = createMiddlewareSupabaseClient(request, response)
+    const supabase = createMiddlewareSupabaseClient(request)
     
     // Validar usuario usando getUser() (método recomendado)
     const { data: { user }, error: userError } = await supabase.auth.getUser()
@@ -96,6 +97,22 @@ export const middleware = async (request: NextRequest) => {
         resendConfirmationUrl.searchParams.set(ROUTES.PARAMS.REDIRECT_TO, pathname);
         resendConfirmationUrl.searchParams.set(ROUTES.PARAMS.REASON, 'email_not_confirmed');
         return NextResponse.redirect(resendConfirmationUrl);
+      }
+
+      // Check if profile is completed (skip this check for complete-profile route)
+      if (!isCompleteProfileRoute) {
+        // Obtener datos del perfil del usuario desde user_metadata
+        const userMetadata = user.user_metadata || {}
+        const profileCompleted = userMetadata.profileCompleted === true
+        
+        // Solo redirigir si el usuario existe y el perfil NO está completo
+        if (!profileCompleted) {
+          console.log(`🚫 Access denied to ${pathname} for user ${user.email} - Profile not completed`)
+          const completeProfileUrl = new URL(ROUTES.PROFILE.COMPLETE, request.url);
+          completeProfileUrl.searchParams.set(ROUTES.PARAMS.REDIRECT_TO, pathname);
+          completeProfileUrl.searchParams.set(ROUTES.PARAMS.REASON, 'profile_incomplete');
+          return NextResponse.redirect(completeProfileUrl);
+        }
       }
       
       console.log(`✅ Access granted to ${pathname} for user: ${user.email}`)
