@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '@/lib/shadcn-util';
+import { cn } from '@/lib/shadcn-utils';
 import { Loader2, CheckCircle, AlertCircle, XCircle } from 'lucide-react';
 
 interface RedirectMsjProps {

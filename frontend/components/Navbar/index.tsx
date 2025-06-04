@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Menu, X, User, LogOut, Settings, Calendar, ChevronDown } from 'lucide-react'
-import { cn } from '@/lib/shadcn-util'
+import { cn } from '@/lib/shadcn-utils'
 
 const NavBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)

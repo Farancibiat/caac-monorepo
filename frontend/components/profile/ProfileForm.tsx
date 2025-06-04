@@ -4,19 +4,11 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
-import { CalendarIcon, CheckCircle, AlertTriangle } from 'lucide-react';
+import { CheckCircle, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Calendar } from '@/components/ui/calendar';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
 import {
   Select,
   SelectContent,
@@ -31,12 +23,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription,
 } from '@/components/ui/form';
-import { cn } from '@/lib/shadcn-util';
 import { useAuthStore } from '@/stores/auth/store';
 import { supabaseClient } from '@/stores/auth/clients';
 import { reqClient } from '@/lib/api-client';
+import BirthPicker from '../ui/birthPicker';
 
 // Define el esquema de validación con Yup
 const profileSchema = yup.object({
@@ -284,40 +275,16 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
             control={control}
             name="fechaNacimiento"
             render={({ field }) => (
-              <FormItem className="flex flex-col">
+              <FormItem>
                 <FormLabel>Fecha de Nacimiento</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP", { locale: es })
-                        ) : (
-                          <span>Selecciona una fecha</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) =>
-                        date > new Date() || date < new Date("1900-01-01")
-                      }
-                      initialFocus
-                      locale={es}
-                    />
-                  </PopoverContent>
-                </Popover>
+                <FormControl>
+                  <BirthPicker
+                    startYear={1920}
+                    endYear={new Date().getFullYear()}
+                    selected={field.value || new Date()}
+                    onSelect={field.onChange}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -413,7 +380,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
             name="club"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Club (Opcional)</FormLabel>
+                <FormLabel>Club</FormLabel>
                 <FormControl>
                   <Input 
                     placeholder="Nombre de tu club de natación" 
@@ -422,16 +389,20 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
                     onChange={(e) => field.onChange(e.target.value || null)}
                   />
                 </FormControl>
-                <FormDescription>
-                  Si perteneces a algún club, indícalo aquí.
-                </FormDescription>
                 <FormMessage />
+              
               </FormItem>
             )}
           />
         </div>
 
-        <Button type="submit" disabled={isSubmitting} className="w-full md:w-auto">
+        <Button 
+          type="submit" 
+          disabled={isSubmitting} 
+          variant="default"
+          size="lg"
+          className="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white font-semibold px-8 py-3 transition-colors duration-200"
+        >
           {isSubmitting ? 'Guardando...' : (mode === 'registro' ? 'Completar Registro' : 'Guardar Cambios')}
         </Button>
       </form>
