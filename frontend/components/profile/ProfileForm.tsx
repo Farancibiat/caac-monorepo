@@ -396,15 +396,15 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
           />
         </div>
 
-        <Button 
-          type="submit" 
-          disabled={isSubmitting} 
-          variant="default"
-          size="lg"
-          className="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white font-semibold px-8 py-3 transition-colors duration-200"
-        >
-          {isSubmitting ? 'Guardando...' : (mode === 'registro' ? 'Completar Registro' : 'Guardar Cambios')}
-        </Button>
+        <div className="flex justify-center md:justify-end">
+          <Button 
+            type="submit" 
+            disabled={isSubmitting} 
+            className="w-full md:w-auto bg-primary-600 hover:bg-primary-700 text-white h-12 text-base font-medium"
+          >
+            {isSubmitting ? 'Guardando...' : (mode === 'registro' ? 'Completar Registro' : 'Guardar Cambios')}
+          </Button>
+        </div>
       </form>
     </Form>
   );

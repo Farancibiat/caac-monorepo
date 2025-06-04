@@ -51,20 +51,7 @@ const CompleteProfilePage = () => {
           </CardHeader>
           
           <CardContent className="space-y-6">
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-              <div className="flex items-start space-x-3">
-                <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
-                <div className="text-sm text-amber-800">
-                  <p className="font-medium mb-2">¿Por qué necesitamos esta información?</p>
-                  <ul className="list-disc list-inside space-y-1 text-amber-700">
-                    <li>Para contactarte en caso de emergencias</li>
-                    <li>Para personalizar tu experiencia en el club</li>
-                    <li>Para cumplir con los requisitos de seguridad</li>
-                    <li>Para enviarte información relevante sobre eventos</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
+            
 
             <ProfileForm
               mode="registro"
