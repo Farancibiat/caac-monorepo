@@ -71,6 +71,11 @@ export const MESSAGES = {
     RESERVATION_NOT_FOUND: 'Reserva no encontrada',
   },
 
+  429: {
+    RATE_LIMIT_EXCEEDED: 'Demasiadas peticiones, intenta de nuevo más tarde',
+    RATE_LIMIT_AUTH_EXCEEDED: 'Demasiados intentos de autenticación, intenta de nuevo más tarde',
+  },
+
   500: {
     AUTH_REGISTER_ERROR: 'Error al registrar usuario',
     AUTH_LOGIN_ERROR: 'Error al iniciar sesión',

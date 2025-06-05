@@ -1,15 +1,15 @@
 import express, { Router } from 'express';
-import { register, login, getProfile, updateProfile } from '@/controllers/authController';
+import { getProfile, updateProfile, checkProfileStatus } from '@/controllers/authController';
 import { protect } from '@/config/auth';
 
 const router: Router = express.Router();
 
-// Rutas públicas
-router.post('/register', register);
-router.post('/login', login);
+// NOTA: Las rutas /register y /login fueron eliminadas
+// ya que ahora usamos Supabase Auth para la autenticación
 
-// Rutas protegidas
+// Rutas protegidas - requieren autenticación con Supabase
 router.get('/profile', protect, getProfile);
 router.put('/profile', protect, updateProfile);
+router.get('/profile-status', protect, checkProfileStatus);
 
 export default router; 

@@ -2,7 +2,15 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { notFound, errorHandler } from '@/middleware/errorMiddleware';
+import { securityHeaders } from '@/middleware/securityMiddleware';
+import { apiLimiter, authLimiter } from '@/middleware/rateLimitMiddleware';
 import { sendMessage } from '@/utils/responseHelper';
+
+// Cargar variables de entorno PRIMERO
+dotenv.config();
+
+// Importar configuración de Supabase (esto ejecutará la inicialización)
+import '@/config/supabase';
 
 // Importar rutas
 import authRoutes from '@/routes/authRoutes';
@@ -10,16 +18,12 @@ import scheduleRoutes from '@/routes/scheduleRoutes';
 import reservationRoutes from '@/routes/reservationRoutes';
 import userRoutes from '@/routes/userRoutes';
 
-
-
-// Cargar variables de entorno
-dotenv.config();
-
 // Inicializar express
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
+app.use(securityHeaders);
 app.use(cors({
   origin: [
     'https://aguasabiertaschile.cl',
@@ -30,6 +34,10 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Rate Limiting
+app.use('/api', apiLimiter);
+app.use('/api/auth', authLimiter);
 
 // Rutas
 app.use('/api/auth', authRoutes);

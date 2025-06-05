@@ -60,7 +60,7 @@ export const getUserReservations = async (req: Request, res: Response): Promise<
     
     // Construir filtro
     const filter: any = {
-      userId: req.user.id,
+      userId: parseInt(req.user.id),
     };
     
     if (status) {
@@ -111,7 +111,7 @@ export const getReservationById = async (req: Request, res: Response): Promise<v
     }
     
     // Si el usuario no es admin ni tesorero, verificar que la reserva sea del usuario
-    if (req.user?.role === 'USER' && reservation.userId !== req.user.id) {
+    if (req.user?.role === 'USER' && reservation.userId !== parseInt(req.user.id)) {
       sendMessage(res, 'RESERVATION_INSUFFICIENT_PERMISSIONS');
       return;
     }
@@ -175,7 +175,7 @@ export const createReservation = async (req: Request, res: Response): Promise<vo
     // Verificar si el usuario ya tiene una reserva en ese horario y fecha
     const existingUserReservation = await prisma.reservation.findFirst({
       where: {
-        userId: req.user.id,
+        userId: parseInt(req.user.id),
         scheduleId: Number(scheduleId),
         date: reservationDate,
         status: {
@@ -192,7 +192,7 @@ export const createReservation = async (req: Request, res: Response): Promise<vo
     // Crear la reserva
     const newReservation = await prisma.reservation.create({
       data: {
-        userId: req.user.id,
+        userId: parseInt(req.user.id),
         scheduleId: Number(scheduleId),
         date: reservationDate,
         status: 'PENDING',
@@ -231,7 +231,7 @@ export const cancelReservation = async (req: Request, res: Response): Promise<vo
     }
     
     // Verificar permisos
-    if (req.user.role === 'USER' && reservation.userId !== req.user.id) {
+    if (req.user.role === 'USER' && reservation.userId !== parseInt(req.user.id)) {
       sendMessage(res, 'RESERVATION_CANCEL_INSUFFICIENT_PERMISSIONS');
       return;
     }
@@ -298,7 +298,7 @@ export const confirmPayment = async (req: Request, res: Response): Promise<void>
       data: {
         isPaid: true,
         paymentDate: new Date(),
-        paymentConfirmedBy: req.user.id,
+        paymentConfirmedBy: parseInt(req.user.id),
         status: 'CONFIRMED',
       },
     });
@@ -307,10 +307,10 @@ export const confirmPayment = async (req: Request, res: Response): Promise<void>
     await prisma.paymentRecord.create({
       data: {
         reservationId: Number(id),
-        amount: Number(amount),
+        amount: parseFloat(amount),
         paymentMethod,
-        confirmedById: req.user.id,
-        notes: notes || '',
+        notes: notes || null,
+        confirmedById: parseInt(req.user.id),
       },
     });
     

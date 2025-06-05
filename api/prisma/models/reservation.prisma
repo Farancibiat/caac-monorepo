@@ -3,6 +3,8 @@ enum ReservationStatus {
   CONFIRMED
   CANCELLED
   COMPLETED
+
+  @@schema("public")
 }
 model SwimmingSchedule {
   id          Int           @id @default(autoincrement())
@@ -17,6 +19,7 @@ model SwimmingSchedule {
   reservations Reservation[]
 
   @@map("swimming_schedules")
+  @@schema("public")
 }
 model PaymentRecord {
   id            Int         @id @default(autoincrement())
@@ -31,6 +34,7 @@ model PaymentRecord {
   updatedAt     DateTime    @updatedAt @map("updated_at")
 
   @@map("payment_records")
+  @@schema("public")
 }
 
 model Reservation {
@@ -51,4 +55,5 @@ model Reservation {
 
   @@index([date, scheduleId])
   @@map("reservations")
+  @@schema("public")
 }

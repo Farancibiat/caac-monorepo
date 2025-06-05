@@ -1,19 +1,23 @@
 import { Request, Response } from 'express';
 import prisma from '@/config/db';
 import { Role } from '@prisma/client';
-import crypto from '@/utils/crypto';
 import { sendMessage } from '@/utils/responseHelper';
+import { supabaseAdmin } from '@/config/supabase';
 
 export const getUsers = async (_req: Request, res: Response): Promise<void> => {
   try {
     const users = await prisma.user.findMany({
       select: {
         id: true,
+        auth_id: true,
         email: true,
         name: true,
         phone: true,
         role: true,
         isActive: true,
+        avatar_url: true,
+        provider: true,
+        profileCompleted: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -39,11 +43,15 @@ export const getUserById = async (req: Request, res: Response): Promise<void> =>
       where: { id: Number(id) },
       select: {
         id: true,
+        auth_id: true,
         email: true,
         name: true,
         phone: true,
         role: true,
         isActive: true,
+        avatar_url: true,
+        provider: true,
+        profileCompleted: true,
         createdAt: true,
         updatedAt: true,
         reservations: true,
@@ -71,7 +79,7 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
       return;
     }
     
-    // Verificar si el email ya existe
+    // Verificar si el email ya existe en nuestra base de datos
     const existingUser = await prisma.user.findUnique({
       where: { email }
     });
@@ -81,25 +89,51 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
       return;
     }
     
-    // Hash de la contraseña
-    const salt = await crypto.genSalt();
-    const hashedPassword = await crypto.hash(password, salt);
+    // Crear usuario en Supabase Auth primero
+    const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      password,
+      user_metadata: {
+        full_name: name,
+      },
+      email_confirm: true, // Auto-confirmar email para usuarios creados por admin
+    });
+
+    if (authError || !authUser.user) {
+      console.error('Error al crear usuario en Supabase:', authError);
+      sendMessage(res, 'USER_CREATE_ERROR');
+      return;
+    }
     
+    // Crear registro en nuestra base de datos
     const newUser = await prisma.user.create({
       data: {
+        auth_id: authUser.user.id,
         email,
-        password: hashedPassword,
         name,
-        phone,
+        phone: phone || null,
         role: role || Role.USER,
         isActive: true,
+        provider: 'email',
+        profileCompleted: !!(name && phone),
+      },
+      select: {
+        id: true,
+        auth_id: true,
+        email: true,
+        name: true,
+        phone: true,
+        role: true,
+        isActive: true,
+        avatar_url: true,
+        provider: true,
+        profileCompleted: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
     
-    // Excluir la contraseña de la respuesta
-    const { password: _, ...userWithoutPassword } = newUser;
-    
-    sendMessage(res, 'USER_CREATED', userWithoutPassword);
+    sendMessage(res, 'USER_CREATED', newUser);
   } catch (error) {
     console.error('Error creating user:', error);
     sendMessage(res, 'USER_CREATE_ERROR');

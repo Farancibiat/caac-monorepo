@@ -25,6 +25,7 @@
   "author": "",
   "dependencies": {
     "@prisma/client": "^6.8.2",
+    "@supabase/supabase-js": "^2.49.10",
     "@types/cors": "^2.8.18",
     "@types/express": "^5.0.2",
     "@types/jsonwebtoken": "^9.0.5",
@@ -32,6 +33,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "express-rate-limit": "^7.5.0",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.16.0",
     "prisma": "^6.8.2",
