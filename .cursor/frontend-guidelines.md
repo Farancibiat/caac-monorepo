@@ -209,7 +209,7 @@ module.exports = {
   force = false
   conditions = {Role = ["admin"]}
 
-# Headers de seguridad
+# Headers de seguridad (backup - ya implementados en Next.js)
 [[headers]]
   for = "/*"
   [headers.values]
@@ -217,6 +217,20 @@ module.exports = {
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Permitted-Cross-Domain-Policies = "none"
+    X-Download-Options = "noopen"
+
+# Headers específicos para rutas sensibles
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    Cache-Control = "no-store, no-cache, must-revalidate"
+    X-Robots-Tag = "noindex, nofollow"
+
+[[headers]]
+  for = "/dashboard/*"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
 ```
 
 ### 2. Environment Variables en Netlify
@@ -227,4 +241,26 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 NEXT_PUBLIC_API_URL=https://your-api-domain.com
 NEXT_PUBLIC_SITE_URL=https://aguasabiertaschiloe.cl
 NEXT_PUBLIC_UNSPLASH_ACCESS_KEY=your_unsplash_key
+NEXT_PUBLIC_GA4_MEASUREMENT_ID=G-XXXXXXXXXX
+```
+
+## Google Analytics 4
+
+### Implementación Simple
+El CSP ya está configurado para permitir GA4. Solo agrega el script estándar de Google:
+
+```html
+<!-- En app/layout.tsx o donde necesites -->
+<Script
+  src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID}`}
+  strategy="afterInteractive"
+/>
+<Script id="google-analytics" strategy="afterInteractive">
+  {`
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', '${process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID}');
+  `}
+</Script>
 ``` 

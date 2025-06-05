@@ -43,6 +43,21 @@ const clearSupabaseCookies = (request: NextRequest, response: NextResponse) => {
   return cookiesToClear.length
 }
 
+// Función helper para agregar headers de seguridad dinámicos
+const addSecurityHeaders = (response: NextResponse, request: NextRequest) => {
+  // Headers específicos para rutas admin
+  if (request.nextUrl.pathname.startsWith('/admin')) {
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+  }
+  
+  // Headers para rutas de autenticación
+  if (request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/registro')) {
+    response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+  }
+  
+  return response;
+};
+
 export const middleware = async (request: NextRequest) => {
   const { pathname } = request.nextUrl
 
@@ -54,17 +69,20 @@ export const middleware = async (request: NextRequest) => {
   const isAuthRoute = authRoutes.some(route => pathname.startsWith(route))
   const isCompleteProfileRoute = pathname.startsWith(ROUTES.PROFILE.COMPLETE)
 
-  // Si es una ruta pública, continuar sin validación
-  if (!isProtectedRoute && !isAuthRoute) {
-    return NextResponse.next()
-  }
-
-  // Crear response para manejar cookies
-  const response = NextResponse.next({
+  // Crear response base con headers de seguridad
+  let response = NextResponse.next({
     request: {
       headers: request.headers,
     },
-  })
+  });
+  
+  // Aplicar headers de seguridad a todas las respuestas
+  response = addSecurityHeaders(response, request);
+
+  // Si es una ruta pública, continuar con headers de seguridad aplicados
+  if (!isProtectedRoute && !isAuthRoute) {
+    return response;
+  }
 
   try {
     // Crear cliente Supabase
@@ -124,7 +142,8 @@ export const middleware = async (request: NextRequest) => {
       if (user) {
         console.log(`🔄 User ${user.email} accessing auth route, redirecting to dashboard`)
         const redirectTo = request.nextUrl.searchParams.get(ROUTES.PARAMS.REDIRECT_TO) || ROUTES.DASHBOARD
-        return NextResponse.redirect(new URL(redirectTo, request.url))
+        const redirectResponse = NextResponse.redirect(new URL(redirectTo, request.url));
+        return addSecurityHeaders(redirectResponse, request);
       }
       
       console.log(`🔑 Allowing access to auth route: ${pathname}`)
@@ -139,7 +158,8 @@ export const middleware = async (request: NextRequest) => {
       const loginUrl = new URL(ROUTES.AUTH.LOGIN, request.url);
       loginUrl.searchParams.set(ROUTES.PARAMS.REDIRECT_TO, pathname);
       loginUrl.searchParams.set(ROUTES.PARAMS.REASON, 'middleware_error');
-      return NextResponse.redirect(loginUrl);
+      const errorResponse = NextResponse.redirect(loginUrl);
+      return addSecurityHeaders(errorResponse, request);
     }
   }
 
