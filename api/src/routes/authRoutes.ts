@@ -1,6 +1,7 @@
 import express, { Router } from 'express';
 import { getProfile, updateProfile, checkProfileStatus } from '@/controllers/authController';
 import { protect } from '@/config/auth';
+import { schemas, validateBody, cleanEmptyStrings } from '@/schemas';
 
 const router: Router = express.Router();
 
@@ -9,7 +10,7 @@ const router: Router = express.Router();
 
 // Rutas protegidas - requieren autenticación con Supabase
 router.get('/profile', protect, getProfile);
-router.put('/profile', protect, updateProfile);
+router.put('/profile', protect, cleanEmptyStrings, validateBody(schemas.auth.updateProfile), updateProfile);
 router.get('/profile-status', protect, checkProfileStatus);
 
 export default router; 

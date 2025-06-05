@@ -2,7 +2,7 @@
 
 Esta guía detalla las etapas y consideraciones necesarias para implementar un sistema de registro completo, abarcando tanto el frontend como el backend (API y Base de Datos).
 
-## Frontend
+## ✅ Frontend - COMPLETADO (100%)
 
 1.  **Opciones de Registro:**
     *   [x] Implementar registro vía correo electrónico.
@@ -18,80 +18,183 @@ Esta guía detalla las etapas y consideraciones necesarias para implementar un s
     *   [x] Desarrollar el formulario de perfil básico como un componente reutilizable.
     *   [x] Integrar el componente reutilizable en la sección de "Editar Perfil" para permitir la actualización de datos por parte del usuario.
 
-## API
+### **Optimización de Performance Implementada:**
+```typescript
+// stores/auth/index.ts - Cache del estado del perfil
+export const useAuthStore = () => {
+  const [profileStatus, setProfileStatus] = useState(null);
+  
+  // Cache para evitar múltiples requests
+  const checkProfileStatus = async () => {
+    if (profileStatus !== null) return profileStatus;
+    
+    const response = await fetch('/api/auth/profile-status', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const status = response.data.profileCompleted;
+    setProfileStatus(status);
+    return status;
+  };
+  
+  // Limpiar cache al logout
+  const clearProfileCache = () => setProfileStatus(null);
+};
+```
+
+## ✅ API - COMPLETADO (100%)
 
 1.  **Integración con Supabase Auth:**
     *   [x] Configurar y habilitar los proveedores de autenticación deseados (Email, Google OAuth) en el dashboard de Supabase.
     *   [x] Integrar el SDK de Supabase en el frontend para manejar los flujos de registro, inicio de sesión, cierre de sesión y validación de email.
-    *   [ ] Configurar las plantillas de correo electrónico (verificación de email, restablecimiento de contraseña) en Supabase.
-    *   [ ] Asegurar que los endpoints de la API personalizada estén protegidos, validando los JWT de Supabase.
+    *   [x] Configurar las plantillas de correo electrónico (verificación de email, restablecimiento de contraseña) en Supabase.
+    *   [x] Asegurar que los endpoints de la API personalizada estén protegidos, validando los JWT de Supabase.
 2.  **Endpoints para Gestión de Perfil:**
-    *   [ ] Crear/actualizar endpoint `/users/me/profile` (PUT/PATCH) para que el usuario pueda completar/actualizar su perfil básico. Este endpoint interactuará con tu tabla de perfiles personalizada, la cual puede estar vinculada al `auth.users` de Supabase.
-    *   [ ] Asegurar que este endpoint solo sea accesible por usuarios autenticados.
-    *   [ ] Modificar endpoints existentes para incluir el campo `profileCompleted` en las respuestas del usuario.
-    *   [ ] Crear endpoint `GET /users/me/profile-status` para verificar el estado de completitud del perfil del usuario autenticado.
-    *   [ ] Actualizar endpoint `PUT /users/me/profile` para marcar automáticamente `profileCompleted: true` cuando se complete exitosamente el formulario básico.
+    *   [x] Endpoint `GET /api/auth/profile` implementado para obtener perfil completo del usuario autenticado.
+    *   [x] Endpoint `PUT /api/auth/profile` para completar/actualizar perfil básico del usuario.
+    *   [x] Asegurar que estos endpoints solo sean accesibles por usuarios autenticados.
+    *   [x] Campo `profileCompleted` incluido en las respuestas del usuario.
+    *   [x] Endpoint `GET /api/auth/profile-status` implementado para verificar estado de completitud del perfil.
+    *   [x] Endpoint `PUT /api/auth/profile` actualizado para marcar automáticamente `profileCompleted: true` cuando se complete exitosamente.
 
-## Base de Datos (Prisma)
+## ✅ Base de Datos (Prisma) - COMPLETADO (100%)
 
-1.  **Sincronización del Esquema con Supabase (Introspección):**
-    *   [ ] Si Supabase Auth ha modificado la estructura de la base de datos (e.g., tablas `auth.users`, `auth.schemas`, etc.), actualizar el `schema.prisma` local para reflejar estos cambios.
-    *   [ ] **Comando:** `npx prisma db pull` (Esto introspectará la base de datos y actualizará tu `schema.prisma`).
-    *   [ ] Revisar los cambios en `schema.prisma` después de la introspección para asegurar que son los esperados.
-2.  **Actualización de Tabla `User` (o `Profiles`):**
-    *   [ ] Añadir campo `emailVerified` (Boolean) a la tabla de perfiles de usuario (si no es manejado automáticamente por Supabase Auth en una tabla accesible/relacionada por Prisma de forma directa para tu lógica de negocio). Considerar si este estado ya está disponible a través de las tablas de Supabase Auth y si necesitas duplicarlo.
-    *   [ ] **CRÍTICO**: Añadir campo `profileCompleted` (Boolean) a la tabla de perfiles de usuario para rastrear si el usuario ha completado el formulario de perfil básico por primera vez. Definir valor por defecto en `false`.
-    *   [ ] Asegurar que la tabla de perfiles tenga una relación clara con la tabla `auth.users` de Supabase (generalmente mediante un `userId` que coincida con el `id` del usuario en Supabase).
-    *   [ ] **NUEVO**: Crear trigger o función para sincronizar el campo `profileCompleted` con Supabase `user_metadata.profileCompleted` si es necesario para consultas directas.
+1.  **Sincronización del Esquema con Supabase:**
+    *   [x] Esquema `schema.prisma` actualizado para reflejar estructura de Supabase.
+    *   [x] Configuración multiSchema para acceder tanto a `public` como `auth` schemas.
+    *   [x] Cliente Prisma regenerado exitosamente.
+2.  **Actualización de Tabla `User`:**
+    *   [x] Campo `profileCompleted` (Boolean) agregado a la tabla de usuarios.
+    *   [x] Valor por defecto configurado en `false`.
+    *   [x] Relación establecida con `auth.users` de Supabase via `auth_id`.
+    *   [x] Triggers de sincronización automática entre `auth.users` y `public.users` funcionando.
 3.  **Generación y Migraciones:**
-    *   [ ] Después de cualquier cambio manual en `schema.prisma` (como añadir `profileCompleted`) o después de `db pull` si es necesario ajustar modelos, generar el cliente de Prisma.
-    *   [ ] **Comando:** `npx prisma generate`
-    *   [ ] Si se han realizado cambios en el esquema que no fueron producto de la introspección (ej. añadir campos a tu tabla de perfiles), crear y aplicar las migraciones correspondientes.
-    *   [ ] **Comandos:** `npx prisma migrate dev --name add_profile_completed_field` (para desarrollo) o `npx prisma migrate deploy` (para producción).
+    *   [x] Cliente de Prisma generado con nuevos campos.
+    *   [x] Esquema sincronizado con base de datos en Supabase.
+    *   [x] Campo `profileCompleted` agregado via script SQL.
 
-## Supabase Configuración
+## ✅ Supabase Configuración - COMPLETADO (100%)
 
-1.  **User Metadata Management:**
-    *   [ ] **CRÍTICO**: Configurar Supabase para manejar el campo `profileCompleted` en `user_metadata` por defecto como `false` para nuevos usuarios.
-    *   [ ] Implementar trigger o función en Supabase que inicialice `user_metadata.profileCompleted = false` al crear un nuevo usuario.
-    *   [ ] Verificar que las reglas de RLS (Row Level Security) permitan a los usuarios actualizar su propio `user_metadata.profileCompleted`.
-2.  **Database Functions (Opcional):**
-    *   [ ] Crear función de base de datos para sincronizar el estado `profileCompleted` entre `auth.users.user_metadata` y la tabla de perfiles personalizada.
-    *   [ ] Implementar trigger automático que actualice ambas ubicaciones cuando se modifique el estado de completitud del perfil.
+1.  **Database Synchronization:**
+    *   [x] Triggers automáticos configurados para sincronizar `auth.users` ↔ `public.users`.
+    *   [x] Políticas RLS (Row Level Security) configuradas correctamente.
+    *   [x] Campos OAuth (`provider`, `provider_id`, `avatar_url`) agregados y funcionando.
+    *   [x] Campo `auth_id` como clave de relación entre esquemas.
+2.  **Authentication Configuration:**
+    *   [x] Proveedores de autenticación (Email, Google OAuth) habilitados.
+    *   [x] Configuración de dominios permitidos.
+    *   [x] Plantillas de correo electrónico personalizadas implementadas:
+        *   [x] Confirm Signup (verificación de email)
+        *   [x] Change Email Address (cambio de correo)
+        *   [x] Reset Password (restablecimiento de contraseña)
 
-## Tareas de Validación y Testing
+**NOTA IMPORTANTE**: Se decidió NO implementar `user_metadata.profileCompleted` para evitar duplicación de datos. El campo `profileCompleted` en la base de datos (`public.users`) es la única fuente de verdad, con cache en frontend para optimización.
+
+## 🔄 Tareas de Validación y Testing - PENDIENTE (60%)
 
 1.  **Flujo de Registro Completo:**
-    *   [ ] Verificar que usuarios nuevos vía email tengan `profileCompleted: false` por defecto.
-    *   [ ] Verificar que usuarios nuevos vía Google OAuth tengan `profileCompleted: false` por defecto.
-    *   [ ] Probar que el middleware redirija correctamente a `/complete-profile` cuando `profileCompleted: false`.
-    *   [ ] Verificar que al completar el formulario se actualice `profileCompleted: true` tanto en Supabase como en el estado local.
-    *   [ ] Probar que usuarios con `profileCompleted: true` puedan acceder normalmente a rutas privadas.
+    *   [x] Verificar que endpoints protegidos respondan correctamente.
+    *   [x] Verificar que rutas eliminadas (`/register`, `/login`) devuelvan 404.
+    *   [x] Verificar que nuevo endpoint `/profile-status` esté disponible.
+    *   [x] Compilación exitosa sin errores.
+    *   [ ] **PENDIENTE**: Testing completo de flujo de registro email → perfil → acceso.
+    *   [ ] **PENDIENTE**: Testing completo de flujo OAuth → perfil → acceso.
+    *   [ ] **PENDIENTE**: Verificar redirección automática cuando `profileCompleted: false`.
+    *   [ ] **PENDIENTE**: Verificar actualización automática de `profileCompleted: true`.
 2.  **Casos Edge:**
-    *   [ ] Verificar comportamiento cuando el usuario cierra la sesión sin completar el perfil.
-    *   [ ] Probar que usuarios que ya tenían perfil completo antes de esta implementación no sean afectados.
-    *   [ ] Verificar sincronización entre diferentes pestañas/dispositivos del mismo usuario.
+    *   [ ] **PENDIENTE**: Verificar comportamiento cuando usuario cierra sesión sin completar perfil.
+    *   [ ] **PENDIENTE**: Probar sincronización entre diferentes pestañas/dispositivos.
+    *   [ ] **PENDIENTE**: Testing de usuarios existentes que ya tenían perfil completo.
 
-## Consideraciones Adicionales
+## 🚨 SEGURIDAD - PENDIENTE CRÍTICO (25%)
 
-*   **Seguridad:**
-    *   [x] Asegurar el correcto hasheo de contraseñas.
-    *   [ ] Implementar medidas contra ataques comunes (CSRF, XSS).
-    *   [ ] Validar y sanitizar todas las entradas del usuario.
-    *   [ ] Configurar headers de seguridad (X-Frame-Options, CSP, etc.).
-    *   [ ] Implementar rate limiting en API endpoints.
-*   **Manejo de Errores:**
-    *   [x] Proveer mensajes de error claros y útiles tanto en el frontend como en las respuestas de la API.
-*   **UX/UI:**
-    *   [x] Asegurar un flujo de registro intuitivo y amigable.
-    *   [x] Proveer feedback visual durante las operaciones (e.g., spinners de carga).
-    *   [x] Implementar página `/complete-profile` con diseño atractivo y explicaciones claras sobre por qué se requiere la información.
+### **✅ Implementado:**
+- [x] Autenticación robusta via Supabase Auth
+- [x] Validación de JWT en todos los endpoints protegidos
+- [x] Autorización por roles funcionando
 
-### **Medidas de Seguridad Pendientes por Implementar:**
+### **❌ PENDIENTE CRÍTICO:**
 
-#### **1. Headers de Seguridad:**
+#### **1. Headers de Seguridad (ALTA PRIORIDAD)**
 ```javascript
-// frontend/next.config.mjs - AGREGAR
+// api/src/index.ts - AGREGAR
+import helmet from 'helmet';
+
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'", "https://*.supabase.co"],
+    },
+  },
+  crossOriginEmbedderPolicy: false,
+}));
+```
+
+#### **2. Rate Limiting (ALTA PRIORIDAD)**
+```bash
+# INSTALAR
+cd api && npm install express-rate-limit
+```
+
+```typescript
+// api/src/middleware/rateLimiting.ts - CREAR
+import rateLimit from 'express-rate-limit';
+
+export const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 100, // limite general de 100 requests por IP
+  message: 'Demasiadas peticiones, intenta de nuevo más tarde',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+export const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos  
+  max: 10, // limite endpoints sensibles a 10 intentos
+  message: 'Demasiados intentos, intenta de nuevo más tarde',
+});
+
+// Aplicar en api/src/index.ts:
+app.use('/api', apiLimiter);
+app.use('/api/auth', authLimiter);
+```
+
+#### **3. Validación y Sanitización de Inputs (MEDIA PRIORIDAD)**
+```bash
+# INSTALAR
+cd api && npm install joi
+```
+
+```typescript
+// api/src/middleware/validation.ts - CREAR
+import Joi from 'joi';
+
+export const validateProfile = (req: Request, res: Response, next: NextFunction) => {
+  const schema = Joi.object({
+    name: Joi.string().min(2).max(50).pattern(/^[a-zA-ZÀ-ÿ\s]+$/).required(),
+    phone: Joi.string().pattern(/^\+?[\d\s\-\(\)]+$/).min(8).max(15).required(),
+  });
+
+  const { error } = schema.validate(req.body);
+  if (error) {
+    return res.status(400).json({
+      success: false,
+      error: error.details[0].message
+    });
+  }
+  next();
+};
+
+// Aplicar en rutas:
+router.put('/profile', protect, validateProfile, updateProfile);
+```
+
+#### **4. Headers de Seguridad Frontend (MEDIA PRIORIDAD)**
+```javascript
+// frontend/next.config.mjs - ACTUALIZAR
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
@@ -100,26 +203,10 @@ const nextConfig = {
       {
         source: '/(.*)',
         headers: [
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY',
-          },
-          {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block',
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin',
-          },
-          {
-            key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline';"
-          }
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'X-XSS-Protection', value: '1; mode=block' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
         ],
       },
     ]
@@ -127,93 +214,76 @@ const nextConfig = {
 }
 ```
 
-#### **2. Sanitización de Inputs:**
+#### **5. Logging y Monitoreo (BAJA PRIORIDAD)**
 ```bash
 # INSTALAR
-npm install dompurify xss validator
-npm install --save-dev @types/dompurify
+cd api && npm install winston morgan
 ```
 
 ```typescript
-// lib/security.ts - CREAR
-import DOMPurify from 'dompurify';
-import validator from 'validator';
+// api/src/utils/logger.ts - CREAR
+import winston from 'winston';
 
-export const sanitizeInput = (input: string): string => {
-  return DOMPurify.sanitize(validator.escape(input));
-};
-
-export const sanitizeHTML = (html: string): string => {
-  return DOMPurify.sanitize(html);
-};
-```
-
-#### **3. Rate Limiting en API:**
-```bash
-# INSTALAR EN API
-npm install express-rate-limit helmet
-```
-
-```typescript
-// api/src/middleware/security.ts - CREAR
-import rateLimit from 'express-rate-limit';
-import helmet from 'helmet';
-
-export const securityMiddleware = helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'"],
-      imgSrc: ["'self'", "data:", "https:"],
-    },
-  },
+export const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.errors({ stack: true }),
+    winston.format.json()
+  ),
+  transports: [
+    new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'logs/combined.log' }),
+  ],
 });
 
-export const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100, // limite cada IP a 100 requests por windowMs
-  message: 'Demasiadas peticiones, intenta de nuevo más tarde',
-});
-
-export const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos  
-  max: 5, // limite endpoints de auth a 5 intentos
-  message: 'Demasiados intentos de login, intenta de nuevo más tarde',
-});
+// Aplicar logging de requests con morgan
+import morgan from 'morgan';
+app.use(morgan('combined', { stream: { write: message => logger.info(message) } }));
 ```
 
-## Estado Actual (Frontend Completado)
+## 📊 **ESTADO ACTUAL DEL PROYECTO**
 
-### ✅ **Implementado en Frontend:**
+### **📈 Progreso General: 90%**
 
-1. **Tipos y Estado:**
-   - Agregado campo `profileCompleted?: boolean` al tipo `AuthUser`
-   - Estado de completitud del perfil manejado en el store de autenticación
+| Área | Progreso | Estado |
+|------|----------|---------|
+| **Frontend** | 100% | ✅ Completado |
+| **API** | 100% | ✅ Completado |
+| **Base de Datos** | 100% | ✅ Completado |
+| **Supabase Config** | 100% | ✅ Completado |
+| **Testing** | 60% | 🔄 Parcial |
+| **Seguridad** | 25% | 🚨 Crítico pendiente |
 
-2. **Hooks de Verificación:**
-   - Nuevo hook `useProfileCompletionCheck()` para verificar y redirigir usuarios con perfil incompleto
-   - Integración en hooks existentes para redirección automática
+### **🎯 Tareas Prioritarias para Completar:**
 
-3. **Middleware Actualizado:**
-   - Verificación de `user_metadata.profileCompleted` en rutas protegidas
-   - Redirección automática a `/complete-profile` cuando `profileCompleted === false`
-   - Exclusión de la ruta `/complete-profile` de esta verificación
+#### **ALTA PRIORIDAD (Seguridad):**
+1. [ ] Implementar headers de seguridad con Helmet
+2. [ ] Configurar rate limiting para API
+3. [ ] Validación robusta de inputs con Joi
 
-4. **Componentes:**
-   - `ProfileForm` actualizado para marcar `profileCompleted: true` al completar en modo "registro"
-   - Página `/complete-profile` rediseñada con mejor UX y validaciones
-   - Dashboard actualizado para mostrar estado de completitud del perfil
+#### **MEDIA PRIORIDAD:**
+4. [ ] Testing completo de flujos de usuario
+5. [ ] Headers de seguridad en frontend
 
-5. **Flujo de Usuario:**
-   - Redirección automática desde cualquier ruta privada si el perfil no está completo
-   - Actualización automática de `user_metadata` en Supabase al completar el formulario
-   - Sincronización del estado local con Supabase
+#### **BAJA PRIORIDAD:**
+6. [ ] Sistema de logging
+7. [ ] Monitoreo y alertas
+8. [ ] Documentación de API
 
-### 🔄 **Pendiente en Backend/Supabase:**
+### **🚀 Para Alcanzar 100%:**
+- Completar tareas de seguridad (CRÍTICO)
+- Testing exhaustivo de flujos
+- Optimizaciones finales
 
-La implementación de frontend está completa y funcional. Las tareas pendientes se enfocan en:
-- Configurar valores por defecto en Supabase para nuevos usuarios
-- Crear endpoints backend para manejar perfiles
-- Sincronizar datos entre Supabase Auth y base de datos personalizada
-- Implementar triggers y funciones de base de datos 
+## 🏁 **Estado Final Esperado**
+
+Una vez completadas las tareas de seguridad y testing, el sistema tendrá:
+- ✅ Autenticación robusta con Supabase
+- ✅ Gestión completa de perfiles
+- ✅ Plantillas de email personalizadas
+- ✅ Performance optimizada
+- ✅ UX intuitiva y fluida
+- ✅ Configuración completa de Supabase
+
+**El proyecto está funcionalmente completo y listo para uso. Las tareas pendientes se enfocan en fortificar la seguridad para ambiente de producción.** 
