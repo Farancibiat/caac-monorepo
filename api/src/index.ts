@@ -52,6 +52,15 @@ app.get('/', (_req, res) => {
   sendMessage(res, 'APP_WELCOME');
 });
 
+// Health check para Render.com
+app.get('/health', (_req, res) => {
+  res.status(200).json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    service: 'aachiloe-api'
+  });
+});
+
 // Middleware de errores
 app.use(notFound);
 app.use(errorHandler);
