@@ -29,12 +29,10 @@ export const ProtectedRoute = ({
 
   useEffect(() => {
     if (shouldRedirect) {
-      const currentPath = window.location.pathname
       redirect(redirectTo, { 
         preserveQuery: true, 
         reason: 'authentication_required' 
       })
-      console.log('🔒 Redirecting to login from protected route:', currentPath)
     }
   }, [shouldRedirect, redirectTo, redirect])
 
@@ -60,9 +58,7 @@ export const ProtectedRoute = ({
     )
   }
 
-  // Si hay usuario, mostrar el contenido protegido
   if (user) {
-    console.log('✅ Access granted to protected route for user:', user.email)
     return <>{children}</>
   }
 

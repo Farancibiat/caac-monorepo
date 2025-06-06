@@ -7,7 +7,6 @@ const router: Router = express.Router();
 
 // NOTA: Las rutas /register y /login fueron eliminadas
 // ya que ahora usamos Supabase Auth para la autenticación
-// TODO: Revisar si es necesario tener estas rutas
 // Rutas protegidas - requieren autenticación con Supabase
 router.get('/profile', protect, getProfile);
 router.put('/profile', protect, cleanEmptyStrings, validateBody(schemas.auth.updateProfile), updateProfile);

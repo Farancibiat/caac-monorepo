@@ -28,7 +28,6 @@ export const signInWithGoogle = async () => {
   })
 
   if (error) {
-    console.error('Error signing in with Google:', error)
     throw error
   }
 
@@ -46,7 +45,6 @@ export const signInWithEmail = async (email: string, password: string) => {
   })
 
   if (error) {
-    console.error('Error signing in with email:', error)
     throw error
   }
 
@@ -68,7 +66,6 @@ export const signUp = async (email: string, password: string, userData?: Record<
   })
 
   if (error) {
-    console.error('Error signing up:', error)
     throw error
   }
 
@@ -79,29 +76,18 @@ export const signOut = async () => {
   const cookieStore = await cookies()
   
   try {
-    // Primero obtener el cliente de Supabase
     const supabase = await supabaseServer()
-    
-    // Obtener el usuario actual antes de cerrar sesión (método más seguro)
     const { data: { user } } = await supabase.auth.getUser()
     
     if (user) {
-      console.log('Signing out user:', user.email)
-      
-      // Cerrar sesión en Supabase
       const { error } = await supabase.auth.signOut({ scope: 'global' })
       
       if (error) {
-        console.error('Error signing out from Supabase:', error)
-        // Continuamos para limpiar cookies locales incluso si Supabase falla
-      } else {
-        console.log('Successfully signed out from Supabase')
+        
       }
     }
 
-    // Limpiar todas las cookies relacionadas con Supabase
     const allCookies = cookieStore.getAll()
-    let cookiesCleared = 0
     
     allCookies.forEach(cookie => {
       if (cookie.name.startsWith('sb-') || 
@@ -111,24 +97,16 @@ export const signOut = async () => {
           cookieStore.delete({
             name: cookie.name,
             path: '/',
-            domain: undefined // Let the browser determine the domain
+            domain: undefined
           })
-          cookiesCleared++
-        } catch (error) {
-          console.warn(`Failed to delete cookie ${cookie.name}:`, error)
+        } catch {
+          
         }
       }
     })
-    
-    console.log(`Cleared ${cookiesCleared} auth-related cookies`)
-
-    // Revalidar todas las páginas para limpiar cache
     revalidatePath('/', 'layout')
     
-  } catch (error) {
-    console.error('Error during sign out process:', error)
-    
-    // Limpiar cookies incluso si hay errores
+  } catch {
     try {
       const allCookies = cookieStore.getAll()
       allCookies.forEach(cookie => {
@@ -141,16 +119,15 @@ export const signOut = async () => {
               path: '/',
               domain: undefined
             })
-          } catch (deleteError) {
-            console.warn(`Failed to delete cookie ${cookie.name} in error handler:`, deleteError)
+          } catch {
+            
           }
         }
       })
       
-      // Revalidar incluso si hay errores
       revalidatePath('/', 'layout')
-    } catch (cleanupError) {
-      console.error('Error during cleanup in error handler:', cleanupError)
+    } catch {
+      
     }
   }
 } 

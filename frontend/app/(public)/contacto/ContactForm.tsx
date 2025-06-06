@@ -52,7 +52,6 @@ const ContactForm = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // TODO: Implementar lógica de envío de formulario
     alert("Funcionalidad en desarrollo. Pronto podrás enviar mensajes.")
   }
 

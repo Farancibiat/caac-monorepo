@@ -35,8 +35,7 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
     }
 
     sendMessage(res, 'AUTH_PROFILE_RETRIEVED', user);
-  } catch (error) {
-    console.error('Error al obtener perfil:', error);
+  } catch {
     sendMessage(res, 'AUTH_PROFILE_ERROR');
   }
 };
@@ -105,8 +104,7 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
     });
 
     sendMessage(res, 'AUTH_PROFILE_UPDATED', updatedUser);
-  } catch (error) {
-    console.error('Error al actualizar perfil:', error);
+  } catch {
     sendMessage(res, 'AUTH_UPDATE_ERROR');
   }
 };
@@ -140,8 +138,7 @@ export const checkProfileStatus = async (req: Request, res: Response): Promise<v
         phone: !user.phone,
       },
     });
-  } catch (error) {
-    console.error('Error al verificar estado del perfil:', error);
+  } catch {
     sendMessage(res, 'AUTH_PROFILE_ERROR');
   }
 }; 

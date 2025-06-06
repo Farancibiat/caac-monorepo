@@ -13,10 +13,8 @@ const DashboardPage = () => {
   const { redirect, routes } = useRouting();
 
   useEffect(() => {
-    console.log('Dashboard - Auth state:', { user: !!user, loading, error })
     
     if (!loading && !user) {
-      console.log('Dashboard - Redirecting to login (no user)')
       redirect(routes.AUTH.LOGIN)
     }
   }, [user, loading, error, redirect, routes.AUTH.LOGIN])

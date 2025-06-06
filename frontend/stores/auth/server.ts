@@ -5,7 +5,6 @@ import type { AuthUser } from './types'
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-// Función para crear cliente servidor
 export const supabaseServer = async () => {
   const cookieStore = await cookies()
 
@@ -23,8 +22,7 @@ export const supabaseServer = async () => {
               cookieStore.set(name, value, options)
             )
           } catch {
-            // La función set puede ser llamada desde un Server Component
-            // ignoramos si falla aquí
+           
           }
         },
       },
@@ -32,7 +30,6 @@ export const supabaseServer = async () => {
   )
 }
 
-// Utilidades del servidor
 export const getUser = async (): Promise<AuthUser | null> => {
   const supabase = await supabaseServer()
   
@@ -40,13 +37,11 @@ export const getUser = async (): Promise<AuthUser | null> => {
     const { data: { user }, error } = await supabase.auth.getUser()
     
     if (error) {
-      console.error('Error getting user:', error)
       return null
     }
     
     return user as AuthUser
-  } catch (error) {
-    console.error('Error in getUser:', error)
+  } catch {
     return null
   }
 }

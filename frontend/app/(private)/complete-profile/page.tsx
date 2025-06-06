@@ -56,7 +56,6 @@ const CompleteProfilePage = () => {
             <ProfileForm
               mode="registro"
               onSuccess={() => {
-                console.log('Profile completed successfully, redirecting to dashboard');
                 redirect(routes.DASHBOARD);
               }}
             />

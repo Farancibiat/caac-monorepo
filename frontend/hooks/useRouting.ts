@@ -40,15 +40,11 @@ export const useRouting = () => {
     const redirectTo = urlParams.get(ROUTES.PARAMS.REDIRECT_TO);
     
     if (redirectTo && redirectTo !== window.location.pathname) {
-      // Limpiar parámetro y redirigir a la URL solicitada
       window.history.replaceState({}, '', window.location.pathname);
       router.push(redirectTo);
-      console.log('🔄 Redirecting after auth to:', redirectTo);
       return true;
     } else {
-      // Si no hay redirectTo, redirigir al dashboard por defecto
       router.push(ROUTES.DASHBOARD);
-      console.log('🔄 Redirecting after auth to dashboard (default)');
       return true;
     }
   };

@@ -165,7 +165,6 @@ export class EmailService {
   // Enviar email genérico
   static async sendEmail(template: EmailTemplate): Promise<boolean> {
     try {
-      console.log(`📧 Enviando email a: ${template.to}`);
       
       const { data, error } = await resend.emails.send({
         from: template.from || DEFAULT_FROM,
@@ -175,14 +174,11 @@ export class EmailService {
       });
 
       if (error) {
-        console.error('❌ Error enviando email:', error);
         return false;
       }
 
-      console.log('✅ Email enviado exitosamente:', data?.id);
       return true;
     } catch (error) {
-      console.error('❌ Error inesperado enviando email:', error);
       return false;
     }
   }
@@ -202,14 +198,11 @@ export class EmailService {
   static async testConfiguration(): Promise<boolean> {
     try {
       if (!process.env.RESEND_API_KEY) {
-        console.error('❌ RESEND_API_KEY no configurada');
         return false;
       }
 
-      console.log('✅ Configuración de Resend verificada');
       return true;
     } catch (error) {
-      console.error('❌ Error verificando configuración de Resend:', error);
       return false;
     }
   }

@@ -25,7 +25,6 @@ export const getUsers = async (_req: Request, res: Response): Promise<void> => {
     
     sendMessage(res, 'USER_LIST_RETRIEVED', users);
   } catch (error) {
-    console.error('Error fetching users:', error);
     sendMessage(res, 'USER_FETCH_ERROR');
   }
 };
@@ -65,7 +64,6 @@ export const getUserById = async (req: Request, res: Response): Promise<void> =>
     
     sendMessage(res, 'USER_RETRIEVED', user);
   } catch (error) {
-    console.error('Error fetching user:', error);
     sendMessage(res, 'USER_FETCH_ERROR');
   }
 };
@@ -100,7 +98,6 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
     });
 
     if (authError || !authUser.user) {
-      console.error('Error al crear usuario en Supabase:', authError);
       sendMessage(res, 'USER_CREATE_ERROR');
       return;
     }
@@ -135,7 +132,6 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
     
     sendMessage(res, 'USER_CREATED', newUser);
   } catch (error) {
-    console.error('Error creating user:', error);
     sendMessage(res, 'USER_CREATE_ERROR');
   }
 };
@@ -175,7 +171,6 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
     
     sendMessage(res, 'USER_PROFILE_RETRIEVED', user);
   } catch (error) {
-    console.error('Error fetching user profile:', error);
     sendMessage(res, 'USER_FETCH_ERROR');
   }
 };
@@ -259,13 +254,11 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
     });
     
     if (updateError) {
-      console.error('Error updating Supabase user metadata:', updateError);
       // No fallar la operación por esto, solo logear
     }
     
     sendMessage(res, 'USER_PROFILE_UPDATED', updatedUser);
   } catch (error) {
-    console.error('Error updating user profile:', error);
     sendMessage(res, 'USER_UPDATE_ERROR');
   }
 }; 

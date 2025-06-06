@@ -17,7 +17,6 @@ export const getAllSchedules = async (_req: Request, res: Response): Promise<voi
 
     sendMessage(res, 'SCHEDULE_LIST_RETRIEVED', schedules);
   } catch (error) {
-    console.error('Error al obtener horarios:', error);
     sendMessage(res, 'SCHEDULE_FETCH_ERROR');
   }
 };
@@ -43,7 +42,6 @@ export const getScheduleById = async (req: Request, res: Response): Promise<void
     
     sendMessage(res, 'SCHEDULE_RETRIEVED', schedule);
   } catch (error) {
-    console.error('Error al obtener horario:', error);
     sendMessage(res, 'SCHEDULE_FETCH_ERROR');
   }
 };
@@ -73,7 +71,6 @@ export const createSchedule = async (req: Request, res: Response): Promise<void>
     
     sendMessage(res, 'SCHEDULE_CREATED', newSchedule);
   } catch (error) {
-    console.error('Error al crear horario:', error);
     sendMessage(res, 'SCHEDULE_CREATE_ERROR');
   }
 };
@@ -107,7 +104,6 @@ export const updateSchedule = async (req: Request, res: Response): Promise<void>
     
     sendMessage(res, 'SCHEDULE_UPDATED', updatedSchedule);
   } catch (error) {
-    console.error('Error al actualizar horario:', error);
     sendMessage(res, 'SCHEDULE_UPDATE_ERROR');
   }
 };
@@ -145,7 +141,6 @@ export const deleteSchedule = async (req: Request, res: Response): Promise<void>
     
     sendMessage(res, 'SCHEDULE_DELETED');
   } catch (error) {
-    console.error('Error al eliminar horario:', error);
     sendMessage(res, 'SCHEDULE_DELETE_ERROR');
   }
 };
@@ -195,7 +190,6 @@ export const checkAvailability = async (req: Request, res: Response): Promise<vo
     
     sendMessage(res, 'SCHEDULE_AVAILABILITY_CHECKED', availabilityData);
   } catch (error) {
-    console.error('Error al verificar disponibilidad:', error);
     sendMessage(res, 'SCHEDULE_AVAILABILITY_ERROR');
   }
 }; 

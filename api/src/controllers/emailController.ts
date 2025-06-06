@@ -61,7 +61,6 @@ export const sendReservationConfirmation = async (req: Request, res: Response): 
 
     sendMessage(res, 'RESERVATION_EMAIL_SENT');
   } catch (error) {
-    console.error('Error enviando comprobante de reserva:', error);
     sendMessage(res, 'EMAIL_SEND_ERROR');
   }
 };
@@ -121,7 +120,6 @@ export const sendReservationReminder = async (req: Request, res: Response): Prom
 
     sendMessage(res, 'REMINDER_EMAIL_SENT');
   } catch (error) {
-    console.error('Error enviando recordatorio:', error);
     sendMessage(res, 'EMAIL_SEND_ERROR');
   }
 };
@@ -137,7 +135,6 @@ export const testEmailConfiguration = async (_req: Request, res: Response): Prom
       sendMessage(res, 'EMAIL_CONFIG_INVALID');
     }
   } catch (error) {
-    console.error('Error testando configuración de email:', error);
     sendMessage(res, 'EMAIL_CONFIG_ERROR');
   }
 }; 

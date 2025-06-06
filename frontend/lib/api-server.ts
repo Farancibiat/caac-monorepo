@@ -50,11 +50,9 @@ export const requestServ = async <T = unknown>(
       
       if (session?.access_token && !error) {
         headers.Authorization = `Bearer ${session.access_token}`
-      } else {
-        console.warn('API call requires auth but no session token found on server')
       }
-    } catch (error) {
-      console.error('Error getting session on server:', error)
+    } catch {
+      
     }
   }
 
@@ -85,8 +83,6 @@ export const requestServ = async <T = unknown>(
       ok: response.ok
     }
   } catch (error) {
-    console.error('API Server Error:', error)
-    
     return {
       error: error instanceof Error ? error.message : 'Network error',
       status: 0,

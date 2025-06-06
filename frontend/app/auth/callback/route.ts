@@ -35,19 +35,13 @@ export async function GET(request: Request) {
           redirectUrl = `${origin}${next}`
         }
         
-        console.log('✅ Authentication successful, redirecting to:', redirectUrl)
         return NextResponse.redirect(redirectUrl)
       } else {
-        console.error('❌ Error exchanging code for session:', error)
         return NextResponse.redirect(`${origin}${ROUTES.AUTH.ERROR}?${ROUTES.PARAMS.ERROR}=${encodeURIComponent(error?.message || 'Unknown error')}`)
       }
-    } catch (error) {
-      console.error('❌ Unexpected error during authentication:', error)
+    } catch {
       return NextResponse.redirect(`${origin}${ROUTES.AUTH.ERROR}?${ROUTES.PARAMS.ERROR}=${encodeURIComponent('Unexpected authentication error')}`)
     }
   }
-
-  // Sin código de autenticación
-  console.error('❌ No authentication code provided')
   return NextResponse.redirect(`${origin}${ROUTES.AUTH.ERROR}?${ROUTES.PARAMS.ERROR}=${encodeURIComponent('No authentication code provided')}`)
 } 

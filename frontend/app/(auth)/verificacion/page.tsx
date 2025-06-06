@@ -45,7 +45,6 @@ export default function VerificacionPage() {
             <div className="text-center">
               <button 
                 className="text-sm text-primary-600 hover:text-primary-700 font-medium"
-                // TODO: Implement resend verification email functionality
               >
                 Reenviar correo de verificación
               </button>

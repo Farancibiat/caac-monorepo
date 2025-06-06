@@ -29,7 +29,6 @@ app.use(cors({
   origin: [
     'https://aguasabiertaschiloe.cl',
     'https://www.aguasabiertaschiloe.cl',
-    'http://localhost:3000'
   ],
   credentials: true
 }));

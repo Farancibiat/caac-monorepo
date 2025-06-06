@@ -43,7 +43,6 @@ export const getAllReservations = async (req: Request, res: Response): Promise<v
     
     sendMessage(res, 'RESERVATION_LIST_RETRIEVED', reservations);
   } catch (error) {
-    console.error('Error al obtener reservas:', error);
     sendMessage(res, 'RESERVATION_FETCH_ERROR');
   }
 };
@@ -79,7 +78,6 @@ export const getUserReservations = async (req: Request, res: Response): Promise<
     
     sendMessage(res, 'RESERVATION_USER_LIST_RETRIEVED', reservations);
   } catch (error) {
-    console.error('Error al obtener reservas del usuario:', error);
     sendMessage(res, 'RESERVATION_FETCH_ERROR');
   }
 };
@@ -118,7 +116,6 @@ export const getReservationById = async (req: Request, res: Response): Promise<v
     
     sendMessage(res, 'RESERVATION_RETRIEVED', reservation);
   } catch (error) {
-    console.error('Error al obtener reserva:', error);
     sendMessage(res, 'RESERVATION_FETCH_ERROR');
   }
 };
@@ -205,7 +202,6 @@ export const createReservation = async (req: Request, res: Response): Promise<vo
     
     sendMessage(res, 'RESERVATION_CREATED', newReservation);
   } catch (error) {
-    console.error('Error al crear reserva:', error);
     sendMessage(res, 'RESERVATION_CREATE_ERROR');
   }
 };
@@ -255,7 +251,6 @@ export const cancelReservation = async (req: Request, res: Response): Promise<vo
     
     sendMessage(res, 'RESERVATION_CANCELLED', { reservation: updatedReservation });
   } catch (error) {
-    console.error('Error al cancelar reserva:', error);
     sendMessage(res, 'RESERVATION_CANCEL_ERROR');
   }
 };
@@ -316,7 +311,6 @@ export const confirmPayment = async (req: Request, res: Response): Promise<void>
     
     sendMessage(res, 'RESERVATION_PAYMENT_CONFIRMED', { reservation: updatedReservation });
   } catch (error) {
-    console.error('Error al confirmar pago:', error);
     sendMessage(res, 'RESERVATION_PAYMENT_ERROR');
   }
 };
@@ -352,7 +346,6 @@ export const completeReservation = async (req: Request, res: Response): Promise<
     
     sendMessage(res, 'RESERVATION_COMPLETED', { reservation: updatedReservation });
   } catch (error) {
-    console.error('Error al completar reserva:', error);
     sendMessage(res, 'RESERVATION_COMPLETE_ERROR');
   }
 }; 
