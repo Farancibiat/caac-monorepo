@@ -17,6 +17,7 @@ import authRoutes from '@/routes/authRoutes';
 import scheduleRoutes from '@/routes/scheduleRoutes';
 import reservationRoutes from '@/routes/reservationRoutes';
 import userRoutes from '@/routes/userRoutes';
+import emailRoutes from '@/routes/emailRoutes';
 
 // Inicializar express
 const app = express();
@@ -26,8 +27,8 @@ const PORT = process.env.PORT || 3000;
 app.use(securityHeaders);
 app.use(cors({
   origin: [
-    'https://aguasabiertaschile.cl',
-    'https://www.aguasabiertaschile.cl',
+    'https://aguasabiertaschiloe.cl',
+    'https://www.aguasabiertaschiloe.cl',
     'http://localhost:3000'
   ],
   credentials: true
@@ -43,7 +44,8 @@ app.use('/api/auth', authLimiter);
 app.use('/api/auth', authRoutes);
 app.use('/api/schedules', scheduleRoutes);
 app.use('/api/reservations', reservationRoutes);
-app.use('/api/users', userRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/emails', emailRoutes);
 
 // Ruta principal
 app.get('/', (_req, res) => {

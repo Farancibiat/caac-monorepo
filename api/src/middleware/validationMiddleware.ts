@@ -87,8 +87,10 @@ export const cleanEmptyStrings = (req: Request, _res: Response, next: NextFuncti
     return cleaned;
   };
 
-  if (req.body) req.body = clean(req.body);
-  if (req.query) req.query = clean(req.query);
+  // Solo limpiar req.body para peticiones PUT/POST/PATCH
+  if (req.body && Object.keys(req.body).length > 0) {
+    req.body = clean(req.body);
+  }
   
   next();
 }; 

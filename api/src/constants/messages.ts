@@ -6,6 +6,8 @@ export const MESSAGES = {
     APP_WELCOME: 'API de Reservas de Piscina',
     USER_LIST_RETRIEVED: 'Lista de usuarios obtenida correctamente',
     USER_RETRIEVED: 'Usuario obtenido correctamente',
+    USER_PROFILE_RETRIEVED: 'Perfil de usuario obtenido correctamente',
+    USER_PROFILE_UPDATED: 'Perfil de usuario actualizado correctamente',
     SCHEDULE_LIST_RETRIEVED: 'Lista de horarios obtenida correctamente',
     SCHEDULE_RETRIEVED: 'Horario obtenido correctamente',
     SCHEDULE_UPDATED: 'Horario actualizado correctamente',
@@ -18,6 +20,9 @@ export const MESSAGES = {
     RESERVATION_CANCELLED: 'Reserva cancelada correctamente',
     RESERVATION_PAYMENT_CONFIRMED: 'Pago confirmado correctamente',
     RESERVATION_COMPLETED: 'Reserva marcada como completada',
+    RESERVATION_EMAIL_SENT: 'Comprobante de reserva enviado exitosamente',
+    REMINDER_EMAIL_SENT: 'Recordatorio de reserva enviado exitosamente',
+    EMAIL_CONFIG_VALID: 'Configuración de email válida',
   },
 
   201: {
@@ -46,11 +51,14 @@ export const MESSAGES = {
     RESERVATION_CANNOT_COMPLETE_CANCELLED: 'No se puede completar una reserva cancelada',
     RESERVATION_MISSING_PAYMENT_DATA: 'Por favor proporciona el monto y método de pago',
     RESERVATION_MISSING_AVAILABILITY_DATA: 'Por favor proporciona el ID del horario y la fecha',
+    RESERVATION_ID_REQUIRED: 'El ID de la reserva es requerido',
+    EMAIL_CONFIG_INVALID: 'Configuración de email inválida',
   },
 
   401: {
     AUTH_NOT_AUTHENTICATED: 'No estás autenticado',
     AUTH_NOT_AUTHORIZED: 'No estás autorizado para acceder a este recurso',
+    USER_NOT_AUTHENTICATED: 'Usuario no autenticado',
     AUTH_TOKEN_INVALID: 'Token inválido o expirado',
     AUTH_INVALID_CREDENTIALS: 'Credenciales inválidas',
     AUTH_ACCOUNT_DISABLED: 'Tu cuenta está desactivada. Por favor contacta al administrador.',
@@ -83,6 +91,7 @@ export const MESSAGES = {
     AUTH_UPDATE_ERROR: 'Error al actualizar perfil',
     USER_FETCH_ERROR: 'Error al obtener usuarios',
     USER_CREATE_ERROR: 'Error al crear usuario',
+    USER_UPDATE_ERROR: 'Error al actualizar perfil de usuario',
     SCHEDULE_FETCH_ERROR: 'Error al obtener horarios de natación',
     SCHEDULE_CREATE_ERROR: 'Error al crear horario de natación',
     SCHEDULE_UPDATE_ERROR: 'Error al actualizar horario de natación',
@@ -93,5 +102,8 @@ export const MESSAGES = {
     RESERVATION_CANCEL_ERROR: 'Error al cancelar reserva',
     RESERVATION_PAYMENT_ERROR: 'Error al confirmar pago de la reserva',
     RESERVATION_COMPLETE_ERROR: 'Error al marcar reserva como completada',
+    EMAIL_SEND_ERROR: 'Error al enviar el correo electrónico',
+    PASSWORD_RESET_ERROR: 'Error al enviar el email de recuperación de contraseña',
+    EMAIL_CONFIG_ERROR: 'Error al verificar la configuración de email',
   },
 } as const;

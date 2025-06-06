@@ -5,16 +5,20 @@ import { NextResponse } from 'next/server'
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get(ROUTES.PARAMS.CODE);
+  const tokenHash = searchParams.get('token_hash');
+  
   // Unificar los parámetros de redirección
   const next = searchParams.get('next') ?? 
                searchParams.get(ROUTES.PARAMS.REDIRECT_TO) ?? 
                ROUTES.DASHBOARD;
 
-  if (code) {
+  if (code || tokenHash) {
     const supabase = await supabaseServer()
     
     try {
-      const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+      const { data, error } = tokenHash 
+        ? await supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'signup' })
+        : await supabase.auth.exchangeCodeForSession(code!)
       
       if (!error && data.session) {
         const forwardedHost = request.headers.get('x-forwarded-host')
