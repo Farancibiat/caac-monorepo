@@ -166,7 +166,7 @@ export class EmailService {
   static async sendEmail(template: EmailTemplate): Promise<boolean> {
     try {
       
-      const { data, error } = await resend.emails.send({
+      const { error } = await resend.emails.send({
         from: template.from || DEFAULT_FROM,
         to: template.to,
         subject: template.subject,
