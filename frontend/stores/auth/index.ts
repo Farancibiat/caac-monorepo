@@ -14,7 +14,7 @@ export { useAuth, useRequireAuth, useAuthRedirect } from './hooks'
 export { supabaseClient } from './clients'
 
 // Debug utilities (client safe)
-export { checkAuthStatus, refreshAuthState, clearLocalAuthState, debugAuthState } from './debug'
+// export { checkAuthStatus, refreshAuthState, clearLocalAuthState, debugAuthState } from './debug'
 
 // ===== SERVER SIDE =====
 // Para usar funciones del servidor, importa directamente:
