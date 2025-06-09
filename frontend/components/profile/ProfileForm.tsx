@@ -108,7 +108,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
           reset(data as ProfileFormData);
           toast.success('Datos del perfil cargados.');
         } catch (error) {
-          console.error("Error fetching profile data:", error);
           let errorMessage = 'No se pudieron cargar los datos del perfil.';
           if (error instanceof Error) {
             errorMessage = error.message;
@@ -129,13 +128,9 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
         throw new Error(response.error || 'Error al guardar el perfil');
       }
       
-      console.log('✅ Profile saved to API successfully');
-      
       // Paso 2: Si estamos en modo registro, marcar el perfil como completado en Supabase
       if (mode === 'registro' && user) {
         try {
-          console.log('🔄 Updating user metadata in Supabase...');
-          
           const { error: updateError } = await supabaseClient.auth.updateUser({
             data: {
               ...user.user_metadata,
@@ -144,7 +139,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
           });
 
           if (updateError) {
-            console.error('❌ Error updating user metadata:', updateError);
             throw new Error(`Error al marcar perfil como completado: ${updateError.message}`);
           }
           
@@ -156,12 +150,8 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
               profileCompleted: true
             }
           };
-          setUser(updatedUser);
-          console.log('✅ Profile marked as completed in Supabase');
-          
+          setUser(updatedUser);          
         } catch (metadataError) {
-          console.error('❌ Critical error updating profile completion status:', metadataError);
-          
           // Mostrar error específico para el usuario
           const errorMessage = metadataError instanceof Error 
             ? metadataError.message 
@@ -185,12 +175,10 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
       
       // Solo llamar onSuccess si TODO fue exitoso
       if (onSuccess) {
-        console.log('✅ All operations successful, calling onSuccess');
         onSuccess(data);
       }
       
     } catch (error: unknown) {
-      console.error("❌ Error in form submission:", error);
       
       // Determinar mensaje de error específico
       let errorMessage = 'Ocurrió un error al guardar el perfil';
