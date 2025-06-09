@@ -1,1 +1,3 @@
 .cursor/** merge=ours
+docs/** merge=ours
+api/src/scripts/** merge=ours
