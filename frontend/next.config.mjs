@@ -41,11 +41,11 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.supabase.co https://*.supabase.net",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.supabase.co",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: https: blob:",
-              "connect-src 'self' https://*.supabase.co https://*.supabase.net wss://*.supabase.co wss://*.supabase.net",
+              "connect-src 'self' https://api.aguasabiertaschiloe.cl https://*.supabase.co wss://*.supabase.co",
               "worker-src 'self' blob:",
               "object-src 'none'",
               "base-uri 'none'",
