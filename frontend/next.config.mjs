@@ -3,6 +3,12 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   
+  // Configuración específica para Netlify
+  trailingSlash: true,
+  images: {
+    unoptimized: true
+  },
+  
   // Configuración de webpack para ignorar realtime-js warnings
   webpack: (config) => {
     // Ignorar warnings de realtime-js
