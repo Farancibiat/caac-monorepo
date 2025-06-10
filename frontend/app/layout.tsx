@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/auth/auth-provider";
-import { Toaster } from "sonner";const inter = Inter({ subsets: ["latin"] });
+import { Toaster } from "sonner";
+import { GoogleAnalytics } from '@next/third-parties/google';
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
@@ -43,6 +46,9 @@ const RootLayout = ({
           {children}
         </AuthProvider>
         <Toaster />
+        {process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID && (
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID} />
+        )}
       </body>
     </html>
   );
