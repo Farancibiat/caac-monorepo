@@ -4,15 +4,23 @@ import { getUserFromToken } from '@/config/supabase';
 import { sendMessage } from '@/utils/responseHelper';
 import prisma from '@/config/db';
 
+// Tipo para usuario autenticado
+export interface AuthenticatedUser {
+  id: string;
+  email: string;
+  role: Role;
+  auth_id: string;
+}
+
+// Request con usuario autenticado (para rutas protegidas)
+export interface AuthenticatedRequest extends Request {
+  user: AuthenticatedUser;
+}
+
 declare global {
   namespace Express {
     interface Request {
-      user?: {
-        id: string;
-        email: string;
-        role: Role;
-        auth_id: string;
-      };
+      user?: AuthenticatedUser;
     }
   }
 }

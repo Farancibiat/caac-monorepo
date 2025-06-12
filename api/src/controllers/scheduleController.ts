@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import prisma from '@/config/db';
 import { sendMessage } from '@/utils/responseHelper';
+import { AuthenticatedRequest } from '@/config/auth';
 
 // Obtener todos los horarios
 export const getAllSchedules = async (_req: Request, res: Response): Promise<void> => {
@@ -47,7 +48,7 @@ export const getScheduleById = async (req: Request, res: Response): Promise<void
 };
 
 // Crear un nuevo horario (solo admin)
-export const createSchedule = async (req: Request, res: Response): Promise<void> => {
+export const createSchedule = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const { dayOfWeek, startTime, endTime, maxCapacity, laneCount } = req.body;
     
@@ -76,7 +77,7 @@ export const createSchedule = async (req: Request, res: Response): Promise<void>
 };
 
 // Actualizar un horario (solo admin)
-export const updateSchedule = async (req: Request, res: Response): Promise<void> => {
+export const updateSchedule = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const { dayOfWeek, startTime, endTime, maxCapacity, laneCount, isActive } = req.body;
@@ -109,7 +110,7 @@ export const updateSchedule = async (req: Request, res: Response): Promise<void>
 };
 
 // Eliminar un horario (solo admin)
-export const deleteSchedule = async (req: Request, res: Response): Promise<void> => {
+export const deleteSchedule = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     

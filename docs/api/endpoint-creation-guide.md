@@ -335,6 +335,7 @@ import {
   validateQuery,
   cleanEmptyStrings
 } from '@/schemas';
+import { withAuth, withAuthAndRole } from '@/utils/authWrapper';
 
 const router: Router = express.Router();
 
@@ -342,14 +343,14 @@ const router: Router = express.Router();
 router.get('/',
   protect,
   validateQuery(schemas.[module].query.list),
-  get[Modules]
+  withAuth(get[Modules])
 );
 
 // GET /api/[modules]/:id - Obtener por ID (requiere auth)
 router.get('/:id',
   protect,
   validateParams(schemas.[module].params.id),
-  get[Module]ById
+  withAuth(get[Module]ById)
 );
 
 // POST /api/[modules] - Crear (solo admin)
@@ -358,7 +359,7 @@ router.post('/',
   authorize([Role.ADMIN]),
   cleanEmptyStrings,
   validateBody(schemas.[module].create),
-  create[Module]
+  withAuthAndRole(create[Module])
 );
 
 // PUT /api/[modules]/:id - Actualizar (solo admin)
@@ -368,7 +369,7 @@ router.put('/:id',
   validateParams(schemas.[module].params.id),
   cleanEmptyStrings,
   validateBody(schemas.[module].update),
-  update[Module]
+  withAuthAndRole(update[Module])
 );
 
 // DELETE /api/[modules]/:id - Eliminar (solo admin)
@@ -376,7 +377,7 @@ router.delete('/:id',
   protect,
   authorize([Role.ADMIN]),
   validateParams(schemas.[module].params.id),
-  delete[Module]
+  withAuthAndRole(delete[Module])
 );
 
 export default router;
@@ -528,5 +529,312 @@ router.post('/:id/confirm',
 - **Ejemplo Completo**: `api/src/routes/userRoutes.ts`
 
 ---
+
+## 🔐 Wrappers de Autenticación: Type Safety sin `any`
+
+### **Problema Resuelto**
+
+Anteriormente usábamos `as any` para resolver conflictos de tipos entre `AuthenticatedRequest` y Express Router:
+
+```typescript
+// ❌ Problemático - Uso de "any"
+router.get('/profile', protect, getProfile as any);
+router.post('/', protect, authorize([Role.ADMIN]), createUser as any);
+```
+
+### **Solución Implementada**
+
+Creamos wrappers type-safe que eliminan completamente el uso de `any`:
+
+```typescript
+// api/src/utils/authWrapper.ts
+import { Request, Response, NextFunction } from 'express';
+import { AuthenticatedRequest } from '@/config/auth';
+
+/**
+ * Wrapper para controladores que requieren autenticación
+ */
+export const withAuth = (
+  handler: (req: AuthenticatedRequest, res: Response) => Promise<void>
+) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // El middleware protect garantiza que req.user existe
+      await handler(req as AuthenticatedRequest, res);
+    } catch (error) {
+      next(error);
+    }
+  };
+};
+
+/**
+ * Wrapper para controladores que requieren autenticación y autorización
+ */
+export const withAuthAndRole = (
+  handler: (req: AuthenticatedRequest, res: Response) => Promise<void>
+) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // Los middleware protect + authorize garantizan permisos
+      await handler(req as AuthenticatedRequest, res);
+    } catch (error) {
+      next(error);
+    }
+  };
+};
+```
+
+### **Uso en Rutas**
+
+```typescript
+// api/src/routes/[module]Routes.ts
+import { withAuth, withAuthAndRole } from '@/utils/authWrapper';
+
+// ✅ Type-safe - Solo autenticación
+router.get('/profile', protect, withAuth(getProfile));
+router.get('/my-items', protect, withAuth(getUserItems));
+
+// ✅ Type-safe - Autenticación + Autorización
+router.get('/', protect, authorize([Role.ADMIN]), withAuthAndRole(getUsers));
+router.post('/', protect, authorize([Role.ADMIN]), withAuthAndRole(createUser));
+```
+
+### **Beneficios Obtenidos**
+
+1. **Zero `any`**: Eliminado completamente el uso de `any` en rutas
+2. **Type Safety Real**: TypeScript entiende los tipos correctamente
+3. **Error Handling**: Manejo consistente de errores en un lugar
+4. **Claridad**: Explícito sobre qué rutas requieren autenticación/autorización
+5. **Mantenibilidad**: Fácil modificar comportamiento en un solo lugar
+
+### **Patrón de Uso**
+
+```typescript
+// Para rutas que solo requieren estar logueado
+router.get('/endpoint', protect, withAuth(controller));
+
+// Para rutas que requieren roles específicos  
+router.post('/endpoint', protect, authorize([Role.ADMIN]), withAuthAndRole(controller));
+
+// Para rutas públicas (sin wrapper)
+router.get('/public', controller);
+```
+
+---
+
+
+
+### **Principio Fundamental**
+
+> **"Una sola fuente de verdad para cada tipo de validación"**
+
+- **Schemas (Zod)**: Validación de entrada (tipos, formatos, rangos)
+- **Controladores**: Validación de lógica de negocio (existencia, permisos, estado)
+
+### **Implementación del Principio**
+
+#### **✅ CORRECTO: Separación Clara**
+
+```typescript
+// Schema - Validación de entrada
+export const userSchemas = {
+  create: z.object({
+    email: z.string().email('Email inválido'),
+    name: z.string().min(1, 'Nombre requerido'),
+    password: z.string().min(8, 'Mínimo 8 caracteres'),
+  }),
+};
+
+// Controlador - Solo lógica de negocio
+export const createUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    // req.body ya validado por schema - garantiza campos requeridos
+    const { email, name, password } = req.body;
+    
+    // Solo validación de negocio
+    const existingUser = await prisma.user.findUnique({
+      where: { email }
+    });
+
+    if (existingUser) {
+      sendMessage(res, 'USER_EMAIL_ALREADY_EXISTS');
+      return;
+    }
+    
+    // Crear usuario...
+  } catch (error) {
+    sendMessage(res, 'USER_CREATE_ERROR');
+  }
+};
+```
+
+#### **❌ INCORRECTO: Validación Duplicada**
+
+```typescript
+// Schema ya valida estos campos
+export const userSchemas = {
+  create: z.object({
+    email: z.string().email(),
+    name: z.string().min(1),
+  }),
+};
+
+// Controlador re-valida innecesariamente
+export const createUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { email, name } = req.body;
+    
+    // ❌ REDUNDANTE - Schema ya validó esto
+    if (!email || !name) {
+      sendMessage(res, 'USER_MISSING_REQUIRED_FIELDS');
+      return;
+    }
+    
+    // ❌ REDUNDANTE - Schema ya validó formato
+    if (!email.includes('@')) {
+      sendMessage(res, 'USER_INVALID_EMAIL');
+      return;
+    }
+    
+    // ✅ CORRECTO - Validación de negocio
+    const existingUser = await prisma.user.findUnique({
+      where: { email }
+    });
+  }
+};
+```
+
+### **Tipos de Validación**
+
+#### **1. Validación de Entrada (Schemas)**
+- **Responsabilidad**: Tipos, formatos, rangos, estructura
+- **Cuándo**: Antes de llegar al controlador
+- **Herramienta**: Zod schemas + middleware
+
+```typescript
+// Ejemplos de validación de entrada
+const schemas = {
+  // Tipos y formatos
+  email: z.string().email(),
+  age: z.number().min(18).max(100),
+  date: z.string().refine((date) => !isNaN(Date.parse(date))),
+  
+  // Estructura y rangos
+  pagination: z.object({
+    page: z.number().min(1),
+    limit: z.number().min(1).max(100),
+  }),
+  
+  // Enums y opciones
+  status: z.enum(['ACTIVE', 'INACTIVE']),
+};
+```
+
+#### **2. Validación de Negocio (Controladores)**
+- **Responsabilidad**: Existencia, permisos, estado, relaciones
+- **Cuándo**: Dentro del controlador
+- **Herramienta**: Consultas a base de datos + lógica
+
+```typescript
+// Ejemplos de validación de negocio
+export const updateUser = async (req: AuthenticatedRequest, res: Response) => {
+  // Entrada ya validada por schema
+  const { id } = req.params;
+  const updateData = req.body;
+  
+  // Validación de existencia
+  const user = await prisma.user.findUnique({ where: { id } });
+  if (!user) {
+    sendMessage(res, 'USER_NOT_FOUND');
+    return;
+  }
+  
+  // Validación de permisos
+  if (req.user.role !== 'ADMIN' && req.user.id !== id) {
+    sendMessage(res, 'USER_INSUFFICIENT_PERMISSIONS');
+    return;
+  }
+  
+  // Validación de estado
+  if (user.isDeleted) {
+    sendMessage(res, 'USER_ALREADY_DELETED');
+    return;
+  }
+  
+  // Proceder con actualización...
+};
+```
+
+
+
+**Patrón Establecido para uso de Router.[method]**
+```typescript
+// Orden estándar de middleware
+router.method('/path',
+  protect,                    // 1. Autenticación
+  authorize([Role]),          // 2. Autorización  
+  cleanEmptyStrings,          // 3. Limpieza
+  validateParams(schema),     // 4. Validación params
+  validateQuery(schema),      // 5. Validación query
+  validateBody(schema),       // 6. Validación body
+  controllerFunction          // 7. Controlador
+);
+```
+
+
+### **Mejores Prácticas Establecidas**
+
+
+
+#### **1. Schemas Completos**
+```typescript
+// Incluir TODAS las validaciones de entrada
+export const userSchemas = {
+  create: z.object({
+    // Campos requeridos con validación
+    email: commonSchemas.email,
+    name: commonSchemas.name,
+    
+    // Campos opcionales con validación
+    phone: commonSchemas.phone.optional(),
+    
+    // Validaciones complejas
+    password: z.string()
+      .min(8, 'Mínimo 8 caracteres')
+      .regex(/[A-Z]/, 'Debe contener mayúscula')
+      .regex(/[0-9]/, 'Debe contener número'),
+  }),
+};
+```
+
+#### **2. Separación Clara**
+```typescript
+// ✅ Schema: Validación de entrada
+const schema = z.object({
+  email: z.string().email(),
+  age: z.number().min(18),
+});
+
+// ✅ Controlador: Validación de negocio
+const controller = async (req, res) => {
+  // Entrada garantizada válida
+  const { email, age } = req.body;
+  
+  // Solo lógica de negocio
+  const existingUser = await findUserByEmail(email);
+  if (existingUser) {
+    return sendMessage(res, 'USER_ALREADY_EXISTS');
+  }
+};
+```
+
+### **Checklist de Validación para nuevo endopoints**
+
+#### **Al Crear Nuevo Endpoint:**
+- [ ] **Schema creado** con todas las validaciones de entrada
+- [ ] **Middleware aplicado** en orden correcto
+- [ ] **Controlador limpio** sin validaciones redundantes
+- [ ] **Tipos exportados** desde schema index
+
 
 *Esta guía asegura consistencia arquitectónica y escalabilidad en el desarrollo de nuevos endpoints.* 

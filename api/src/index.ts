@@ -18,6 +18,7 @@ import scheduleRoutes from '@/routes/scheduleRoutes';
 import reservationRoutes from '@/routes/reservationRoutes';
 import userRoutes from '@/routes/userRoutes';
 import emailRoutes from '@/routes/emailRoutes';
+import clubRoutes from '@/routes/clubRoutes';
 
 // Inicializar express
 const app = express();
@@ -47,6 +48,7 @@ app.use('/api/schedules', scheduleRoutes);
 app.use('/api/reservations', reservationRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/emails', emailRoutes);
+app.use('/api/clubes', clubRoutes);
 
 // Ruta principal
 app.get('/', (_req, res) => {

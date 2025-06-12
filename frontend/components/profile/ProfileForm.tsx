@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Combobox } from '@/components/ui/combobox';
 import {
   Select,
   SelectContent,
@@ -28,8 +29,17 @@ import { useAuthStore } from '@/stores/auth/store';
 import { supabaseClient } from '@/stores/auth/clients';
 import { reqClient } from '@/lib/api-client';
 import BirthPicker from '../ui/birthPicker';
+import { 
+  getRegiones, 
+  getComunasByRegion, 
+  isValidComunaForRegion 
+} from '@/lib/regiones-comunas-helper';
 
-// Define el esquema de validación con Yup
+import type { ProfileFormData, ProfileFormProps } from '@/types/forms/profile-form';
+import type { ProfileApiData } from '@/types/api-responses/profile';
+import type { ClubSimple } from '@/types/models/club';
+import type { ApiResponse } from '@/types/api';
+
 const profileSchema = yup.object({
   nombre: yup.string().required('El nombre es obligatorio').min(2, 'El nombre debe tener al menos 2 caracteres'),
   primerApellido: yup.string().required('El primer apellido es obligatorio').min(2, 'El primer apellido debe tener al menos 2 caracteres'),
@@ -37,57 +47,94 @@ const profileSchema = yup.object({
   fechaNacimiento: yup.date().required('La fecha de nacimiento es obligatoria').max(new Date(), 'La fecha de nacimiento no puede ser futura').typeError('Por favor, introduce una fecha válida'),
   telefono: yup.string().required('El teléfono es obligatorio').matches(/^[+]?[0-9\s-()]*$/, 'Formato de teléfono inválido'),
   direccion: yup.string().required('La dirección es obligatoria'),
-  comuna: yup.string().required('La comuna es obligatoria'),
-  region: yup.string().required('La región es obligatoria'),
-  sexo: yup.string().required('El sexo es obligatorio').oneOf(['masculino', 'femenino', 'otro'], 'Selecciona un sexo válido'),
-  club: yup.string().required('El club es obligatorio'),
+  comuna: yup.string()
+    .required('La comuna es obligatoria')
+    .test('comuna-matches-region', 'La comuna debe corresponder a la región seleccionada', 
+      function(value) {
+        const { region } = this.parent;
+        return value && region ? isValidComunaForRegion(value, region) : true;
+      }
+    ),
+  region: yup.string()
+    .required('La región es obligatoria')
+    .oneOf(getRegiones(), 'Selecciona una región válida'),
+  sexo: yup.string().required('El sexo es obligatorio').oneOf(['masculino', 'femenino', 'otro'] as const, 'Selecciona un sexo válido'),
+  club: yup.string().required('Debes seleccionar una opción para el club'),
 });
 
-type ProfileFormData = yup.InferType<typeof profileSchema>;
-
-// Tipo para la respuesta de la API del perfil
-interface ProfileApiResponse {
-  nombre: string;
-  primerApellido: string;
-  segundoApellido: string;
-  fechaNacimiento: string | Date;
-  telefono: string;
-  direccion: string;
-  comuna: string;
-  region: string;
-  sexo: string;
-  club?: string;
-}
-
-interface ProfileFormProps {
-  mode: 'registro' | 'edicion';
-  userId?: string;
-  onSuccess?: (data: ProfileFormData) => void;
-}
+type ProfileSchemaType = yup.InferType<typeof profileSchema>;
 
 const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) => {
   const { user, setUser } = useAuthStore();
   
-  const form = useForm<ProfileFormData>({
+  const form = useForm<ProfileSchemaType>({
     resolver: yupResolver(profileSchema),
     defaultValues: {
       nombre: '',
       primerApellido: '',
       segundoApellido: '',
-      fechaNacimiento: undefined,
+      fechaNacimiento: new Date(),
       telefono: '',
       direccion: '',
       comuna: '',
       region: '',
-      sexo: '',
-      club: undefined
+      sexo: 'masculino',
+      club: ''
     },
   });
 
-  const { handleSubmit, control, reset, formState: { isSubmitting } } = form;
+  const { handleSubmit, control, reset, formState: { isSubmitting }, watch, setValue } = form;
+
+  const selectedRegion = watch('region');
+  
+  const [clubs, setClubes] = useState<ClubSimple[]>([]);
+  const [isLoadingClubes, setIsLoadingClubes] = useState(true);
+  
+  const regionOptions = getRegiones();
+  const comunaOptions = selectedRegion ? getComunasByRegion(selectedRegion) : [];
+  
+  const clubOptions = clubs.length > 0 
+    ? clubs.map(club => club.nombre)
+    : ['Sin Club', 'Otro'];
+  
+  useEffect(() => {
+    const fetchClubes = async () => {
+      try {
+        setIsLoadingClubes(true);
+        const response = await reqClient.get('/api/clubes');
+        
+        if (response.ok && response.data) {
+          const clubsResponse = response.data as ApiResponse<ClubSimple[]>;
+          if (clubsResponse.data) {
+            setClubes(clubsResponse.data);
+          }
+        } else {
+          setClubes([]);
+        }
+      } catch (error) {
+        console.error('Error al cargar clubs:', error);
+        setClubes([]);
+      } finally {
+        setIsLoadingClubes(false);
+      }
+    };
+
+    fetchClubes();
+  }, []);
 
   useEffect(() => {
-    if (mode === 'edicion') {
+    if (selectedRegion) {
+      const currentComuna = watch('comuna');
+      if (currentComuna && !isValidComunaForRegion(currentComuna, selectedRegion)) {
+        setValue('comuna', '');
+      }
+    } else {
+      setValue('comuna', '');
+    }
+  }, [selectedRegion, setValue, watch]);
+
+  useEffect(() => {
+    if (mode === 'edicion' && clubs.length > 0) {
       const fetchProfileData = async () => {
         try {
           const response = await reqClient.get('/api/user/profile');
@@ -96,16 +143,27 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
             throw new Error(response.error || 'No se pudo cargar el perfil');
           }
           
-          const data = response.data;
-          // Convertir fechaNacimiento a Date si es string
-          if (data && typeof data === 'object' && 'fechaNacimiento' in data && data.fechaNacimiento) {
-            const profileData = data as ProfileApiResponse;
-            if (typeof profileData.fechaNacimiento === 'string') {
-              profileData.fechaNacimiento = new Date(profileData.fechaNacimiento);
-            }
-          }
+          const profileData = response.data as ProfileApiData;
           
-          reset(data as ProfileFormData);
+          // Convertir clubId a nombre del club para el formulario
+          const clubName = profileData.clubId 
+            ? clubs.find(club => club.id === profileData.clubId)?.nombre || ''
+            : '';
+          
+          const formData: ProfileSchemaType = {
+            nombre: profileData.nombre,
+            primerApellido: profileData.primerApellido,
+            segundoApellido: profileData.segundoApellido,
+            fechaNacimiento: new Date(profileData.fechaNacimiento),
+            telefono: profileData.telefono,
+            direccion: profileData.direccion,
+            comuna: profileData.comuna,
+            region: profileData.region,
+            sexo: profileData.sexo as 'masculino' | 'femenino' | 'otro',
+            club: clubName
+          };
+          
+          reset(formData);
           toast.success('Datos del perfil cargados.');
         } catch (error) {
           let errorMessage = 'No se pudieron cargar los datos del perfil.';
@@ -117,18 +175,31 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
       };
       fetchProfileData();
     }
-  }, [mode, reset, userId]);
+  }, [mode, reset, userId, clubs]);
 
-  const onSubmit = async (data: ProfileFormData) => {
+  const onSubmit = async (data: ProfileSchemaType) => {
     try {
-      // Paso 1: Guardar el perfil en la API
-      const response = await reqClient.put('/api/user/profile', data);
+      let clubId: number | null = null;
+      if (data.club) {
+        const selectedClub = clubs.find(club => club.nombre === data.club);
+        clubId = selectedClub ? selectedClub.id : null;
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { club, ...restData } = data;
+      const submitData = {
+        ...restData,
+        fechaNacimiento: data.fechaNacimiento,
+        sexo: data.sexo,
+        clubId
+      };
+
+      const response = await reqClient.put('/api/user/profile', submitData);
       
       if (!response.ok) {
         throw new Error(response.error || 'Error al guardar el perfil');
       }
       
-      // Paso 2: Si estamos en modo registro, marcar el perfil como completado en Supabase
       if (mode === 'registro' && user) {
         try {
           const { error: updateError } = await supabaseClient.auth.updateUser({
@@ -142,7 +213,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
             throw new Error(`Error al marcar perfil como completado: ${updateError.message}`);
           }
           
-          // Actualizar el estado local del usuario solo si la operación fue exitosa
           const updatedUser = {
             ...user,
             user_metadata: {
@@ -152,7 +222,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
           };
           setUser(updatedUser);          
         } catch (metadataError) {
-          // Mostrar error específico para el usuario
           const errorMessage = metadataError instanceof Error 
             ? metadataError.message 
             : 'Error al marcar el perfil como completado';
@@ -162,32 +231,26 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
             description: 'Los datos se guardaron pero hay un problema con el estado de completitud. Intenta nuevamente.'
           });
           
-          // NO llamar onSuccess si hay error en metadata
           return;
         }
       }
 
-      // Paso 3: Solo si llegamos aquí, todas las operaciones fueron exitosas
       toast.success('Perfil guardado con éxito!', {
         icon: <CheckCircle className="h-5 w-5 text-green-500" />,
         description: mode === 'registro' ? 'Tu registro ha sido completado exitosamente' : 'Los cambios se han guardado'
       });
       
-      // Solo llamar onSuccess si TODO fue exitoso
       if (onSuccess) {
-        onSuccess(data);
+        onSuccess(data as ProfileFormData);
       }
       
     } catch (error: unknown) {
-      
-      // Determinar mensaje de error específico
       let errorMessage = 'Ocurrió un error al guardar el perfil';
       let description = 'Por favor, revisa los datos e intenta nuevamente';
       
       if (error instanceof Error) {
         errorMessage = error.message;
         
-        // Personalizar descripción según el tipo de error
         if (error.message.includes('network') || error.message.includes('fetch')) {
           description = 'Problema de conexión. Verifica tu internet e intenta nuevamente.';
         } else if (error.message.includes('validation')) {
@@ -197,15 +260,11 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
         }
       }
       
-      // Mostrar error al usuario con descripción útil
       toast.error(errorMessage, {
         icon: <AlertTriangle className="h-5 w-5 text-red-500" />,
         description: description,
-        duration: 6000 // Más tiempo para leer el error
+        duration: 6000
       });
-      
-      // NO llamar onSuccess si hay cualquier error
-      // El usuario permanece en la página para reintentar
     }
   };
 
@@ -213,7 +272,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
     <Form {...form}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Nombre */}
           <FormField
             control={control}
             name="nombre"
@@ -227,8 +285,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
               </FormItem>
             )}
           />
-
-          {/* Primer Apellido */}
           <FormField
             control={control}
             name="primerApellido"
@@ -242,8 +298,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
               </FormItem>
             )}
           />
-
-          {/* Segundo Apellido */}
           <FormField
             control={control}
             name="segundoApellido"
@@ -258,7 +312,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
             )}
           />
 
-          {/* Fecha de Nacimiento */}
           <FormField
             control={control}
             name="fechaNacimiento"
@@ -277,8 +330,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
               </FormItem>
             )}
           />
-
-          {/* Teléfono */}
           <FormField
             control={control}
             name="telefono"
@@ -292,8 +343,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
               </FormItem>
             )}
           />
-
-          {/* Dirección */}
           <FormField
             control={control}
             name="direccion"
@@ -307,23 +356,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
               </FormItem>
             )}
           />
-
-          {/* Comuna */}
-          <FormField
-            control={control}
-            name="comuna"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Comuna</FormLabel>
-                <FormControl>
-                  <Input placeholder="Ej: Providencia" {...field} autoComplete="address-level2" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Región */}
           <FormField
             control={control}
             name="region"
@@ -331,14 +363,40 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
               <FormItem>
                 <FormLabel>Región</FormLabel>
                 <FormControl>
-                  <Input placeholder="Ej: Metropolitana" {...field} autoComplete="address-level1" />
+                  <Combobox
+                    options={regionOptions}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    placeholder="Selecciona tu región"
+                    searchPlaceholder="Buscar región..."
+                    emptyText="No se encontraron regiones."
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          
-          {/* Sexo */}
+          <FormField
+            control={control}
+            name="comuna"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Comuna</FormLabel>
+                <FormControl>
+                  <Combobox
+                    options={comunaOptions}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    placeholder="Selecciona tu comuna"
+                    searchPlaceholder="Buscar comuna..."
+                    disabled={!selectedRegion}
+                    emptyText={!selectedRegion ? "Primero selecciona una región" : "No se encontraron comunas."}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={control}
             name="sexo"
@@ -361,8 +419,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
               </FormItem>
             )}
           />
-
-          {/* Club */}
           <FormField
             control={control}
             name="club"
@@ -370,15 +426,17 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
               <FormItem>
                 <FormLabel>Club</FormLabel>
                 <FormControl>
-                  <Input 
-                    placeholder="Nombre de tu club de natación" 
-                    {...field} 
-                    value={field.value || ''} 
-                    onChange={(e) => field.onChange(e.target.value || null)}
+                  <Combobox
+                    options={clubOptions}
+                    value={field.value || ''}
+                    onValueChange={field.onChange}
+                    placeholder={isLoadingClubes ? "Cargando clubs..." : "Selecciona tu club"}
+                    searchPlaceholder="Buscar club..."
+                    disabled={isLoadingClubes}
+                    emptyText="No se encontraron clubs."
                   />
                 </FormControl>
                 <FormMessage />
-              
               </FormItem>
             )}
           />

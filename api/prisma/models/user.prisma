@@ -24,6 +24,7 @@ model User {
   reservations          Reservation[]
   confirmedReservations Reservation[] @relation("PaymentConfirmations")
   confirmedPayments     PaymentRecord[]
+  profile               Profile?
 
   @@map("users")
   @@schema("public")

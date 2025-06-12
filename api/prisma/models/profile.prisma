@@ -1,0 +1,31 @@
+enum Sexo {
+  MASCULINO @map("masculino")
+  FEMENINO  @map("femenino")
+  OTRO      @map("otro")
+
+  @@schema("public")
+}
+
+model Profile {
+  id               Int      @id @default(autoincrement())
+  userId           Int      @unique @map("user_id")
+  nombre           String
+  primerApellido   String   @map("primer_apellido")
+  segundoApellido  String   @map("segundo_apellido")
+  fechaNacimiento  DateTime @map("fecha_nacimiento") @db.Date
+  telefono         String
+  direccion        String
+  comuna           String
+  region           String
+  sexo             Sexo
+  clubId           Int?     @map("club_id")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+  
+  // Relaciones
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  club Club? @relation(fields: [clubId], references: [id], onDelete: SetNull)
+
+  @@map("profiles")
+  @@schema("public")
+} 

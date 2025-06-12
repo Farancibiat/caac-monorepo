@@ -1,9 +1,10 @@
-import { Request, Response } from 'express';
+import {  Response } from 'express';
 import prisma from '@/config/db';
 import { sendMessage } from '@/utils/responseHelper';
+import { AuthenticatedRequest } from '@/config/auth';
 
 // Obtener todas las reservas (admin/tesorero)
-export const getAllReservations = async (req: Request, res: Response): Promise<void> => {
+export const getAllReservations = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const { status, date, userId } = req.query;
     
@@ -48,13 +49,8 @@ export const getAllReservations = async (req: Request, res: Response): Promise<v
 };
 
 // Obtener reservas del usuario actual
-export const getUserReservations = async (req: Request, res: Response): Promise<void> => {
+export const getUserReservations = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
-    if (!req.user) {
-      sendMessage(res, 'RESERVATION_NOT_AUTHENTICATED');
-      return;
-    }
-    
     const { status } = req.query;
     
     // Construir filtro
@@ -83,7 +79,7 @@ export const getUserReservations = async (req: Request, res: Response): Promise<
 };
 
 // Obtener una reserva por ID
-export const getReservationById = async (req: Request, res: Response): Promise<void> => {
+export const getReservationById = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     
@@ -99,7 +95,7 @@ export const getReservationById = async (req: Request, res: Response): Promise<v
           }
         },
         schedule: true,
-        paymentRecords: req.user?.role === 'USER' ? false : true,
+        paymentRecords: req.user.role === 'USER' ? false : true,
       },
     });
     
@@ -109,7 +105,7 @@ export const getReservationById = async (req: Request, res: Response): Promise<v
     }
     
     // Si el usuario no es admin ni tesorero, verificar que la reserva sea del usuario
-    if (req.user?.role === 'USER' && reservation.userId !== parseInt(req.user.id)) {
+    if (req.user.role === 'USER' && reservation.userId !== parseInt(req.user.id)) {
       sendMessage(res, 'RESERVATION_INSUFFICIENT_PERMISSIONS');
       return;
     }
@@ -121,20 +117,10 @@ export const getReservationById = async (req: Request, res: Response): Promise<v
 };
 
 // Crear una nueva reserva
-export const createReservation = async (req: Request, res: Response): Promise<void> => {
+export const createReservation = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
-    if (!req.user) {
-      sendMessage(res, 'RESERVATION_NOT_AUTHENTICATED');
-      return;
-    }
-    
+
     const { scheduleId, date } = req.body;
-    
-    // Validar datos de entrada
-    if (!scheduleId || !date) {
-      sendMessage(res, 'RESERVATION_MISSING_REQUIRED_FIELDS');
-      return;
-    }
     
     // Verificar si el horario existe
     const schedule = await prisma.swimmingSchedule.findUnique({
@@ -207,13 +193,8 @@ export const createReservation = async (req: Request, res: Response): Promise<vo
 };
 
 // Cancelar una reserva (usuario, admin)
-export const cancelReservation = async (req: Request, res: Response): Promise<void> => {
+export const cancelReservation = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
-    if (!req.user) {
-      sendMessage(res, 'RESERVATION_NOT_AUTHENTICATED');
-      return;
-    }
-    
     const { id } = req.params;
     
     // Obtener la reserva
@@ -243,33 +224,21 @@ export const cancelReservation = async (req: Request, res: Response): Promise<vo
       where: { id: Number(id) },
       data: {
         status: 'CANCELLED',
-      },
-      include: {
-        schedule: true,
+        updatedAt: new Date(),
       },
     });
     
-    sendMessage(res, 'RESERVATION_CANCELLED', { reservation: updatedReservation });
+    sendMessage(res, 'RESERVATION_CANCELLED', updatedReservation);
   } catch (error) {
     sendMessage(res, 'RESERVATION_CANCEL_ERROR');
   }
 };
 
-// Confirmar pago de reserva (tesorero, admin)
-export const confirmPayment = async (req: Request, res: Response): Promise<void> => {
+// Confirmar pago de una reserva (admin/tesorero)
+export const confirmPayment = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
-    if (!req.user) {
-      sendMessage(res, 'RESERVATION_NOT_AUTHENTICATED');
-      return;
-    }
-    
     const { id } = req.params;
-    const { amount, paymentMethod, notes } = req.body;
-    
-    if (!amount || !paymentMethod) {
-      sendMessage(res, 'RESERVATION_MISSING_PAYMENT_DATA');
-      return;
-    }
+    const { amount, paymentMethod } = req.body;
     
     // Obtener la reserva
     const reservation = await prisma.reservation.findUnique({
@@ -287,36 +256,36 @@ export const confirmPayment = async (req: Request, res: Response): Promise<void>
       return;
     }
     
-    // Actualizar la reserva
-    const updatedReservation = await prisma.reservation.update({
+    // Crear registro de pago
+    await prisma.paymentRecord.create({
+      data: {
+        reservationId: Number(id),
+        amount: Number(amount),
+        paymentMethod,
+        confirmedById: parseInt(req.user.id),
+      },
+    });
+    
+    // Actualizar reserva
+    await prisma.reservation.update({
       where: { id: Number(id) },
       data: {
         isPaid: true,
         paymentDate: new Date(),
         paymentConfirmedBy: parseInt(req.user.id),
         status: 'CONFIRMED',
+        updatedAt: new Date(),
       },
     });
     
-    // Registrar el pago
-    await prisma.paymentRecord.create({
-      data: {
-        reservationId: Number(id),
-        amount: parseFloat(amount),
-        paymentMethod,
-        notes: notes || null,
-        confirmedById: parseInt(req.user.id),
-      },
-    });
-    
-    sendMessage(res, 'RESERVATION_PAYMENT_CONFIRMED', { reservation: updatedReservation });
+    sendMessage(res, 'RESERVATION_PAYMENT_CONFIRMED');
   } catch (error) {
     sendMessage(res, 'RESERVATION_PAYMENT_ERROR');
   }
 };
 
 // Marcar reserva como completada (admin)
-export const completeReservation = async (req: Request, res: Response): Promise<void> => {
+export const completeReservation = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     
@@ -337,14 +306,15 @@ export const completeReservation = async (req: Request, res: Response): Promise<
     }
     
     // Actualizar estado de la reserva
-    const updatedReservation = await prisma.reservation.update({
+    await prisma.reservation.update({
       where: { id: Number(id) },
       data: {
         status: 'COMPLETED',
+        updatedAt: new Date(),
       },
     });
     
-    sendMessage(res, 'RESERVATION_COMPLETED', { reservation: updatedReservation });
+    sendMessage(res, 'RESERVATION_COMPLETED');
   } catch (error) {
     sendMessage(res, 'RESERVATION_COMPLETE_ERROR');
   }

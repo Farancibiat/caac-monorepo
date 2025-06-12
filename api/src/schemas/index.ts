@@ -2,6 +2,7 @@
 export * from './common';
 export * from './auth';
 export * from './user';
+export * from './reservation';
 
 // Re-exportar validación middleware para conveniencia
 export {
@@ -16,10 +17,12 @@ export {
 // Objeto centralizado para acceder a todos los schemas
 import { authSchemas } from './auth';
 import { userSchemas } from './user';
+import { reservationSchemas } from './reservation';
 
 export const schemas = {
   auth: authSchemas,
   user: userSchemas,
+  reservation: reservationSchemas,
 } as const;
 
 // Tipos centralizados
@@ -35,4 +38,11 @@ export type {
   UpdateUserData,
   UserListQuery,
   UserParamsId
-} from './user'; 
+} from './user';
+
+export type {
+  CreateReservationData,
+  CancelReservationData,
+  ConfirmPaymentData,
+  CompleteReservationData,
+} from './reservation'; 
