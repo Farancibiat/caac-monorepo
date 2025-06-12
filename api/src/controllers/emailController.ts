@@ -126,7 +126,7 @@ export const sendReservationReminder = async (req: AuthenticatedRequest, res: Re
 };
 
 // Endpoint para probar la configuración de emails
-export const testEmailConfiguration = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+export const testEmailConfiguration = async (_req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const isConfigured = await EmailService.testConfiguration();
     
