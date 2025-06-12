@@ -1,11 +1,11 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import prisma from '@/config/db';
 import { Role } from '@prisma/client';
 import { sendMessage } from '@/utils/responseHelper';
 import { supabaseAdmin } from '@/config/supabase';
 import { AuthenticatedRequest } from '@/config/auth';
 
-export const getUsers = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+export const getUsers = async (_req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const users = await prisma.user.findMany({
       select: {
