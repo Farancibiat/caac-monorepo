@@ -25,6 +25,9 @@ model User {
   confirmedReservations Reservation[] @relation("PaymentConfirmations")
   confirmedPayments     PaymentRecord[]
   profile               Profile?
+  
+  // Relación con Event (como creador)
+  createdEvents         Event[]
 
   @@map("users")
   @@schema("public")

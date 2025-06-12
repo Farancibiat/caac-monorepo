@@ -7,6 +7,9 @@ model Club {
   
   // Relación con Profile
   profiles  Profile[]
+  
+  // Relación con Event (como organizador)
+  organizedEvents Event[]
 
   @@map("clubs")
   @@schema("public")
