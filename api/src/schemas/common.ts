@@ -54,7 +54,15 @@ export const commonSchemas = {
 // Helper para crear schemas de parámetros de ID
 export const createParamIdSchema = (idName = 'id') => z.object({
   [idName]: z.string().transform((val, ctx) => {
-    const parsed = parseInt(val);
+    if (!/^\d+$/.test(val)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `${idName} debe ser un número válido`,
+      });
+      return z.NEVER;
+    }
+    
+    const parsed = Number(val);
     if (isNaN(parsed) || parsed <= 0) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,

@@ -1,10 +1,11 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { EmailService } from '../services/emailService';
 import { sendMessage } from '../utils/responseHelper';
 import prisma from '../config/db';
+import { AuthenticatedRequest } from '../config/auth';
 
 // Enviar comprobante de reserva
-export const sendReservationConfirmation = async (req: Request, res: Response): Promise<void> => {
+export const sendReservationConfirmation = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const { reservationId } = req.body;
 
@@ -66,7 +67,7 @@ export const sendReservationConfirmation = async (req: Request, res: Response): 
 };
 
 // Enviar recordatorio de reserva
-export const sendReservationReminder = async (req: Request, res: Response): Promise<void> => {
+export const sendReservationReminder = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const { reservationId } = req.body;
 
@@ -125,7 +126,7 @@ export const sendReservationReminder = async (req: Request, res: Response): Prom
 };
 
 // Endpoint para probar la configuración de emails
-export const testEmailConfiguration = async (_req: Request, res: Response): Promise<void> => {
+export const testEmailConfiguration = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const isConfigured = await EmailService.testConfiguration();
     

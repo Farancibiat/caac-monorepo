@@ -9,6 +9,7 @@ import {
   checkAvailability
 } from '@/controllers/scheduleController';
 import { protect, authorize } from '@/config/auth';
+import { withAuthAndRole } from '@/utils/authWrapper';
 
 const router: Router = express.Router();
 
@@ -18,8 +19,8 @@ router.get('/availability', checkAvailability);
 router.get('/:id', getScheduleById);
 
 // Rutas protegidas para administradores
-router.post('/', protect, authorize([Role.ADMIN]), createSchedule);
-router.put('/:id', protect, authorize([Role.ADMIN]), updateSchedule);
-router.delete('/:id', protect, authorize([Role.ADMIN]), deleteSchedule);
+router.post('/', protect, authorize([Role.ADMIN]), withAuthAndRole(createSchedule));
+router.put('/:id', protect, authorize([Role.ADMIN]), withAuthAndRole(updateSchedule));
+router.delete('/:id', protect, authorize([Role.ADMIN]), withAuthAndRole(deleteSchedule));
 
 export default router; 

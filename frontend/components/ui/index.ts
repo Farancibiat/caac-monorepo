@@ -26,6 +26,7 @@ export {
 } from './popover';
 export { Calendar } from './calendar';
 export { Checkbox } from './checkbox';
+export { Combobox, type ComboboxProps } from './combobox';
 export {
   Dialog,
   DialogContent,

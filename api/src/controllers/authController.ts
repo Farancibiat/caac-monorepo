@@ -1,16 +1,12 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import prisma from '@/config/db';
 import { sendMessage } from '@/utils/responseHelper';
+import { AuthenticatedRequest } from '@/config/auth';
 
 // Obtener perfil del usuario actual
-export const getProfile = async (req: Request, res: Response): Promise<void> => {
+export const getProfile = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
-    if (!req.user) {
-      sendMessage(res, 'AUTH_NOT_AUTHENTICATED');
-      return;
-    }
-
-    // Buscar usuario por auth_id en lugar de id numérico
+    // req.user garantizado por middleware protect
     const user = await prisma.user.findUnique({
       where: { auth_id: req.user.auth_id },
       select: {
@@ -41,13 +37,9 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
 };
 
 // Actualizar perfil del usuario
-export const updateProfile = async (req: Request, res: Response): Promise<void> => {
+export const updateProfile = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
-    if (!req.user) {
-      sendMessage(res, 'AUTH_NOT_AUTHENTICATED');
-      return;
-    }
-
+    // req.body ya validado por schema - garantiza al menos un campo
     const { name, phone } = req.body;
 
     // Preparar datos para actualización (solo campos permitidos)
@@ -55,12 +47,6 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
     
     if (name !== undefined) updateData.name = name;
     if (phone !== undefined) updateData.phone = phone;
-
-    // Si no hay campos para actualizar
-    if (Object.keys(updateData).length === 0) {
-      sendMessage(res, 'AUTH_UPDATE_ERROR');
-      return;
-    }
 
     // Obtener estado actual del usuario
     const currentUser = await prisma.user.findUnique({
@@ -110,13 +96,8 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
 };
 
 // Verificar si el perfil está completo
-export const checkProfileStatus = async (req: Request, res: Response): Promise<void> => {
+export const checkProfileStatus = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
-    if (!req.user) {
-      sendMessage(res, 'AUTH_NOT_AUTHENTICATED');
-      return;
-    }
-
     const user = await prisma.user.findUnique({
       where: { auth_id: req.user.auth_id },
       select: {

@@ -3,8 +3,9 @@ import prisma from '@/config/db';
 import { Role } from '@prisma/client';
 import { sendMessage } from '@/utils/responseHelper';
 import { supabaseAdmin } from '@/config/supabase';
+import { AuthenticatedRequest } from '@/config/auth';
 
-export const getUsers = async (_req: Request, res: Response): Promise<void> => {
+export const getUsers = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const users = await prisma.user.findMany({
       select: {
@@ -29,14 +30,9 @@ export const getUsers = async (_req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const getUserById = async (req: Request, res: Response): Promise<void> => {
+export const getUserById = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    
-    if (!id || isNaN(Number(id))) {
-      sendMessage(res, 'USER_INVALID_ID');
-      return;
-    }
     
     const user = await prisma.user.findUnique({
       where: { id: Number(id) },
@@ -68,14 +64,9 @@ export const getUserById = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-export const createUser = async (req: Request, res: Response): Promise<void> => {
+export const createUser = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const { email, name, password, phone, role } = req.body;
-    
-    if (!email || !password || !name) {
-      sendMessage(res, 'USER_MISSING_REQUIRED_FIELDS');
-      return;
-    }
     
     // Verificar si el email ya existe en nuestra base de datos
     const existingUser = await prisma.user.findUnique({
@@ -137,17 +128,10 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
 };
 
 // Obtener perfil del usuario autenticado
-export const getProfile = async (req: Request, res: Response): Promise<void> => {
+export const getProfile = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
-    const authId = req.user?.auth_id;
-    
-    if (!authId) {
-      sendMessage(res, 'USER_NOT_AUTHENTICATED');
-      return;
-    }
-    
     const user = await prisma.user.findUnique({
-      where: { auth_id: authId },
+      where: { auth_id: req.user.auth_id },
       select: {
         id: true,
         auth_id: true,
@@ -176,15 +160,8 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
 };
 
 // Actualizar perfil del usuario autenticado
-export const updateProfile = async (req: Request, res: Response): Promise<void> => {
+export const updateProfile = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
-    const authId = req.user?.auth_id;
-    
-    if (!authId) {
-      sendMessage(res, 'USER_NOT_AUTHENTICATED');
-      return;
-    }
-    
     const { 
       nombre, 
       primerApellido, 
@@ -203,7 +180,7 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
     
     // Verificar si el usuario existe
     const existingUser = await prisma.user.findUnique({
-      where: { auth_id: authId }
+      where: { auth_id: req.user.auth_id }
     });
     
     if (!existingUser) {
@@ -213,7 +190,7 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
     
     // Actualizar usuario en la base de datos
     const updatedUser = await prisma.user.update({
-      where: { auth_id: authId },
+      where: { auth_id: req.user.auth_id },
       data: {
         name: fullName,
         phone: telefono,
@@ -237,7 +214,7 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
     });
     
     // También actualizar user_metadata en Supabase
-    const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(authId, {
+    const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(req.user.auth_id, {
       user_metadata: {
         profileCompleted: true,
         full_name: fullName,
