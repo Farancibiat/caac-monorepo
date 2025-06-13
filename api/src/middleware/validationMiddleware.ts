@@ -30,8 +30,7 @@ export const validate = (schemas: ValidationSchemas) => {
         }));
         
         errors.push(...locationErrors);
-      } else {
-        // Si la validación pasa, reemplazar con datos validados/transformados
+      } else if (location === 'body' || location === 'params') {
         req[location] = result.data;
       }
     }

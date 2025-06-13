@@ -174,7 +174,6 @@ module.exports = {
     './pages/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
     './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
   ],
   theme: {
   //...
@@ -243,24 +242,3 @@ NEXT_PUBLIC_SITE_URL=https://aguasabiertaschiloe.cl
 NEXT_PUBLIC_UNSPLASH_ACCESS_KEY=your_unsplash_key
 NEXT_PUBLIC_GA4_MEASUREMENT_ID=G-XXXXXXXXXX
 ```
-
-## Google Analytics 4
-
-### Implementación Simple
-El CSP ya está configurado para permitir GA4. Solo agrega el script estándar de Google:
-
-```html
-<!-- En app/layout.tsx o donde necesites -->
-<Script
-  src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID}`}
-  strategy="afterInteractive"
-/>
-<Script id="google-analytics" strategy="afterInteractive">
-  {`
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', '${process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID}');
-  `}
-</Script>
-``` 

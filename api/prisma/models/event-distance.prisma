@@ -1,0 +1,31 @@
+model EventDistance {
+  id                Int      @id @default(autoincrement())
+  eventId           Int      @map("event_id")
+  
+  // Información de la distancia
+  name              String   // "Distancia Corta", "Élite", "Principiantes"
+  distance          Int      // Distancia en metros
+  distanceDisplay   String   @map("distance_display") // "1.5 km", "2.5 km"
+  
+  // Límites (informativos)
+  maxParticipants   Int?     @map("max_participants")
+  currentEnrolled   Int      @default(0) @map("current_enrolled")
+  minAge            Int?     @map("min_age")
+  maxAge            Int?     @map("max_age")
+  
+  // Requisitos específicos de esta distancia
+  requirements      Json?    // string[]
+  
+  // Metadata
+  isActive          Boolean  @default(true) @map("is_active")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  // Relaciones
+  event             Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+  @@index([isActive])
+  @@map("event_distances")
+  @@schema("public")
+} 
