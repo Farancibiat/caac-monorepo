@@ -5,7 +5,7 @@ import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { cookies } from 'next/headers'
-import { ROUTES } from '@/constants/routes'
+import { ROUTES } from '@/config/routes'
 export const signInWithGoogle = async () => {
   const supabase = await supabaseServer()
   const headersList = await headers()

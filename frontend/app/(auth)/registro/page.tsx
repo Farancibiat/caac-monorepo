@@ -2,13 +2,14 @@ import React from 'react'
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { RegisterForm } from './RegisterForm'
+import { ROUTES } from '@/config/routes'
 
 export const metadata = {
   title: 'Registro - Club de Aguas Abiertas Chiloé',
   description: 'Regístrate en el Club de Aguas Abiertas Chiloé'
 }
 
-export default function RegistroPage() {
+const RegistroPage=()=> {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-ocean-50 to-accent-50 flex items-center justify-center p-4">
       <Card className="w-full max-w-md border-primary-200 shadow-xl">
@@ -20,7 +21,7 @@ export default function RegistroPage() {
           <CardDescription className="text-neutral-600">
             O{' '}
             <Link 
-              href="/login" 
+              href={ROUTES.AUTH.LOGIN} 
               className="text-primary-600 hover:text-primary-700 font-medium"
             >
               iniciar sesión si ya tienes una cuenta
@@ -36,17 +37,19 @@ export default function RegistroPage() {
               <p className="text-sm text-neutral-500">
                 Al registrarte, aceptas nuestros{' '}
                 <Link 
-                  href="/terminos" 
+                  href={ROUTES.TERMINOS} 
                   className="text-primary-600 hover:text-primary-700 underline"
+                  target="_blank"
                 >
-                  Términos de Servicio
-                </Link>{' '}
-                y{' '}
+                  términos y condiciones
+                </Link>
+                {' '}y la{' '}
                 <Link 
-                  href="/privacidad" 
+                  href={ROUTES.PRIVACIDAD} 
                   className="text-primary-600 hover:text-primary-700 underline"
+                  target="_blank"
                 >
-                  Política de Privacidad
+                  política de privacidad
                 </Link>
               </p>
             </div>
@@ -56,3 +59,4 @@ export default function RegistroPage() {
     </div>
   )
 }
+export default RegistroPage;

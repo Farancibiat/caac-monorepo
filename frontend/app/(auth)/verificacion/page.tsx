@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Mail } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { ROUTES } from '@/config/routes'
 
 export const metadata = {
   title: 'Verificación de Correo - Club de Aguas Abiertas Chiloé',
@@ -34,7 +35,7 @@ export default function VerificacionPage() {
           </p>
           
           <div className="space-y-4">
-            <Link href="/login">
+            <Link href={ROUTES.AUTH.LOGIN}>
               <Button 
                 className="w-full bg-primary-600 hover:bg-primary-700 text-white h-12 text-base font-medium"
               >

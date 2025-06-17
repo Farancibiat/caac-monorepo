@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import { useRequireAuth } from '@/stores/auth'
-import { ROUTES } from '@/constants/routes'
+import { ROUTES } from '@/config/routes'
 import { useRouting } from '@/hooks/useRouting'
 import RedirectMsj from '@/components/RedirectMsj'
 

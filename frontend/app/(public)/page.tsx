@@ -6,6 +6,7 @@ import { Calendar, MapPin, Users, Trophy, Camera, Waves, ArrowRight, Star, Heart
 import Link from "next/link"
 import Image from "next/image"
 import { useAuthStore } from "@/stores/auth/store"
+import { ROUTES } from "@/config/routes"
 
 const Home = () => {
   const { user } = useAuthStore()
@@ -67,14 +68,14 @@ const Home = () => {
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 {user ? (
-                  <Link href="/dashboard">
+                  <Link href={ROUTES.DASHBOARD}>
                     <Button className="bg-accent-400 hover:bg-accent-500 text-accent-900 font-semibold h-12 px-8 text-lg">
                       <Calendar className="mr-2 h-5 w-5" />
                       Reservar Piscina
                     </Button>
                   </Link>
                 ) : (
-                  <Link href="/login">
+                  <Link href={ROUTES.AUTH.LOGIN}>
                     <Button className="bg-accent-400 hover:bg-accent-500 text-accent-900 font-semibold h-12 px-8 text-lg">
                       <Users className="mr-2 h-5 w-5" />
                       Únete al Club
@@ -82,7 +83,7 @@ const Home = () => {
                   </Link>
                 )}
                 
-                <Link href="/eventos">
+                <Link href={ROUTES.EVENTOS}>
                   <Button 
                     variant="outline" 
                     className="border-2 border-white bg-transparent text-white hover:bg-white hover:text-primary-700 h-12 px-8 text-lg font-semibold"
@@ -174,7 +175,7 @@ const Home = () => {
                   </div>
                   
                   <div className="pt-4">
-                    <Link href="/eventos">
+                    <Link href={ROUTES.EVENTOS}>
                       <Button className="bg-accent-600 hover:bg-accent-700 text-white h-12 px-8 text-lg font-semibold">
                         <Star className="mr-2 h-5 w-5" />
                         Más Información
@@ -247,14 +248,14 @@ const Home = () => {
                   
                   <div className="pt-4">
                     {user ? (
-                      <Link href="/dashboard">
+                      <Link href={ROUTES.DASHBOARD}>
                         <Button className="bg-primary-600 hover:bg-primary-700 text-white h-12 px-8 text-lg font-semibold">
                           <Calendar className="mr-2 h-5 w-5" />
                           Reservar Ahora
                         </Button>
                       </Link>
                     ) : (
-                      <Link href="/login">
+                      <Link href={ROUTES.AUTH.LOGIN}>
                         <Button className="bg-primary-600 hover:bg-primary-700 text-white h-12 px-8 text-lg font-semibold">
                           <Users className="mr-2 h-5 w-5" />
                           Únete para Reservar
@@ -317,12 +318,13 @@ const Home = () => {
                   </div>
                   
                   <div className="pt-2">
-                    <Link href="/eventos">
+                    <Link href={ROUTES.EVENTOS}>
                       <Button 
                         variant="outline" 
-                        className="w-full border-primary-300 text-primary-700 hover:bg-primary-600 hover:text-white hover:border-primary-600 transition-all"
+                        className="border-primary-300 text-primary-700 hover:bg-primary-50 h-12 px-8 text-lg font-semibold"
                       >
-                        Ver Detalles
+                        <Calendar className="mr-2 h-5 w-5" />
+                        Ver Eventos
                       </Button>
                     </Link>
                   </div>
@@ -332,7 +334,7 @@ const Home = () => {
           </div>
           
           <div className="text-center mt-12">
-            <Link href="/eventos">
+            <Link href={ROUTES.EVENTOS}>
               <Button className="bg-primary-600 hover:bg-primary-700 text-white h-12 px-8 text-lg">
                 Ver Todos los Eventos
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -365,10 +367,13 @@ const Home = () => {
               </div>
               
               <div className="pt-4">
-                <Link href="/galeria">
-                  <Button className="bg-ocean-600 hover:bg-ocean-700 text-white h-12 px-8 text-lg font-semibold">
+                <Link href={ROUTES.GALERIA}>
+                  <Button 
+                    variant="outline" 
+                    className="border-accent-300 text-accent-700 hover:bg-accent-50 h-12 px-8 text-lg font-semibold"
+                  >
                     <Camera className="mr-2 h-5 w-5" />
-                    Explorar Galería
+                    Ver Galería
                   </Button>
                 </Link>
               </div>

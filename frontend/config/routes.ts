@@ -1,6 +1,12 @@
 export const ROUTES = {
     // Rutas públicas
     HOME: '/',
+    EVENTOS: '/eventos',
+    GALERIA: '/galeria',
+    NOSOTROS: '/nosotros',
+    CONTACTO: '/contacto',
+    TERMINOS: '/terminos',
+    PRIVACIDAD: '/privacidad',
     
     // Rutas de autenticación
     AUTH: {
@@ -16,14 +22,14 @@ export const ROUTES = {
       ERROR: '/auth/auth-code-error',    // ⚠️ Referenciado en código de callback
     },
     
-    // Rutas privadas
-    DASHBOARD: '/dashboard',
+    // Rutas privadas (con prefijo /app/)
+    DASHBOARD: '/app/dashboard',
     PROFILE: {
-      COMPLETE: '/complete-profile',
-      EDIT: '/settings/profile',
+      COMPLETE: '/app/complete-profile',
+      EDIT: '/app/settings/profile',
     },
-    RESERVATIONS: '/reservas',
-    ADMIN: '/admin',
+    RESERVATIONS: '/app/reservas',
+    ADMIN: '/app/admin',
     
     // Parámetros de URL
     PARAMS: {

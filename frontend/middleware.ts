@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
-import { ROUTES } from '@/constants/routes';
+import { ROUTES } from '@/config/routes'
+import { isAuthRoute, isAdminRoute } from '@/lib/route-utils'
 
 const createMiddlewareSupabaseClient = (request: NextRequest) => {
   return createServerClient(
@@ -42,7 +43,7 @@ const clearSupabaseCookies = (request: NextRequest, response: NextResponse) => {
 
 const addSecurityHeaders = (response: NextResponse, request: NextRequest) => {
 
-  if (request.nextUrl.pathname.startsWith('/admin')) {
+  if (isAdminRoute(request.nextUrl.pathname)) {
     response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
   }
   
@@ -57,12 +58,10 @@ const addSecurityHeaders = (response: NextResponse, request: NextRequest) => {
 export const middleware = async (request: NextRequest) => {
   const { pathname } = request.nextUrl
 
-  const protectedRoutes = [ROUTES.DASHBOARD, ROUTES.RESERVATIONS, ROUTES.ADMIN, ROUTES.PROFILE.COMPLETE, ROUTES.PROFILE.EDIT];
-  const authRoutes = [ROUTES.AUTH.LOGIN, ROUTES.AUTH.REGISTER];
-  
-  const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))
-  const isAuthRoute = authRoutes.some(route => pathname.startsWith(route))
-  const isCompleteProfileRoute = pathname.startsWith(ROUTES.PROFILE.COMPLETE)
+  // Optimización: verificación directa para rutas /app/
+  const isProtectedRoute = pathname.startsWith('/app/')
+  const isAuthRouteCheck = isAuthRoute(pathname)
+  const isCompleteProfileRouteCheck = pathname.startsWith('/app/complete-profile')
 
 
   let response = NextResponse.next({
@@ -75,7 +74,7 @@ export const middleware = async (request: NextRequest) => {
   response = addSecurityHeaders(response, request);
 
 
-  if (!isProtectedRoute && !isAuthRoute) {
+  if (!isProtectedRoute && !isAuthRouteCheck) {
     return response;
   }
 
@@ -103,7 +102,7 @@ export const middleware = async (request: NextRequest) => {
         return NextResponse.redirect(resendConfirmationUrl);
       }
 
-      if (!isCompleteProfileRoute) {
+      if (!isCompleteProfileRouteCheck) {
         const userMetadata = user.user_metadata || {}
         const profileCompleted = userMetadata.profileCompleted === true
         
@@ -118,7 +117,7 @@ export const middleware = async (request: NextRequest) => {
       return response
     }
 
-    if (isAuthRoute) {
+    if (isAuthRouteCheck) {
       if (user) {
         const redirectTo = request.nextUrl.searchParams.get(ROUTES.PARAMS.REDIRECT_TO) || ROUTES.DASHBOARD
         const redirectResponse = NextResponse.redirect(new URL(redirectTo, request.url));

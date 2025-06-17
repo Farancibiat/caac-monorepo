@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { ROUTES } from '@/config/routes'
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()
@@ -22,22 +23,22 @@ const Footer = () => {
             <h4 className="text-base font-semibold text-white">Enlaces Rápidos</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/eventos" className="hover:text-primary-400 transition-colors">
+                <Link href={ROUTES.EVENTOS} className="hover:text-primary-400 transition-colors">
                   Eventos
                 </Link>
               </li>
               <li>
-                <Link href="/galeria" className="hover:text-primary-400 transition-colors">
+                <Link href={ROUTES.GALERIA} className="hover:text-primary-400 transition-colors">
                   Galería
                 </Link>
               </li>
               <li>
-                <Link href="/nosotros" className="hover:text-primary-400 transition-colors">
+                <Link href={ROUTES.NOSOTROS} className="hover:text-primary-400 transition-colors">
                   Nosotros
                 </Link>
               </li>
               <li>
-                <Link href="/contacto" className="hover:text-primary-400 transition-colors">
+                <Link href={ROUTES.CONTACTO} className="hover:text-primary-400 transition-colors">
                   Contacto
                 </Link>
               </li>

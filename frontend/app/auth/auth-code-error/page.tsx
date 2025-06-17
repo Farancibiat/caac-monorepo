@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { AlertCircle } from 'lucide-react'
+import { ROUTES } from '@/config/routes'
 
 const AuthCodeErrorPage = () => {
   return (
@@ -31,12 +32,12 @@ const AuthCodeErrorPage = () => {
           
           <div className="flex flex-col gap-2">
             <Button asChild className="w-full">
-              <Link href="/login">
+              <Link href={ROUTES.AUTH.LOGIN}>
                 Intentar de Nuevo
               </Link>
             </Button>
             <Button variant="outline" asChild className="w-full">
-              <Link href="/">
+              <Link href={ROUTES.HOME}>
                 Volver al Inicio
               </Link>
             </Button>

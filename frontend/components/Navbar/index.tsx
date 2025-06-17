@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { usePathname } from 'next/navigation'
 import { useAuthStore } from '@/stores/auth/store'
 import { Button } from '@/components/ui/button'
 import {
@@ -12,13 +13,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Menu, X, User, LogOut, Settings, Calendar, ChevronDown } from 'lucide-react'
+import { Menu, X, User, LogOut, ChevronDown, Lock } from 'lucide-react'
 import { cn } from '@/lib/shadcn-utils'
+import { isPrivateRoute } from '@/lib/route-utils'
+import { ROUTES } from '@/config/routes'
 
 const NavBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const { user, signOut } = useAuthStore()
+  const pathname = usePathname()
 
   // Detectar scroll para cambiar tamaño del navbar
   useEffect(() => {
@@ -38,12 +42,15 @@ const NavBar = () => {
     setIsMenuOpen(false)
   }
 
+  // Check if we're in a private route
+  const isPrivateRouteCheck = isPrivateRoute(pathname)
+
   const navigation = [
-    { name: 'Inicio', href: '/' },
-    { name: 'Eventos', href: '/eventos' },
-    { name: 'Galería', href: '/galeria' },
-    { name: 'Nosotros', href: '/nosotros' },
-    { name: 'Contacto', href: '/contacto' },
+    { name: 'Inicio', href: ROUTES.HOME },
+    { name: 'Eventos', href: ROUTES.EVENTOS },
+    { name: 'Galería', href: ROUTES.GALERIA },
+    { name: 'Nosotros', href: ROUTES.NOSOTROS },
+    { name: 'Contacto', href: ROUTES.CONTACTO },
   ]
 
   return (
@@ -54,15 +61,19 @@ const NavBar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className={cn(
           "flex justify-between items-center transition-all duration-300 ease-in-out",
-          isScrolled ? "h-16" : "h-20 lg:h-24"
+          isPrivateRouteCheck 
+            ? "h-16" // Altura fija en rutas privadas
+            : isScrolled ? "h-16" : "h-20 lg:h-24" // Comportamiento dinámico en rutas públicas
         )}>
           
           {/* Logo Horizontal */}
           <div className="flex-shrink-0">
-            <Link href="/" className="flex items-center group">
+            <Link href={ROUTES.HOME} className="flex items-center group">
               <div className={cn(
                 "relative transition-all duration-300 ease-in-out overflow-hidden rounded-lg",
-                isScrolled 
+                isPrivateRouteCheck
+                  ? "h-10 w-32 sm:h-12 sm:w-36" // Tamaño fijo en rutas privadas
+                  : isScrolled 
                   ? "h-10 w-32 sm:h-12 sm:w-36" 
                   : "h-12 w-36 sm:h-14 sm:w-40 lg:h-16 lg:w-48"
               )}>
@@ -119,23 +130,15 @@ const NavBar = () => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
-                    <div className="px-2 py-1.5 text-sm text-neutral-500">
-                      {user.user_metadata?.full_name || user.email}
-                    </div>
-                    <DropdownMenuSeparator />
+                    {!isPrivateRouteCheck ? (
                     <DropdownMenuItem asChild>
-                      <Link href="/dashboard" className="flex items-center cursor-pointer">
-                        <Settings className="mr-2 h-4 w-4" />
-                        Dashboard
-                      </Link>
+                                              <Link href={ROUTES.DASHBOARD} className="flex items-center cursor-pointer">
+                          <Lock className="mr-2 h-4 w-4" />
+                          Sitio Privado
+                        </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/reservas" className="flex items-center cursor-pointer">
-                        <Calendar className="mr-2 h-4 w-4" />
-                        Mis Reservas
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
+                    ) : null}
+                    {!isPrivateRouteCheck && <DropdownMenuSeparator />}
                     <DropdownMenuItem onClick={handleSignOut} className="text-red-600 focus:text-red-600 cursor-pointer">
                       <LogOut className="mr-2 h-4 w-4" />
                       Cerrar Sesión
@@ -145,7 +148,7 @@ const NavBar = () => {
               </div>
             ) : (
               <div className="flex items-center space-x-2">
-                <Link href="/registro">
+                <Link href={ROUTES.AUTH.REGISTER}>
                   <Button 
                     variant="ghost" 
                     size="sm" 
@@ -154,7 +157,7 @@ const NavBar = () => {
                     Registrarse
                   </Button>
                 </Link>
-                <Link href="/login">
+                <Link href={ROUTES.AUTH.LOGIN}>
                   <Button 
                     size="sm" 
                     className="bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold px-6 shadow-sm hover:shadow-md transition-all duration-200"
@@ -167,7 +170,8 @@ const NavBar = () => {
           </div>
 
           {/* Mobile menu button */}
-          <div className="lg:hidden">
+          <div className="lg:hidden flex items-center space-x-2">
+            {/* Main menu button */}
             <button
               onClick={toggleMenu}
               className="text-neutral-700 hover:text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary-500 p-2 rounded-xl hover:bg-neutral-100 transition-all duration-200"
@@ -215,24 +219,17 @@ const NavBar = () => {
                       </div>
                     </div>
                     <div className="space-y-2 px-2">
-                      <Link
-                        href="/dashboard"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
+                      {!isPrivateRouteCheck && (
+                                              <Link
+                          href={ROUTES.DASHBOARD}
+                          onClick={() => setIsMenuOpen(false)}
+                        >
                         <Button className="w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold justify-start">
-                          <Settings className="h-4 w-4 mr-2" />
-                          Dashboard
+                            <Lock className="h-4 w-4 mr-2" />
+                            Sitio Privado
                         </Button>
                       </Link>
-                      <Link
-                        href="/reservas"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        <Button variant="outline" className="w-full justify-start font-medium">
-                          <Calendar className="h-4 w-4 mr-2" />
-                          Mis Reservas
-                        </Button>
-                      </Link>
+                      )}
                       <Button 
                         variant="ghost" 
                         onClick={handleSignOut}
@@ -245,12 +242,12 @@ const NavBar = () => {
                   </div>
                 ) : (
                   <div className="space-y-2 px-2">
-                    <Link href="/registro" onClick={() => setIsMenuOpen(false)}>
+                    <Link href={ROUTES.AUTH.REGISTER} onClick={() => setIsMenuOpen(false)}>
                       <Button variant="outline" className="w-full font-semibold">
                         Registrarse
                       </Button>
                     </Link>
-                    <Link href="/login" onClick={() => setIsMenuOpen(false)}>
+                    <Link href={ROUTES.AUTH.LOGIN} onClick={() => setIsMenuOpen(false)}>
                       <Button className="w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold">
                         Iniciar Sesión
                       </Button>

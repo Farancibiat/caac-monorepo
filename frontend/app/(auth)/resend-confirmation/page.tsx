@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/card';
 import Link from 'next/link';
 import { SupabaseErrorCode } from '@/constants/supabaseErrors';
+import { ROUTES } from '@/config/routes'
 
 const resendSchema = yup.object().shape({
   email: yup
@@ -127,7 +128,7 @@ const ResendConfirmationPage = () => {
             </Button>
           </form>
           <div className="mt-6 text-center text-sm">
-            <Link href="/login" className="font-medium text-primary-600 hover:text-primary-700">
+            <Link href={ROUTES.AUTH.LOGIN} className="font-medium text-primary-600 hover:text-primary-700">
               Volver a Iniciar Sesión
             </Link>
           </div>

@@ -1,4 +1,4 @@
-import { ROUTES } from '@/constants/routes';
+import { ROUTES } from '@/config/routes';
 import { supabaseServer } from '@/stores/auth/server'
 import { NextResponse } from 'next/server'
 

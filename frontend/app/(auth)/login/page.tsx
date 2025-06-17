@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { LoginForm } from './LoginForm'
+import { ROUTES } from '@/config/routes'
 
 const LoginPage = () => {
   return (
@@ -23,7 +24,7 @@ const LoginPage = () => {
             <p className="text-sm text-neutral-500">
               ¿No tienes una cuenta?{' '}
               <Link 
-                href="/registro" 
+                href={ROUTES.AUTH.REGISTER} 
                 className="text-primary-600 hover:text-primary-700 font-medium"
               >
                 Regístrate aquí
