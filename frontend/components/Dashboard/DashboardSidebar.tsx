@@ -90,19 +90,19 @@ const DashboardSidebar = () => {
           {/* Header */}
           <div className="p-4 border-b border-neutral-200">
             <div className="flex items-center justify-between">
-              {!sidebarCollapsed && (
+            {!sidebarCollapsed && (
                 <h2 className="font-semibold text-lg text-neutral-900">Panel de Control</h2>
               )}
               
               {/* Desktop collapse button */}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={toggleSidebar}
-                className="hidden lg:flex"
-              >
-                <ChevronLeft className={`h-4 w-4 transition-transform ${sidebarCollapsed ? 'rotate-180' : ''}`} />
-              </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleSidebar}
+              className="hidden lg:flex"
+            >
+              <ChevronLeft className={`h-4 w-4 transition-transform ${sidebarCollapsed ? 'rotate-180' : ''}`} />
+            </Button>
               
               {/* Mobile close button */}
               <Button
@@ -134,11 +134,11 @@ const DashboardSidebar = () => {
 
                 return (
                   <Link key={sectionKey} href={fullPath}>
-                    <Button
+              <Button
                       variant={itemActive ? "default" : "ghost"}
-                      className={`
-                        w-full justify-start text-left
-                        ${sidebarCollapsed ? 'px-2' : 'px-3'}
+                className={`
+                  w-full justify-start text-left
+                  ${sidebarCollapsed ? 'px-2' : 'px-3'}
                         ${itemActive 
                           ? 'bg-primary-600 text-white hover:bg-primary-700' 
                           : 'hover:bg-neutral-100 text-neutral-700'
@@ -148,12 +148,12 @@ const DashboardSidebar = () => {
                     >
                       <div className="flex items-center">
                         {section.icon}
-                        {!sidebarCollapsed && (
+                {!sidebarCollapsed && (
                           <span className="ml-3">{section.title}</span>
-                        )}
+                )}
                       </div>
-                    </Button>
-                  </Link>
+              </Button>
+            </Link>
                 )
               }
 
@@ -165,25 +165,25 @@ const DashboardSidebar = () => {
                     onOpenChange={() => toggleSection(sectionKey)}
                   >
                     <CollapsibleTrigger asChild>
-                      <Button
+                <Button
                         variant={isCurrentSectionActive ? "default" : "ghost"}
-                        className={`
+                  className={`
                           w-full justify-between text-left
-                          ${sidebarCollapsed ? 'px-2' : 'px-3'}
+                    ${sidebarCollapsed ? 'px-2' : 'px-3'}
                           ${isCurrentSectionActive 
-                            ? 'bg-primary-600 text-white hover:bg-primary-700' 
-                            : 'hover:bg-neutral-100 text-neutral-700'
-                          }
-                          transition-colors
-                        `}
-                      >
-                        <div className="flex items-center">
+                      ? 'bg-primary-600 text-white hover:bg-primary-700' 
+                      : 'hover:bg-neutral-100 text-neutral-700'
+                    }
+                    transition-colors
+                  `}
+                >
+                  <div className="flex items-center">
                           {section.icon}
                           {!sidebarCollapsed && (
                             <span className="ml-3">{section.title}</span>
                           )}
                         </div>
-                        {!sidebarCollapsed && (
+                    {!sidebarCollapsed && (
                           isSectionOpen 
                             ? <ChevronDown className="h-4 w-4" /> 
                             : <ChevronRight className="h-4 w-4" />
@@ -224,7 +224,7 @@ const DashboardSidebar = () => {
                       </CollapsibleContent>
                     )}
                   </Collapsible>
-                </div>
+                  </div>
               )
             })}
           </nav>

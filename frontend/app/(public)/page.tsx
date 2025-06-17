@@ -2,9 +2,8 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Calendar, MapPin, Users, Trophy, Camera, Waves, ArrowRight, Star, Heart, Target } from "lucide-react"
+import { Calendar, MapPin, Users, Trophy, Waves, ArrowRight, Star, Heart, Target } from "lucide-react"
 import Link from "next/link"
-import Image from "next/image"
 import { useAuthStore } from "@/stores/auth/store"
 import { ROUTES } from "@/config/routes"
 
@@ -14,35 +13,35 @@ const Home = () => {
   const proximosEventos = [
     {
       titulo: "3° Desafío Unión de las Islas",
-      fecha: "15 de Marzo, 2024",
-      ubicacion: "Quinchao, Chiloé",
-      participantes: 45,
+      fecha: "7 de Diciembre, 2025",
+      ubicacion: "Quinched, Chiloé",
+      participantes: 100,
       tipo: "Competencia",
-      distancia: "2.5 km"
+      distancia: "Iniciación | 0,5k | 1k | 3,5k"
     },
     {
-      titulo: "Natación Nocturna Castro",
-      fecha: "22 de Marzo, 2024",
-      ubicacion: "Castro, Chiloé",
-      participantes: 25,
+      titulo: "2° Feria de Aguas Abiertas",
+      fecha: "7 de Diciembre, 2025",
+      ubicacion: "Quinched, Chiloé",
+      participantes: 150,
       tipo: "Recreativo",
-      distancia: "1 km"
+      distancia: "Expositores Nacionales"
     },
     {
-      titulo: "Copa Chiloé de Aguas Abiertas",
-      fecha: "5 de Abril, 2024",
-      ubicacion: "Ancud, Chiloé",
-      participantes: 80,
-      tipo: "Competencia",
-      distancia: "1.5-5 km"
+      titulo: "2° Clínica de Aguas Abiertas",
+      fecha: "6 de Diciembre, 2025",
+      ubicacion: "Laguna Millán, Chiloé",
+      participantes: 100,
+      tipo: "Formativo",
+      distancia: "Iniciación"
     }
   ]
 
   const estadisticas = [
-    { numero: "150+", texto: "Nadadores Activos", icono: <Users className="h-6 w-6" /> },
-    { numero: "25+", texto: "Eventos Anuales", icono: <Calendar className="h-6 w-6" /> },
-    { numero: "6", texto: "Años de Historia", icono: <Trophy className="h-6 w-6" /> },
-    { numero: "100%", texto: "Satisfacción", icono: <Heart className="h-6 w-6" /> }
+    { numero: "50+", texto: "Socios Activos", icono: <Users className="h-6 w-6" /> },
+    { numero: "40+", texto: "Presencia en eventos ", icono: <Calendar className="h-6 w-6" /> },
+    { numero: "4", texto: "Años de Historia", icono: <Trophy className="h-6 w-6" /> },
+   
   ]
 
   return (
@@ -50,67 +49,36 @@ const Home = () => {
       
       {/* Hero Section */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary-600/90 to-ocean-600/90"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            
-            {/* Content */}
-            <div className="text-center lg:text-left space-y-8">
-              <div className="space-y-4">
-                <h1 className="text-5xl lg:text-6xl font-bold text-white leading-tight">
-                  Vive la <span className="text-accent-300">Aventura</span> del Agua
-                </h1>
-                <p className="text-xl text-primary-100 max-w-2xl">
-                  Únete al Club de Aguas Abiertas Chiloé y descubre la magia de nadar 
-                  en las cristalinas aguas del archipiélago más hermoso de Chile
-                </p>
-              </div>
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                {user ? (
-                  <Link href={ROUTES.DASHBOARD}>
-                    <Button className="bg-accent-400 hover:bg-accent-500 text-accent-900 font-semibold h-12 px-8 text-lg">
-                      <Calendar className="mr-2 h-5 w-5" />
-                      Reservar Piscina
-                    </Button>
-                  </Link>
-                ) : (
-                  <Link href={ROUTES.AUTH.LOGIN}>
-                    <Button className="bg-accent-400 hover:bg-accent-500 text-accent-900 font-semibold h-12 px-8 text-lg">
-                      <Users className="mr-2 h-5 w-5" />
-                      Únete al Club
-                    </Button>
-                  </Link>
-                )}
-                
-                <Link href={ROUTES.EVENTOS}>
-                  <Button 
-                    variant="outline" 
-                    className="border-2 border-white bg-transparent text-white hover:bg-white hover:text-primary-700 h-12 px-8 text-lg font-semibold"
-                  >
-                    Ver Eventos
-                    <ArrowRight className="ml-2 h-5 w-5" />
+        <div className="absolute inset-0 bg-[url('/assets/hero-section.webp')] bg-cover bg-center bg-no-repeat"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-primary-600/40 to-ocean-600/40"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32 min-h-[80vh] flex items-end">
+          <div className="w-full pb-8">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              {user ? (
+                <Link href={ROUTES.DASHBOARD}>
+                  <Button className="bg-accent-400 hover:bg-accent-500 text-accent-900 font-semibold h-12 px-8 text-lg shadow-lg">
+                    <Users className="mr-2 h-5 w-5" />
+                    Ingresa
                   </Button>
                 </Link>
-              </div>
-            </div>
-
-            {/* Logo/Visual - Mejor ajustado al diseño del logo */}
-            <div className="flex justify-center lg:justify-end">
-              <div className="relative">
-                <div className="w-80 h-80 lg:w-96 lg:h-96 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20 shadow-xl">
-                  <Image
-                    src="/assets/logo.png"
-                    alt="Club de Aguas Abiertas Chiloé"
-                    width={320}
-                    height={320}
-                    className="h-72 w-72 lg:h-80 lg:w-80"
-                  />
-                </div>
-                <div className="absolute -bottom-6 -right-6 w-20 h-20 bg-accent-400 rounded-full flex items-center justify-center border-4 border-white shadow-lg">
-                  <Waves className="h-8 w-8 text-accent-900" />
-                </div>
-              </div>
+              ) : (
+                <Link href={ROUTES.AUTH.REGISTER}>
+                  <Button className="bg-accent-400 hover:bg-accent-500 text-accent-900 font-semibold h-12 px-8 text-lg shadow-lg">
+                    <Users className="mr-2 h-5 w-5" />
+                    ¡Regístrate!
+                  </Button>
+                </Link>
+              )}
+              
+              <Link href={ROUTES.EVENTOS}>
+                <Button 
+                  variant="outline" 
+                  className="border-2 border-white bg-white/20 backdrop-blur-sm text-white hover:bg-white hover:text-primary-700 h-12 px-8 text-lg font-semibold shadow-lg"
+                >
+                  Ver Eventos
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -119,7 +87,7 @@ const Home = () => {
       {/* Estadísticas */}
       <section className="py-16 bg-white/80 backdrop-blur-sm border-y border-white/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-4 lg:grid-cols-3 gap-8">
             {estadisticas.map((stat, index) => (
               <div key={index} className="text-center space-y-2">
                 <div className="flex justify-center text-primary-600 mb-2">
@@ -156,21 +124,21 @@ const Home = () => {
                   
                   <p className="text-lg text-neutral-700 leading-relaxed">
                     El evento más esperado del año está de regreso. Una travesía épica que conecta 
-                    las islas de Quinchao en una experiencia única de natación en aguas abiertas.
+                    las islas de Quinched en una experiencia única de natación en aguas abiertas.
                   </p>
                   
                   <div className="space-y-3 text-neutral-700">
                     <div className="flex items-center">
                       <Calendar className="h-5 w-5 mr-3 text-accent-600" />
-                      <span className="font-semibold">Marzo 2026</span>
+                      <span className="font-semibold">7 de Diciembre 2025</span>
                     </div>
                     <div className="flex items-center">
                       <MapPin className="h-5 w-5 mr-3 text-accent-600" />
-                      <span>Quinchao, Chiloé</span>
+                      <span>Quinched, Chiloé</span>
                     </div>
                     <div className="flex items-center">
                       <Waves className="h-5 w-5 mr-3 text-accent-600" />
-                      <span>2.5 km de travesía</span>
+                      <span> Iniciación | 0,5k | 1k | 3,5k</span>
                     </div>
                   </div>
                   
@@ -185,15 +153,19 @@ const Home = () => {
                 </div>
 
                 {/* Visual */}
-                <div className="bg-gradient-to-br from-accent-200 via-yellow-200 to-orange-200 flex items-center justify-center p-8">
-                  <div className="text-center space-y-4">
-                    <div className="w-32 h-32 bg-gradient-to-br from-accent-400 to-yellow-400 rounded-full flex items-center justify-center mx-auto">
+                <div className="bg-gradient-to-br from-accent-200 via-yellow-200 to-orange-200 flex items-center justify-center p-8 relative overflow-hidden">
+                  {/* Imagen de fondo */}
+                  <div className="absolute inset-0 bg-[url('/assets/partida%20desafio.webp')] bg-cover bg-center bg-no-repeat"></div>
+                  {/* Overlay para mantener colores */}
+                  {/* <div className="absolute inset-0 bg-gradient-to-br from-accent-200/90 via-yellow-200/10 to-orange-200/40"></div> */}
+                  <div className="text-center space-y-4 relative z-10">
+                    {/* <div className="w-32 h-32 bg-gradient-to-br from-accent-400 to-yellow-400 rounded-full flex items-center justify-center mx-auto">
                       <Trophy className="h-16 w-16 text-white" />
-                    </div>
-                    <div className="space-y-2">
-                      <p className="text-2xl font-bold text-accent-800">¡Regístrate Ya!</p>
+                    </div> */}
+                    {/* <div className="space-y-2">
+                      <p className="text-2xl font-bold text-accent-800">¡Pronto!</p>
                       <p className="text-accent-700">Cupos Limitados</p>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>
@@ -208,15 +180,17 @@ const Home = () => {
               <div className="grid lg:grid-cols-2">
                 
                 {/* Visual */}
-                <div className="bg-gradient-to-br from-primary-500 to-ocean-600 flex items-center justify-center p-8 text-white">
-                  <div className="text-center space-y-6">
-                    <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center mx-auto">
+                <div className="bg-gradient-to-br from-primary-500 to-ocean-600 flex items-center justify-center p-8 text-white relative overflow-hidden">
+                  {/* Imagen de fondo */}
+                  <div className="absolute inset-0 bg-[url('/assets/piscina.webp')] bg-cover bg-center bg-no-repeat"></div>
+                  <div className="text-center space-y-6 relative z-10">
+                    {/* <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center mx-auto">
                       <Calendar className="h-12 w-12 text-white" />
                     </div>
                     <div className="space-y-2">
                       <h3 className="text-2xl font-bold">Entrena con Nosotros</h3>
                       <p className="text-primary-100">Reserva tu horario ideal</p>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
 
@@ -227,18 +201,18 @@ const Home = () => {
                   </h2>
                   
                   <p className="text-lg text-neutral-700 leading-relaxed">
-                    Accede a nuestras instalaciones y reserva tu horario de piscina de forma 
-                    fácil y segura. Entrena a tu ritmo en el mejor ambiente deportivo de Chiloé.
+                    Tenemos 3 horarios disponibles en la piscina de Castro, y contamos con un excelente entrenador
+                    para que puedas entrenar a tu ritmo, mejorar tu salud, compartir y mejorar tu rendimiento.
                   </p>
                   
                   <div className="space-y-4">
                     <div className="flex items-center text-neutral-700">
                       <Target className="h-5 w-5 mr-3 text-primary-600" />
-                      <span>Horarios flexibles adaptados a tu rutina</span>
+                      <span>Lunes 9PM, Miércoles 8AM y Viernes 7PM</span>
                     </div>
                     <div className="flex items-center text-neutral-700">
                       <Users className="h-5 w-5 mr-3 text-primary-600" />
-                      <span>Entrenadores certificados disponibles</span>
+                      <span>Entrenador: Patricio San Martín</span>
                     </div>
                     <div className="flex items-center text-neutral-700">
                       <Heart className="h-5 w-5 mr-3 text-primary-600" />
@@ -343,7 +317,7 @@ const Home = () => {
           </div>
         </section>
 
-        {/* Galería CTA */}
+        {/* Galería CTA
         <section>
           <Card className="border-ocean-200 shadow-2xl overflow-hidden bg-gradient-to-br from-ocean-50 to-primary-50">
             <CardContent className="p-8 lg:p-12 text-center space-y-8">
@@ -379,7 +353,7 @@ const Home = () => {
               </div>
             </CardContent>
           </Card>
-        </section>
+        </section> */}
       </div>
     </div>
   )
