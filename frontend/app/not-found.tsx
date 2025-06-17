@@ -1,16 +1,11 @@
-'use client'
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { Button } from '@/components/ui/button'
-import { Home, ArrowLeft, User } from 'lucide-react'
 import NavBar from '@/components/Navbar'
 import Footer from '@/components/Footer'
-import { useAuthStore } from '@/stores/auth/store'
 import { ROUTES } from '@/config/routes'
 
-const NotFound = () => {
-  const { user } = useAuthStore()
+const PublicNotFound = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -40,37 +35,6 @@ const NotFound = () => {
               <p className="text-neutral-600 text-lg">
                 Lo sentimos, la página que buscas no existe o ha sido movida.
               </p>
-            </div>
-
-            <div className="w-full max-w-sm space-y-4">
-              <Link href={ROUTES.HOME}>
-                <Button className="w-full bg-primary-600 hover:bg-primary-700 text-white h-12 text-base font-medium">
-                  <Home className="mr-2 h-5 w-5" />
-                  Volver al Inicio
-                </Button>
-              </Link>
-              
-              {user ? (
-                <Link href={ROUTES.DASHBOARD}>
-                  <Button 
-                    variant="outline" 
-                    className="w-full border-primary-300 text-primary-700 hover:bg-primary-50 h-12 text-base font-medium"
-                  >
-                    <User className="mr-2 h-5 w-5" />
-                    Ir al Dashboard
-                  </Button>
-                </Link>
-              ) : (
-                <Link href={ROUTES.EVENTOS}>
-                  <Button 
-                    variant="outline" 
-                    className="w-full border-accent-300 text-accent-700 hover:bg-accent-50 h-12 text-base font-medium"
-                  >
-                    <ArrowLeft className="mr-2 h-5 w-5" />
-                    Ver Eventos
-                  </Button>
-                </Link>
-              )}
             </div>
 
             <div className="text-center text-sm text-neutral-500 space-y-2">
@@ -130,4 +94,4 @@ const NotFound = () => {
   )
 }
 
-export default NotFound 
+export default PublicNotFound;
