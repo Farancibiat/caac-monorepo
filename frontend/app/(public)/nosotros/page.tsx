@@ -13,28 +13,28 @@ export const metadata: Metadata = {
 const NosotrosPage = () => {
   const equipoDirectivo = [
     {
-      nombre: "María Elena Navarro",
-      cargo: "Presidenta",
-      experiencia: "15 años en natación competitiva",
-      descripcion: "Impulsora del desarrollo de la natación en aguas abiertas en Chiloé"
+      nombre: "Felipe Arancibia Torres",
+      cargo: "Presidente",
+      experiencia: "Nadador amateur de aguas abiertas y piscina hace 4 años",
+      descripcion: "Fanático de las largas distancias"
     },
     {
-      nombre: "Carlos Henríquez",
-      cargo: "Vicepresidente",
-      experiencia: "Entrenador certificado FINA",
-      descripcion: "Especialista en técnicas de natación en aguas abiertas"
+      nombre: "Nicole Arenas Ibarra",
+      cargo: "Secretaria",
+      experiencia: "Nadadora amateur de aguas abiertas y piscina hace 2",
+      descripcion: "Nadadora recreativa, el esqueleto de la organización"
     },
     {
-      nombre: "Ana Sofía Cárdenas",
+      nombre: "Constanza Zambrano Conejeros",
       cargo: "Tesorera",
-      experiencia: "10 años administrando organizaciones deportivas",
-      descripcion: "Encargada de la gestión financiera y administrativa del club"
+      experiencia: "2 años de natación en aguas abiertas y piscina",
+      descripcion: "Nadadora de travesías, metódica, ordenada y siempre disponible."
     },
     {
-      nombre: "Roberto Mansilla",
-      cargo: "Secretario",
-      experiencia: "Comunicador y nadador amateur",
-      descripcion: "Responsable de comunicaciones y eventos del club"
+      nombre: "Miguel Barrientos",
+      cargo: "Presidente Suplente",
+      experiencia: "Nadador 4x4 de compentencia, travesías y recreación",
+      descripcion: "Siempre disponible, consejero y un amigo para cada asunto."
     }
   ]
 
@@ -83,18 +83,19 @@ const NosotrosPage = () => {
               <h2 className="text-3xl font-bold text-primary-800">Nuestra Historia</h2>
               <div className="space-y-4 text-neutral-700 leading-relaxed">
                 <p>
-                  El <strong>Club de Aguas Abiertas Chiloé</strong> nació en 2018 del sueño compartido de 
+                  El <strong>Club de Aguas Abiertas Chiloé</strong> nació en 2021 del sueño compartido de 
                   un grupo de nadadores apasionados por las aguas cristalinas del archipiélago de Chiloé.
+                   El día 11 de Abril de 2022, se constituyó oficialmente el club bajo el registro  N° 328013 en la Municipalidad de Castro.
                 </p>
                 <p>
                   Inspirados por la belleza única de nuestras costas y la rica tradición marítima de la isla, 
-                  decidimos crear un espacio donde deportistas de todos los niveles pudieran desarrollar 
+                  decidimos crear un espacio donde deportistas de todos los niveles pudieran desarrollar y compartir
                   sus habilidades de natación en el entorno natural más hermoso de Chile.
                 </p>
                 <p>
                   Desde nuestros inicios con apenas 12 miembros, hemos crecido hasta convertirnos en una 
-                  comunidad de más de 150 nadadores activos, organizando eventos que atraen participantes 
-                  de todo el país y promoviendo el deporte acuático en la región.
+                  comunidad de más de 50 socio activos y una red de nadadores amigos a nivel nacional e internacional,
+                  organizando eventos que atraen participantes de todo el país y promoviendo el deporte acuático en la región.
                 </p>
               </div>
             </div>
@@ -110,45 +111,91 @@ const NosotrosPage = () => {
                   />
                 </div>
                 <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-accent-200 rounded-full flex items-center justify-center">
-                  <span className="text-2xl font-bold text-accent-800">2018</span>
+                  <span className="text-2xl font-bold text-accent-800">2022</span>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Misión y Visión */}
+        {/* Objetivos del Club */}
         <section className="mb-16">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-primary-800 mb-4">Objetivos del Club</h2>
+            <p className="text-neutral-700 max-w-2xl mx-auto">
+              Los pilares fundamentales que guían nuestro trabajo y compromiso con la comunidad
+            </p>
+            <div className="w-32 h-2 bg-club-gradient mx-auto rounded-full mt-4"></div>
+          </div>
+          
           <div className="grid md:grid-cols-2 gap-8">
-            <Card className="border-primary-200 shadow-lg">
+            <Card className="border-primary-200 shadow-lg hover:shadow-xl transition-shadow">
               <CardContent className="p-8">
-                <div className="flex items-center space-x-3 mb-6">
-                  <Target className="h-8 w-8 text-primary-600" />
-                  <h3 className="text-2xl font-bold text-primary-800">Nuestra Misión</h3>
+                <div className="flex items-start space-x-4">
+                  <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-primary-200 to-primary-300 rounded-full flex items-center justify-center">
+                    <span className="text-primary-800 font-bold text-lg">A</span>
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-semibold text-primary-800 mb-3">Actividades Integrales</h4>
+                    <p className="text-neutral-700 leading-relaxed">
+                      Desarrollar entre sus asociadas actividades culturales, recreativas y sociales en general.
+                    </p>
+                  </div>
                 </div>
-                <p className="text-neutral-700 leading-relaxed">
-                  Promover y desarrollar la natación en aguas abiertas en el archipiélago de Chiloé, 
-                  brindando un espacio seguro e inclusivo para deportistas de todos los niveles, 
-                  fomentando el amor por el deporte acuático y la conservación de nuestros recursos naturales.
-                </p>
               </CardContent>
             </Card>
 
-            <Card className="border-ocean-200 shadow-lg">
+            <Card className="border-ocean-200 shadow-lg hover:shadow-xl transition-shadow">
               <CardContent className="p-8">
-                <div className="flex items-center space-x-3 mb-6">
-                  <Waves className="h-8 w-8 text-ocean-600" />
-                  <h3 className="text-2xl font-bold text-ocean-800">Nuestra Visión</h3>
+                <div className="flex items-start space-x-4">
+                  <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-ocean-200 to-ocean-300 rounded-full flex items-center justify-center">
+                    <span className="text-ocean-800 font-bold text-lg">B</span>
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-semibold text-ocean-800 mb-3">Formación y Superación</h4>
+                    <p className="text-neutral-700 leading-relaxed">
+                      Interpretar y expresar los intereses y aspiraciones en acciones que tiendan a la formación y superación personal, en el aspecto intelectual, artístico, social, técnico y cultural.
+                    </p>
+                  </div>
                 </div>
-                <p className="text-neutral-700 leading-relaxed">
-                  Ser el club de natación en aguas abiertas más reconocido del sur de Chile, 
-                  referente en la organización de eventos deportivos sustentables y en la formación 
-                  de nadadores comprometidos con la excelencia deportiva y el cuidado del medio ambiente.
-                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-accent-200 shadow-lg hover:shadow-xl transition-shadow">
+              <CardContent className="p-8">
+                <div className="flex items-start space-x-4">
+                  <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-accent-200 to-accent-300 rounded-full flex items-center justify-center">
+                    <span className="text-accent-800 font-bold text-lg">C</span>
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-semibold text-accent-800 mb-3">Comunidad y Solidaridad</h4>
+                    <p className="text-neutral-700 leading-relaxed">
+                      Promover el sentido de comunidad y solidaridad entre sus miembros personas, a través de la convivencia y de la realización de acciones comunes.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-neutral-300 shadow-lg hover:shadow-xl transition-shadow">
+              <CardContent className="p-8">
+                <div className="flex items-start space-x-4">
+                  <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-neutral-200 to-neutral-300 rounded-full flex items-center justify-center">
+                    <span className="text-neutral-800 font-bold text-lg">D</span>
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-semibold text-neutral-800 mb-3">Desarrollo y Colaboración</h4>
+                    <p className="text-neutral-700 leading-relaxed">
+                      Propender el desarrollo de sus asociados y, para tal efecto, colaborar con las autoridades del estado, de la I. Municipalidad u otros Organismos Gubernamentales o privados sin fines de lucro.
+                    </p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
         </section>
+
+
 
         {/* Valores */}
         <section className="mb-16">

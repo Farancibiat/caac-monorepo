@@ -23,7 +23,7 @@ const nextConfig = {
         headers: [
           {
             key: 'X-Frame-Options',
-            value: 'DENY'
+            value: 'SAMEORIGIN'
           },
           {
             key: 'X-Content-Type-Options',
@@ -41,11 +41,12 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.supabase.co https://*.googletagmanager.com",
-              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-              "font-src 'self' https://fonts.gstatic.com",
-              "img-src 'self' data: https: blob:",
-              "connect-src 'self' https://api.aguasabiertaschiloe.cl https://*.supabase.co wss://*.supabase.co http://localhost:3001 https://*.google-analytics.com",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.supabase.co https://*.googletagmanager.com https://*.googleapis.com https://*.gstatic.com",
+              "style-src 'self' 'unsafe-inline' https://*.googleapis.com",
+              "font-src 'self' https://*.gstatic.com",
+              "img-src 'self' data: https: blob: https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.googleusercontent.com",
+              "connect-src 'self' https://api.aguasabiertaschiloe.cl https://*.supabase.co wss://*.supabase.co http://localhost:3001 https://*.google-analytics.com https://*.googleapis.com",
+              "frame-src 'self' https://*.google.com",
               "worker-src 'self' blob:",
               "object-src 'none'",
               "base-uri 'none'",
