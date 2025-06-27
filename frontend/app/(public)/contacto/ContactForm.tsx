@@ -77,7 +77,7 @@ const ContactForm = () => {
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true)
     try {
-      const response = await reqClient.post('/api/contact', data, { requireAuth: false })
+      const response = await reqClient.post('/api/emails/contact', data, { requireAuth: false })
       
       if (!response.ok) {
         throw new Error(response.error || 'Error al enviar el mensaje')

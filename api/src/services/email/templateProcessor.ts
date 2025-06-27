@@ -28,7 +28,7 @@ import path from 'path';
 export const processTemplate = (templateName: string, data: Record<string, any>): string => {
   try {
     // Leer el archivo HTML
-    const templatePath = path.join(__dirname, '../templates', `${templateName}.html`);
+    const templatePath = path.join(__dirname, 'templates', `${templateName}.html`);
     let html = fs.readFileSync(templatePath, 'utf-8');
 
     // Agregar variables de entorno automáticamente
