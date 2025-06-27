@@ -1,22 +1,106 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Recordatorio de Reserva</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #e0f2fe; /* ocean-100 */
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 600px;
+      background-color: #fafafa; /* neutral-50 */
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: 0 4px 12px rgba(23, 23, 23, 0.1); /* neutral-900 con opacidad */
+      text-align: center;
+    }
+    .header {
+      padding-bottom: 30px;
+      margin-bottom: 30px;
+    }
+    .header h1 {
+      color: #0d9488; /* primary-600 */
+      font-size: 28px;
+      margin: 0;
+    }
+    .reminder-content {
+      background-color: #fef3c7; /* yellow-100 */
+      border-left: 4px solid #f59e0b; /* yellow-500 */
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 30px;
+    }
+    .reminder-content h2 {
+      color: #92400e; /* yellow-800 */
+      font-size: 24px;
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+    .reminder-content p {
+      color: #404040; /* neutral-700 */
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .reservation-details {
+      background-color: #ffffff;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      box-shadow: 0 2px 8px rgba(23, 23, 23, 0.05);
+    }
+    .reservation-details p {
+      margin: 8px 0;
+      color: #525252; /* neutral-600 */
+      text-align: left;
+    }
+    .reservation-details strong {
+      color: #404040; /* neutral-700 */
+    }
+    .actions {
+      margin: 30px 0;
+    }
+    .button {
+      display: inline-block;
+      background-color: #facc15; /* accent-400 */
+      color: #042f2e; /* primary-950 */
+      padding: 12px 24px;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 8px;
+      transition: background-color 0.3s ease;
+    }
+    .button:hover {
+      background-color: #fde047; /* accent-300 */
+    }
+    .footer {
+      color: #737373; /* neutral-500 */
+      font-size: 14px;
+      margin-top: 30px;
+    }
+  </style>
 </head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-  <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-    <div style="text-align: center; padding: 20px 0;">
-      <h1 style="color: #0066cc;">{{SITE_NAME}}</h1>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>{{SITE_NAME}}</h1>
     </div>
     
-    <div style="background: #fff3cd; padding: 30px; border-radius: 8px; border-left: 4px solid #ffc107;">
-      <h2 style="color: #856404; margin-top: 0;">🏊‍♀️ ¡No olvides tu reserva!</h2>
+    <div class="reminder-content">
+      <h2>🏊‍♀️ ¡No olvides tu reserva!</h2>
       
       <p>Te recordamos que tienes una reserva programada:</p>
       
-      <div style="background: white; padding: 20px; border-radius: 5px; margin: 20px 0;">
+      <div class="reservation-details">
         <p><strong>📅 Fecha:</strong> {{date}}</p>
         <p><strong>🕒 Hora:</strong> {{time}}</p>
         <p><strong>🏊 Servicio:</strong> {{service}}</p>
@@ -25,12 +109,17 @@
       
       <p>¡Te esperamos!</p>
       
-      <div style="text-align: center; margin: 30px 0;">
+      <div class="actions">
         <a href="{{SITE_URL}}/reservas/{{id}}" 
-           style="background-color: #0066cc; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
+           class="button">
           Ver Reserva
         </a>
       </div>
+    </div>
+    <div class="footer">
+      <p>Si tienes preguntas, contacta con nosotros:</p>
+      <p>📞 +56 9 4290 6301 | 📧 contacto@aguasabiertaschiloe.cl</p>
+      <p>&copy; {{CURRENT_YEAR}} {{SITE_NAME}} by <a href="https://www.farancibiat.cl" target="_blank" rel="noopener noreferrer">Farancibiat</a></p>
     </div>
   </div>
 </body>

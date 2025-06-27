@@ -1,71 +1,211 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nuevo Mensaje de Contacto</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #e0f2fe; /* ocean-100 */
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 600px;
+      background-color: #fafafa; /* neutral-50 */
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: 0 4px 12px rgba(23, 23, 23, 0.1); /* neutral-900 con opacidad */
+    }
+    .header {
+      text-align: center;
+      padding-bottom: 30px;
+      border-bottom: 2px solid #0d9488; /* primary-600 */
+      margin-bottom: 30px;
+    }
+    .header h1 {
+      color: #0d9488; /* primary-600 */
+      font-size: 28px;
+      margin: 0 0 10px 0;
+    }
+    .header p {
+      color: #737373; /* neutral-500 */
+      font-size: 16px;
+      margin: 0;
+    }
+    .content {
+      background-color: #ffffff;
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 8px rgba(23, 23, 23, 0.05);
+    }
+    .content h2 {
+      color: #0d9488; /* primary-600 */
+      font-size: 24px;
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+    .contact-info {
+      background-color: #f0fdfa; /* primary-50 */
+      border-left: 4px solid #0d9488; /* primary-600 */
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .contact-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .contact-table td {
+      padding: 8px 0;
+      border-bottom: 1px solid #e5e7eb; /* neutral-200 */
+    }
+    .contact-table td:first-child {
+      font-weight: bold;
+      color: #404040; /* neutral-700 */
+      width: 30%;
+    }
+    .contact-table td:last-child {
+      color: #525252; /* neutral-600 */
+    }
+    .contact-table a {
+      color: #0d9488; /* primary-600 */
+      text-decoration: none;
+    }
+    .contact-table a:hover {
+      text-decoration: underline;
+    }
+    .message-content {
+      background-color: #f0fdf4; /* green-50 */
+      border-left: 4px solid #16a34a; /* green-600 */
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+    .message-content h3 {
+      margin-top: 0;
+      color: #16a34a; /* green-600 */
+      font-size: 18px;
+    }
+    .message-text {
+      background-color: #ffffff;
+      padding: 15px;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      line-height: 1.6;
+      color: #404040; /* neutral-700 */
+      border: 1px solid #e5e7eb; /* neutral-200 */
+    }
+    .actions {
+      text-align: center;
+      margin: 30px 0;
+    }
+    .button {
+      display: inline-block;
+      padding: 12px 24px;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 8px;
+      margin: 0 5px;
+      transition: all 0.3s ease;
+    }
+    .button-primary {
+      background-color: #facc15; /* accent-400 */
+      color: #042f2e; /* primary-950 */
+    }
+    .button-primary:hover {
+      background-color: #fde047; /* accent-300 */
+    }
+    .button-secondary {
+      background-color: #16a34a; /* green-600 */
+      color: white;
+    }
+    .button-secondary:hover {
+      background-color: #15803d; /* green-700 */
+    }
+    .footer {
+      text-align: center;
+      padding-top: 30px;
+      border-top: 1px solid #e5e7eb; /* neutral-200 */
+      color: #737373; /* neutral-500 */
+      font-size: 14px;
+    }
+    .footer p {
+      margin: 5px 0;
+    }
+    .footer a {
+      color: #0d9488; /* primary-600 */
+      text-decoration: none;
+    }
+    .footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-  <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-    
+<body>
+  <div class="container">
     <!-- Header -->
-    <div style="text-align: center; padding: 20px 0; border-bottom: 2px solid #0066cc;">
-      <h1 style="color: #0066cc; margin: 0;">{{SITE_NAME}}</h1>
-      <p style="color: #666; margin: 5px 0;">Nuevo Mensaje de Contacto</p>
+    <div class="header">
+      <h1>{{SITE_NAME}}</h1>
+      <p>Nuevo Mensaje de Contacto</p>
     </div>
 
     <!-- Contact Details -->
-    <div style="background: #f8f9fa; padding: 30px; border-radius: 8px; margin: 20px 0;">
-      <h2 style="color: #333; margin-top: 0;">Información del Contacto</h2>
+    <div class="content">
+      <h2>Información del Contacto</h2>
       
-      <div style="background: white; padding: 20px; border-radius: 5px; border-left: 4px solid #0066cc;">
-        <table style="width: 100%; border-collapse: collapse;">
+      <div class="contact-info">
+        <table class="contact-table">
           <tr>
-            <td style="padding: 8px 0; font-weight: bold; width: 30%;">Nombre:</td>
-            <td style="padding: 8px 0;">{{nombre}}</td>
+            <td>Nombre:</td>
+            <td>{{nombre}}</td>
           </tr>
           <tr>
-            <td style="padding: 8px 0; font-weight: bold;">Email:</td>
-            <td style="padding: 8px 0;">
-              <a href="mailto:{{email}}" style="color: #0066cc;">{{email}}</a>
+            <td>Email:</td>
+            <td>
+              <a href="mailto:{{email}}">{{email}}</a>
             </td>
           </tr>
           {{#telefono}}
           <tr>
-            <td style="padding: 8px 0; font-weight: bold;">Teléfono:</td>
-            <td style="padding: 8px 0;">
-              <a href="tel:{{telefono}}" style="color: #0066cc;">{{telefono}}</a>
+            <td>Teléfono:</td>
+            <td>
+              <a href="tel:{{telefono}}">{{telefono}}</a>
             </td>
           </tr>
           {{/telefono}}
           <tr>
-            <td style="padding: 8px 0; font-weight: bold;">Asunto:</td>
-            <td style="padding: 8px 0; font-weight: bold; color: #0066cc;">{{asunto}}</td>
+            <td>Asunto:</td>
+            <td style="font-weight: bold; color: #0d9488;">{{asunto}}</td>
           </tr>
           <tr>
-            <td style="padding: 8px 0; font-weight: bold;">Fecha:</td>
-            <td style="padding: 8px 0;">{{fecha}}</td>
+            <td>Fecha:</td>
+            <td>{{fecha}}</td>
           </tr>
         </table>
       </div>
 
       <!-- Message Content -->
-      <div style="background: white; padding: 20px; border-radius: 5px; margin-top: 20px; border-left: 4px solid #28a745;">
-        <h3 style="margin-top: 0; color: #28a745;">Mensaje:</h3>
-        <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; white-space: pre-wrap; line-height: 1.6;">
-{{mensaje}}
-        </div>
+      <div class="message-content">
+        <h3>Mensaje:</h3>
+        <div class="message-text">{{mensaje}}</div>
       </div>
 
       <!-- Quick Actions -->
-      <div style="text-align: center; margin: 30px 0;">
-        <a href="mailto:{{email}}?subject=Re: {{asunto}}" 
-           style="background-color: #0066cc; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; margin-right: 10px;">
+      <div class="actions">
+        <a href="mailto:contacto@aguasabiertaschiloe.cl?subject=Re: {{asunto}}" 
+           class="button button-primary">
           Responder por Email
         </a>
         {{#telefono}}
-        <a href="tel:{{telefono}}" 
-           style="background-color: #28a745; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
+        <a href="tel:+56942906301" 
+           class="button button-secondary">
           Llamar
         </a>
         {{/telefono}}
@@ -73,9 +213,9 @@
     </div>
 
     <!-- Footer -->
-    <div style="text-align: center; padding: 20px 0; border-top: 1px solid #ddd; color: #666; font-size: 12px;">
+    <div class="footer">
       <p>Este mensaje fue enviado desde el formulario de contacto de {{SITE_NAME}}</p>
-      <p>© {{CURRENT_YEAR}} {{SITE_NAME}}by <a href="https://www.farancibiat.cl" target="_blank" rel="noopener noreferrer">Farancibiat</a></p>
+      <p>&copy; {{CURRENT_YEAR}} {{SITE_NAME}} by <a href="https://www.farancibiat.cl" target="_blank" rel="noopener noreferrer">Farancibiat</a></p>
     </div>
   </div>
 </body>
