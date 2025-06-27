@@ -58,7 +58,7 @@ const Footer = () => {
         {/* Bottom Section */}
         <div className="border-t border-neutral-800 mt-8 pt-6 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
           <div className="text-sm text-neutral-400">
-            © {currentYear} Club de Aguas Abiertas Chiloé. Todos los derechos reservados.
+            © {currentYear} Club de Aguas Abiertas Chiloé.
           </div>
           
           <div className="text-sm text-neutral-400">

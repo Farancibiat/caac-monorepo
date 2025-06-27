@@ -90,7 +90,7 @@ export const sendReservationReminder = async (to: string, reservationDetails: an
 export const sendContactMessage = async (contactData: any): Promise<boolean> => {
   return sendEmail(
     'contactMessage',
-    process.env.RESEND_FROM_EMAIL || 'contacto@web.aguasabiertaschiloe.cl',
+    contactData.email,
     `Nuevo mensaje de contacto: ${contactData.asunto}`,
     {
       ...contactData,
