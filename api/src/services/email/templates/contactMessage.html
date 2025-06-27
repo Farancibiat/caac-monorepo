@@ -152,7 +152,7 @@
   <div class="container">
     <!-- Header -->
     <div class="header">
-      <h1>{{SITE_NAME}}</h1>
+      <h1>Club de Aguas Abiertas Chiloé</h1>
       <p>Nuevo Mensaje de Contacto</p>
     </div>
 
@@ -172,14 +172,12 @@
               <a href="mailto:{{email}}">{{email}}</a>
             </td>
           </tr>
-          {{#telefono}}
           <tr>
             <td>Teléfono:</td>
             <td>
               <a href="tel:{{telefono}}">{{telefono}}</a>
             </td>
           </tr>
-          {{/telefono}}
           <tr>
             <td>Asunto:</td>
             <td style="font-weight: bold; color: #0d9488;">{{asunto}}</td>
@@ -203,19 +201,17 @@
            class="button button-primary">
           Responder por Email
         </a>
-        {{#telefono}}
         <a href="tel:+56942906301" 
            class="button button-secondary">
           Llamar
         </a>
-        {{/telefono}}
       </div>
     </div>
 
     <!-- Footer -->
     <div class="footer">
-      <p>Este mensaje fue enviado desde el formulario de contacto de {{SITE_NAME}}</p>
-      <p>&copy; {{CURRENT_YEAR}} {{SITE_NAME}} by <a href="https://www.farancibiat.cl" target="_blank" rel="noopener noreferrer">Farancibiat</a></p>
+      <p>Este mensaje fue enviado desde el formulario de contacto de <a href="https://www.aguasabiertaschiloe.cl" target="_blank">Club de Aguas Abiertas Chiloé</a></p>
+      <p>&copy; {{CURRENT_YEAR}} {{SITE_NAME}} by <a href="https://www.farancibiat.cl" target="_blank" >Farancibiat</a></p>
     </div>
   </div>
 </body>
