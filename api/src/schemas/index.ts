@@ -3,6 +3,7 @@ export * from './common';
 export * from './auth';
 export * from './user';
 export * from './reservation';
+export * from './contact';
 
 // Re-exportar validación middleware para conveniencia
 export {
@@ -18,11 +19,13 @@ export {
 import { authSchemas } from './auth';
 import { userSchemas } from './user';
 import { reservationSchemas } from './reservation';
+import { contactSchemas } from './contact';
 
 export const schemas = {
   auth: authSchemas,
   user: userSchemas,
   reservation: reservationSchemas,
+  contact: contactSchemas,
 } as const;
 
 // Tipos centralizados
@@ -45,4 +48,8 @@ export type {
   CancelReservationData,
   ConfirmPaymentData,
   CompleteReservationData,
-} from './reservation'; 
+} from './reservation';
+
+export type {
+  SendContactMessageData
+} from './contact'; 

@@ -1,8 +1,9 @@
-import { Response } from 'express';
-import { EmailService } from '../services/emailService';
-import { sendMessage } from '../utils/responseHelper';
-import prisma from '../config/db';
-import { AuthenticatedRequest } from '../config/auth';
+import { Response, Request } from 'express';
+import { sendReservationConfirmation as sendReservationEmail, sendReservationReminder as sendReminderEmail, testConfiguration, sendContactMessage as sendContactEmail } from '@/services/email';
+import { sendMessage } from '@/utils/responseHelper';
+import prisma from '@/config/db';
+import { AuthenticatedRequest } from '@/config/auth';
+import { SendContactMessageData } from '@/schemas/contact';
 
 // Enviar comprobante de reserva
 export const sendReservationConfirmation = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
@@ -50,7 +51,7 @@ export const sendReservationConfirmation = async (req: AuthenticatedRequest, res
     };
 
     // Enviar email
-    const emailSent = await EmailService.sendReservationConfirmation(
+    const emailSent = await sendReservationEmail(
       reservation.user.email!,
       reservationDetails
     );
@@ -109,7 +110,7 @@ export const sendReservationReminder = async (req: AuthenticatedRequest, res: Re
     };
 
     // Enviar recordatorio
-    const emailSent = await EmailService.sendReservationReminder(
+    const emailSent = await sendReminderEmail(
       reservation.user.email!,
       reservationDetails
     );
@@ -128,7 +129,7 @@ export const sendReservationReminder = async (req: AuthenticatedRequest, res: Re
 // Endpoint para probar la configuración de emails
 export const testEmailConfiguration = async (_req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
-    const isConfigured = await EmailService.testConfiguration();
+    const isConfigured = await testConfiguration();
     
     if (isConfigured) {
       sendMessage(res, 'EMAIL_CONFIG_VALID');
@@ -137,5 +138,25 @@ export const testEmailConfiguration = async (_req: AuthenticatedRequest, res: Re
     }
   } catch (error) {
     sendMessage(res, 'EMAIL_CONFIG_ERROR');
+  }
+};
+
+// Enviar mensaje de contacto (endpoint público)
+export const sendContactMessage = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const contactData: SendContactMessageData = req.body;
+
+    // Enviar email al equipo del club
+    const emailSent = await sendContactEmail(contactData);
+
+    if (!emailSent) {
+      sendMessage(res, 'EMAIL_SEND_ERROR');
+      return;
+    }
+
+    sendMessage(res, 'CONTACT_MESSAGE_SENT');
+  } catch (error) {
+    console.error('Error al enviar mensaje de contacto:', error);
+    sendMessage(res, 'EMAIL_SEND_ERROR');
   }
 }; 

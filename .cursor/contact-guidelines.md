@@ -262,261 +262,75 @@ export default ContactForm
 
 ### **FASE 2: API - BACKEND IMPLEMENTATION** 🚀
 
-#### **2.1 Crear schema de validación para contact**
-```typescript
-// api/src/schemas/contact.ts - CREAR NUEVO ARCHIVO
-import { z } from 'zod';
+**ESTADO ACTUAL:**
+- 2.1 ✅ COMPLETADO - Schema de validación para contact creado
+- 2.2 ✅ OK - emailService.ts actualizado 
+- 2.3 ✅ COMPLETADO - Controlador agregado al emailController.ts existente
+- 2.4 ✅ COMPLETADO - Ruta agregada a emailRoutes.ts existente
+- 2.5 ✅ COMPLETADO - Constants/messages.ts actualizado
+- 2.6 ✅ OK - index.ts ya incluye las rutas necesarias
+- 2.7 ✅ COMPLETADO - schemas/index.ts actualizado
+- 2.8 ✅ COMPLETADO - Rate limiter específico para contacto implementado
 
-export const contactSchemas = {
-  // Schema para envío de mensaje de contacto
-  sendMessage: z.object({
-    nombre: z.string()
-      .min(2, 'El nombre debe tener al menos 2 caracteres')
-      .max(50, 'El nombre no puede exceder 50 caracteres')
-      .regex(/^[a-zA-ZÀ-ÿ\s]+$/, 'Solo se permiten letras y espacios')
-      .trim(),
-    email: z.string()
-      .email('Formato de email inválido')
-      .max(255, 'Email muy largo'),
-    telefono: z.string()
-      .regex(/^\+?[\d\s\-\(\)]+$/, 'Formato de teléfono inválido')
-      .min(8, 'Teléfono debe tener al menos 8 dígitos')
-      .max(15, 'Teléfono muy largo')
-      .optional(),
-    asunto: z.string()
-      .min(5, 'El asunto debe tener al menos 5 caracteres')
-      .max(100, 'El asunto no puede exceder 100 caracteres')
-      .trim(),
-    mensaje: z.string()
-      .min(10, 'El mensaje debe tener al menos 10 caracteres')
-      .max(1000, 'El mensaje no puede exceder 1000 caracteres')
-      .trim(),
-  }),
-};
+**RESUMEN DE IMPLEMENTACIÓN:**
 
-// Tipos inferidos
-export type SendContactMessageData = z.infer<typeof contactSchemas.sendMessage>;
+✅ **Schema de Validación** (`api/src/schemas/contact.ts`):
+- Validación robusta para nombre, email, teléfono opcional, asunto y mensaje
+- Regex patterns para nombres (solo letras) y teléfonos
+- Límites de caracteres apropiados
+- Tipos TypeScript inferidos automáticamente
+
+✅ **Controlador de Contacto** (`api/src/controllers/emailController.ts`):
+- Función `sendContactMessage` agregada al controlador existente
+- Endpoint público que no requiere autenticación
+- Manejo de errores robusto
+- Integración con el servicio de email existente
+
+✅ **Rutas de Email** (`api/src/routes/emailRoutes.ts`):
+- Ruta POST `/api/emails/contact` configurada
+- Rate limiter específico aplicado (5 mensajes por hora por IP)
+- Validación de datos con Zod
+- Middleware de limpieza de strings vacíos
+
+✅ **Mensajes de Respuesta** (`api/src/constants/messages.ts`):
+- `CONTACT_MESSAGE_SENT` (200) - Éxito al enviar
+- `CONTACT_INVALID_DATA` (400) - Datos inválidos  
+- `RATE_LIMIT_CONTACT_EXCEEDED` (429) - Rate limit excedido
+- `CONTACT_SEND_ERROR` (500) - Error interno
+
+✅ **Rate Limiting Específico** (`api/src/middleware/rateLimitMiddleware.ts`):
+- `contactLimiter`: 5 mensajes por hora por IP
+- Identificación por IP + User-Agent para mayor seguridad
+- Protección contra ataques DDoS
+- Mensajes de error personalizados
+
+✅ **Integración de Schemas** (`api/src/schemas/index.ts`):
+- Exportación centralizada de contactSchemas
+- Tipos TypeScript disponibles globalmente
+- Integración con sistema de validación existente
+
+**ENDPOINT DISPONIBLE:**
 ```
+POST /api/emails/contact
+Content-Type: application/json
 
-#### **2.2 Actualizar emailService.ts**
-```typescript
-// api/src/services/emailService.ts - AGREGAR al final de EmailTemplates class:
-
-// Email de contacto (nuevo)
-static contactMessage(contactData: any): EmailTemplate {
-  return {
-    to: process.env.CONTACT_EMAIL || 'contacto@aguasabiertaschiloe.cl',
-    subject: `Nuevo mensaje de contacto: ${contactData.asunto}`,
-    html: `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Nuevo Mensaje de Contacto</title>
-      </head>
-      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-        <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-          
-          <!-- Header -->
-          <div style="text-align: center; padding: 20px 0; border-bottom: 2px solid #0066cc;">
-            <h1 style="color: #0066cc; margin: 0;">${SITE_NAME}</h1>
-            <p style="color: #666; margin: 5px 0;">Nuevo Mensaje de Contacto</p>
-          </div>
-
-          <!-- Contact Details -->
-          <div style="background: #f8f9fa; padding: 30px; border-radius: 8px; margin: 20px 0;">
-            <h2 style="color: #333; margin-top: 0;">Información del Contacto</h2>
-            
-            <div style="background: white; padding: 20px; border-radius: 5px; border-left: 4px solid #0066cc;">
-              <table style="width: 100%; border-collapse: collapse;">
-                <tr>
-                  <td style="padding: 8px 0; font-weight: bold; width: 30%;">Nombre:</td>
-                  <td style="padding: 8px 0;">${contactData.nombre}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 8px 0; font-weight: bold;">Email:</td>
-                  <td style="padding: 8px 0;">
-                    <a href="mailto:${contactData.email}" style="color: #0066cc;">${contactData.email}</a>
-                  </td>
-                </tr>
-                ${contactData.telefono ? `
-                <tr>
-                  <td style="padding: 8px 0; font-weight: bold;">Teléfono:</td>
-                  <td style="padding: 8px 0;">
-                    <a href="tel:${contactData.telefono}" style="color: #0066cc;">${contactData.telefono}</a>
-                  </td>
-                </tr>
-                ` : ''}
-                <tr>
-                  <td style="padding: 8px 0; font-weight: bold;">Asunto:</td>
-                  <td style="padding: 8px 0; font-weight: bold; color: #0066cc;">${contactData.asunto}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 8px 0; font-weight: bold;">Fecha:</td>
-                  <td style="padding: 8px 0;">${new Date().toLocaleDateString('es-CL', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}</td>
-                </tr>
-              </table>
-            </div>
-
-            <!-- Message Content -->
-            <div style="background: white; padding: 20px; border-radius: 5px; margin-top: 20px; border-left: 4px solid #28a745;">
-              <h3 style="margin-top: 0; color: #28a745;">Mensaje:</h3>
-              <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; white-space: pre-wrap; line-height: 1.6;">
-${contactData.mensaje}
-              </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="mailto:${contactData.email}?subject=Re: ${contactData.asunto}" 
-                 style="background-color: #0066cc; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; margin-right: 10px;">
-                Responder por Email
-              </a>
-              ${contactData.telefono ? `
-              <a href="tel:${contactData.telefono}" 
-                 style="background-color: #28a745; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
-                Llamar
-              </a>
-              ` : ''}
-            </div>
-          </div>
-
-          <!-- Footer -->
-          <div style="text-align: center; padding: 20px 0; border-top: 1px solid #ddd; color: #666; font-size: 12px;">
-            <p>Este mensaje fue enviado desde el formulario de contacto de ${SITE_NAME}</p>
-            <p>© ${new Date().getFullYear()} ${SITE_NAME}. Todos los derechos reservados.</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `
-  };
-}
-
-// Agregar también al final de la clase EmailService:
-static async sendContactMessage(contactData: any): Promise<boolean> {
-  const template = EmailTemplates.contactMessage(contactData);
-  return this.sendEmail(template);
+{
+  "nombre": "Juan Pérez",
+  "email": "juan@example.com", 
+  "telefono": "+56912345678", // opcional
+  "asunto": "Consulta sobre membresía",
+  "mensaje": "Hola, me gustaría obtener información..."
 }
 ```
 
-#### **2.3 Crear contactController.ts**
-```typescript
-// api/src/controllers/contactController.ts - CREAR NUEVO ARCHIVO
-import { Request, Response } from 'express';
-import { EmailService } from '../services/emailService';
-import { sendMessage } from '../utils/responseHelper';
-import { SendContactMessageData } from '../schemas/contact';
+**PROTECCIONES IMPLEMENTADAS:**
+- ✅ Rate limiting: 5 mensajes/hora por IP
+- ✅ Validación robusta de datos
+- ✅ Sanitización de inputs
+- ✅ Manejo de errores completo
+- ✅ Logging de errores para debugging
 
-// Enviar mensaje de contacto (endpoint público)
-export const sendContactMessage = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const contactData: SendContactMessageData = req.body;
-
-    // Enviar email al equipo del club
-    const emailSent = await EmailService.sendContactMessage(contactData);
-
-    if (!emailSent) {
-      sendMessage(res, 'EMAIL_SEND_ERROR');
-      return;
-    }
-
-    sendMessage(res, 'CONTACT_MESSAGE_SENT');
-  } catch (error) {
-    console.error('Error al enviar mensaje de contacto:', error);
-    sendMessage(res, 'EMAIL_SEND_ERROR');
-  }
-};
-
-// Verificar configuración de emails (endpoint público para debugging)
-export const testEmailConfiguration = async (_req: Request, res: Response): Promise<void> => {
-  try {
-    const isConfigured = await EmailService.testConfiguration();
-    
-    if (isConfigured) {
-      sendMessage(res, 'EMAIL_CONFIG_VALID');
-    } else {
-      sendMessage(res, 'EMAIL_CONFIG_INVALID');
-    }
-  } catch (error) {
-    console.error('Error al verificar configuración de email:', error);
-    sendMessage(res, 'EMAIL_CONFIG_ERROR');
-  }
-};
-```
-
-#### **2.4 Crear contactRoutes.ts**
-```typescript
-// api/src/routes/contactRoutes.ts - CREAR NUEVO ARCHIVO
-import express, { Router } from 'express';
-import { sendContactMessage, testEmailConfiguration } from '@/controllers/contactController';
-import { validateBody, cleanEmptyStrings } from '@/middleware/validationMiddleware';
-import { contactSchemas } from '@/schemas/contact';
-
-const router: Router = express.Router();
-
-// Rutas públicas (no requieren autenticación)
-router.post('/', 
-  cleanEmptyStrings, 
-  validateBody(contactSchemas.sendMessage), 
-  sendContactMessage
-);
-
-router.get('/test-config', testEmailConfiguration);
-
-export default router;
-```
-
-#### **2.5 Actualizar constants/messages.ts**
-```typescript
-// api/src/constants/messages.ts - AGREGAR:
-200: {
-  // ... mensajes existentes ...
-  CONTACT_MESSAGE_SENT: 'Mensaje de contacto enviado correctamente',
-},
-
-400: {
-  // ... mensajes existentes ...
-  CONTACT_INVALID_DATA: 'Los datos del formulario de contacto son inválidos',
-},
-
-500: {
-  // ... mensajes existentes ...
-  CONTACT_SEND_ERROR: 'Error al enviar mensaje de contacto',
-}
-```
-
-#### **2.6 Actualizar index.ts para incluir rutas**
-```typescript
-// api/src/index.ts - AGREGAR:
-import contactRoutes from '@/routes/contactRoutes';
-
-// En la sección de rutas, agregar:
-app.use('/api/contact', contactRoutes);
-```
-
-#### **2.7 Actualizar schemas/index.ts**
-```typescript
-// api/src/schemas/index.ts - AGREGAR:
-export * from './contact';
-
-// En el objeto schemas:
-import { contactSchemas } from './contact';
-
-export const schemas = {
-  auth: authSchemas,
-  user: userSchemas,
-  reservation: reservationSchemas,
-  contact: contactSchemas,  // ⭐ NUEVO
-} as const;
-```
+**FASE 2 COMPLETADA** - El backend está listo para recibir mensajes de contacto desde el frontend.
 
 ---
 

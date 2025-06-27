@@ -8,6 +8,7 @@ export const MESSAGES = {
     CLUB_LIST_RETRIEVED: 'Lista de clubs obtenida correctamente',
     CLUB_RETRIEVED: 'Club obtenido correctamente',
     CLUB_UPDATED: 'Club actualizado correctamente',
+    CONTACT_MESSAGE_SENT: 'Mensaje de contacto enviado correctamente',
     EMAIL_CONFIG_VALID: 'Configuración de email válida',
     EVENT_DELETED: 'Evento eliminado correctamente',
     EVENT_EDITIONS_LINKED: 'Ediciones vinculadas correctamente',
@@ -56,6 +57,7 @@ export const MESSAGES = {
     CLUB_INVALID_ID: 'ID de club inválido',
     CLUB_MISSING_REQUIRED_FIELDS: 'El nombre del club es requerido',
     CLUB_NO_FIELDS_TO_UPDATE: 'Debe proporcionar al menos un campo para actualizar',
+    CONTACT_INVALID_DATA: 'Los datos del formulario de contacto son inválidos',
     EMAIL_CONFIG_INVALID: 'Configuración de email inválida',
     EVENT_ALREADY_EXISTS: 'Este evento ya existe',
     EVENT_INVALID_COST: 'El costo del evento es inválido',
@@ -113,6 +115,7 @@ export const MESSAGES = {
 
   429: {
     RATE_LIMIT_AUTH_EXCEEDED: 'Demasiados intentos de autenticación, intenta de nuevo más tarde',
+    RATE_LIMIT_CONTACT_EXCEEDED: 'Demasiados mensajes de contacto, intenta de nuevo más tarde',
     RATE_LIMIT_EXCEEDED: 'Demasiadas peticiones, intenta de nuevo más tarde',
   },
 
@@ -125,6 +128,7 @@ export const MESSAGES = {
     CLUB_DELETE_ERROR: 'Error al eliminar club',
     CLUB_FETCH_ERROR: 'Error al obtener clubs',
     CLUB_UPDATE_ERROR: 'Error al actualizar club',
+    CONTACT_SEND_ERROR: 'Error al enviar mensaje de contacto',
     EMAIL_CONFIG_ERROR: 'Error al verificar la configuración de email',
     EMAIL_SEND_ERROR: 'Error al enviar el correo electrónico',
     EVENT_CREATE_ERROR: 'Error al crear evento',
