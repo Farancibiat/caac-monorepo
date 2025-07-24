@@ -44,7 +44,7 @@ export const userSchemas = {
     comuna: z.string().min(1, 'La comuna es requerida'),
     region: z.string().min(1, 'La región es requerida'),
     sexo: z.enum(['masculino', 'femenino', 'otro']),
-    club: z.string().min(1, 'El club es requerido'),
+    clubId: z.string().min(1, 'El club es requerido'),
   }),
 };
 
