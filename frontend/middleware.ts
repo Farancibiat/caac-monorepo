@@ -124,25 +124,45 @@ export const middleware = async (request: NextRequest) => {
     },
   });
   
-
   response = addSecurityHeaders(response, request);
 
-
+  // Si es una ruta pública (ni protegida ni de auth), permitir acceso directo
   if (!isProtectedRoute && !isAuthRouteCheck) {
     return response;
   }
 
-  try {
-    const supabase = createMiddlewareSupabaseClient(request)
-  
-    // Usar retry logic si detectamos OAuth redirect
-    const { user, error: userError } = await getUserWithRetry(supabase, request)
-    
-    if (userError && !isOAuthRedirect) {
-      clearSupabaseCookies(request, response)
+  // Si es una ruta de autenticación, manejar lógica específica sin validación completa
+  if (isAuthRouteCheck) {
+    try {
+      const supabase = createMiddlewareSupabaseClient(request)
+      const { user } = await getUserWithRetry(supabase, request)
+      
+      // Si ya hay usuario autenticado, redirigir al dashboard
+      if (user) {
+        const redirectTo = request.nextUrl.searchParams.get(ROUTES.PARAMS.REDIRECT_TO) || ROUTES.DASHBOARD
+        const redirectResponse = NextResponse.redirect(new URL(redirectTo, request.url));
+        return addSecurityHeaders(redirectResponse, request);
+      }
+    } catch {
+      // En caso de error en rutas de auth, permitir acceso de todos modos
     }
+    
+    // Permitir acceso a las rutas de autenticación
+    return response
+  }
 
-    if (isProtectedRoute) {
+  // Para rutas protegidas, hacer validación completa
+  if (isProtectedRoute) {
+    try {
+      const supabase = createMiddlewareSupabaseClient(request)
+    
+      // Usar retry logic si detectamos OAuth redirect
+      const { user, error: userError } = await getUserWithRetry(supabase, request)
+      
+      if (userError && !isOAuthRedirect) {
+        clearSupabaseCookies(request, response)
+      }
+
       if (!user) {
         // Si es un OAuth redirect y no encontramos usuario, ser más tolerante
         if (isOAuthRedirect) {
@@ -178,20 +198,8 @@ export const middleware = async (request: NextRequest) => {
       }
       
       return response
-    }
 
-    if (isAuthRouteCheck) {
-      if (user) {
-        const redirectTo = request.nextUrl.searchParams.get(ROUTES.PARAMS.REDIRECT_TO) || ROUTES.DASHBOARD
-        const redirectResponse = NextResponse.redirect(new URL(redirectTo, request.url));
-        return addSecurityHeaders(redirectResponse, request);
-      }
-      
-      return response
-    }
-
-  } catch {
-    if (isProtectedRoute) {
+    } catch {
       // Si es OAuth redirect y hay error, permitir que pase para manejo client-side
       if (isOAuthRedirect) {
         response.headers.set('X-Auth-Required', 'oauth-error')
