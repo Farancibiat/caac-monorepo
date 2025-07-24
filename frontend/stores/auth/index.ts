@@ -8,7 +8,7 @@ export { useAuthStore } from './store'
 export type { AuthUser, AuthSession, AuthState } from './types'
 
 // Hooks
-export { useAuth, useRequireAuth, useAuthRedirect } from './hooks'
+export { useAuth, useRequireAuth} from './hooks'
 
 // Client (browser only - safe for client components)
 export { supabaseClient } from './clients'

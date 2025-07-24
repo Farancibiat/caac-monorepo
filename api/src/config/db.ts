@@ -2,7 +2,6 @@ import { PrismaClient } from '@prisma/client';
 
 // Validar que la URL de la base de datos esté configurada
 const databaseUrl = process.env.DATABASE_URL;
-const directUrl = process.env.DIRECT_URL;
 
 if (!databaseUrl) {
   throw new Error('DATABASE_URL environment variable is not set');
@@ -23,15 +22,10 @@ if (!isValidPostgresUrl(databaseUrl)) {
 }
 
 // Configurar Prisma con manejo de errores mejorado
+// Las configuraciones de datasource se leen automáticamente desde schema.prisma
 const prisma = new PrismaClient({
   log: ['error', 'warn'],
   errorFormat: 'pretty',
-  datasources: {
-    db: {
-      url: databaseUrl,
-      ...(directUrl && { directUrl })
-    }
-  }
 });
 
 // Función para verificar la conexión
