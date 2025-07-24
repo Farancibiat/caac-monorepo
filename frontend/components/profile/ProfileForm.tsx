@@ -44,7 +44,7 @@ const profileSchema = yup.object({
   nombre: yup.string().required('El nombre es obligatorio').min(2, 'El nombre debe tener al menos 2 caracteres'),
   primerApellido: yup.string().required('El primer apellido es obligatorio').min(2, 'El primer apellido debe tener al menos 2 caracteres'),
   segundoApellido: yup.string().required('El segundo apellido es obligatorio').min(2, 'El segundo apellido debe tener al menos 2 caracteres'),
-  fechaNacimiento: yup.date().required('La fecha de nacimiento es obligatoria').max(new Date(), 'La fecha de nacimiento no puede ser futura').typeError('Por favor, introduce una fecha válida'),
+  fechaNacimiento: yup.date().required('La fecha de nacimiento es obligatoria').max(new Date(), 'La fecha de nacimiento no es válida').typeError('Por favor, introduce una fecha válida'),
   telefono: yup.string().required('El teléfono es obligatorio').matches(/^[+]?[0-9\s-()]*$/, 'Formato de teléfono inválido'),
   direccion: yup.string().required('La dirección es obligatoria'),
   comuna: yup.string()

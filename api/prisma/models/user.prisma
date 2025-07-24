@@ -1,34 +1,32 @@
+model User {
+  id                    Int             @id @default(autoincrement())
+  auth_id               String?         @unique @map("auth_id")
+  email                 String?         @unique
+  password              String?
+  name                  String?
+  role                  Role            @default(USER)
+  phone                 String?
+  isActive              Boolean         @default(true)
+  avatar_url            String?         @map("avatar_url")
+  provider              String?         @default("email")
+  provider_id           String?         @map("provider_id")
+  profileCompleted      Boolean         @default(false) @map("profile_completed")
+  createdAt             DateTime        @default(now()) @map("created_at")
+  updatedAt             DateTime        @updatedAt @map("updated_at")
+  createdEvents         Event[]
+  confirmedPayments     PaymentRecord[]
+  profile               Profile?
+  confirmedReservations Reservation[]   @relation("PaymentConfirmations")
+  reservations          Reservation[]
+
+  @@map("users")
+  @@schema("public")
+}
+
 enum Role {
   ADMIN
   TREASURER
   USER
 
-  @@schema("public")
-}
-
-model User {
-  id                    Int           @id @default(autoincrement())
-  auth_id               String?       @unique @map("auth_id")
-  email                 String?       @unique
-  password              String?
-  name                  String?
-  role                  Role          @default(USER)
-  phone                 String?
-  isActive              Boolean       @default(true)
-  avatar_url            String?       @map("avatar_url")
-  provider              String?       @default("email")
-  provider_id           String?       @map("provider_id")
-  profileCompleted      Boolean       @default(false) @map("profile_completed")
-  createdAt             DateTime      @default(now()) @map("created_at")
-  updatedAt             DateTime      @updatedAt @map("updated_at")
-  reservations          Reservation[]
-  confirmedReservations Reservation[] @relation("PaymentConfirmations")
-  confirmedPayments     PaymentRecord[]
-  profile               Profile?
-  
-  // Relación con Event (como creador)
-  createdEvents         Event[]
-
-  @@map("users")
   @@schema("public")
 }

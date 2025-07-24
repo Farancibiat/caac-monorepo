@@ -12,7 +12,6 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { SupabaseErrorCode } from '@/constants/supabaseErrors'
 import { useRouting } from '@/hooks/useRouting'
-import { useAuthRedirect } from '@/stores/auth/hooks'
 
 // Esquema de validación mejorado para el formulario de login
 const loginSchema = yup.object().shape({
@@ -44,9 +43,6 @@ export const LoginForm = () => {
   const { signInWithGoogle, signInWithEmail, loading } = useAuthStore()
   const [isEmailLoading, setIsEmailLoading] = useState(false)
   const { redirect, routes } = useRouting();
-  
-  // Hook para manejar redirección automática después del login
-  useAuthRedirect();
 
   const {
     register,

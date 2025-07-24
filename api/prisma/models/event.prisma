@@ -1,3 +1,61 @@
+model Event {
+  id                Int               @id @default(autoincrement())
+  name              String
+  slug              String            @unique
+  description       String
+  shortDescription  String            @map("short_description")
+  startDate         DateTime          @map("start_date")
+  endDate           DateTime?         @map("end_date")
+  location          String
+  coordinatesLat    Float?            @map("coordinates_lat")
+  coordinatesLng    Float?            @map("coordinates_lng")
+  maxParticipants   Int?              @map("max_participants")
+  currentEnrolled   Int               @default(0) @map("current_enrolled")
+  minAge            Int?              @map("min_age")
+  maxAge            Int?              @map("max_age")
+  organizatorClubId Int?              @map("organizator_club_id")
+  organizatorUrl    String?           @map("organizator_url")
+  organizatorName   String            @map("organizator_name")
+  isOwnEvent        Boolean           @default(true) @map("is_own_event")
+  contactEmail      String?           @map("contact_email")
+  contactPhone      String?           @map("contact_phone")
+  eventMainType     EventMainType     @map("event_main_type")
+  eventLocationType EventLocationType @map("event_location_type")
+  eventCategory     EventCategory     @map("event_category")
+  status            EventStatus       @default(DRAFT)
+  cost              Json?
+  previousEventId   Int?              @map("previous_event_id")
+  nextEventId       Int?              @map("next_event_id")
+  editionNumber     Int?              @map("edition_number")
+  featuredImage     String?           @map("featured_image")
+  hasGallery        Boolean           @default(false) @map("has_gallery")
+  galleryImages     Json?             @map("gallery_images")
+  requirements      Json?
+  equipment         Json?
+  isActive          Boolean           @default(true) @map("is_active")
+  isFeatured        Boolean           @default(false) @map("is_featured")
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @updatedAt @map("updated_at")
+  createdBy         Int               @map("created_by")
+  distances         EventDistance[]
+  createdByUser     User              @relation(fields: [createdBy], references: [id])
+  nextEvent         Event?            @relation("NextEdition", fields: [nextEventId], references: [id])
+  previousEvents    Event[]           @relation("NextEdition")
+  organizatorClub   Club?             @relation(fields: [organizatorClubId], references: [id])
+  previousEvent     Event?            @relation("PreviousEdition", fields: [previousEventId], references: [id])
+  nextEvents        Event[]           @relation("PreviousEdition")
+
+  @@index([status])
+  @@index([startDate])
+  @@index([isFeatured])
+  @@index([slug])
+  @@index([eventCategory])
+  @@index([previousEventId, nextEventId])
+  @@index([organizatorClubId])
+  @@map("events")
+  @@schema("public")
+}
+
 enum EventMainType {
   POOL       @map("pool")
   OPEN_WATER @map("open_water")
@@ -34,91 +92,3 @@ enum EventStatus {
 
   @@schema("public")
 }
-
-model Event {
-  id                Int      @id @default(autoincrement())
-  
-  // Identificación
-  name              String
-  slug              String   @unique
-  
-  // Descripción
-  description       String   @db.Text
-  shortDescription  String   @map("short_description")
-  
-  // Fechas
-  startDate         DateTime @map("start_date")
-  endDate           DateTime? @map("end_date")
-  
-  // Ubicación
-  location          String
-  coordinatesLat    Float?   @map("coordinates_lat")
-  coordinatesLng    Float?   @map("coordinates_lng")
-  
-  // Participación
-  maxParticipants   Int?     @map("max_participants")
-  currentEnrolled   Int      @default(0) @map("current_enrolled")
-  minAge            Int?     @map("min_age")
-  maxAge            Int?     @map("max_age")
-  
-  // Organización
-  organizatorClubId Int?     @map("organizator_club_id")
-  organizatorUrl    String?  @map("organizator_url")
-  organizatorName   String   @map("organizator_name")
-  isOwnEvent        Boolean  @default(true) @map("is_own_event")
-  contactEmail      String?  @map("contact_email")
-  contactPhone      String?  @map("contact_phone")
-  
-  // Clasificación
-  eventMainType     EventMainType     @map("event_main_type")
-  eventLocationType EventLocationType @map("event_location_type") 
-  eventCategory     EventCategory     @map("event_category")
-  
-  // Estado
-  status            EventStatus @default(DRAFT)
-  
-  // Costo (JSON para rango)
-  cost              Json?  // { min?: number, max?: number, currency: string, description?: string }
-  
-  // Relación entre ediciones
-  previousEventId   Int?     @map("previous_event_id")
-  nextEventId       Int?     @map("next_event_id")
-  editionNumber     Int?     @map("edition_number")
-  
-  // Media
-  featuredImage     String?  @map("featured_image")
-  hasGallery        Boolean  @default(false) @map("has_gallery")
-  galleryImages     Json?    @map("gallery_images") // string[]
-  
-  // Requisitos (JSON arrays)
-  requirements      Json?    // string[]
-  equipment         Json?    // string[]
-  
-  // Metadata
-  isActive          Boolean  @default(true) @map("is_active")
-  isFeatured        Boolean  @default(false) @map("is_featured")
-  createdAt         DateTime @default(now()) @map("created_at")
-  updatedAt         DateTime @updatedAt @map("updated_at")
-  createdBy         Int      @map("created_by")
-  
-  // Relaciones
-  organizatorClub   Club?           @relation(fields: [organizatorClubId], references: [id], onDelete: SetNull)
-  distances         EventDistance[]
-  previousEvent     Event?          @relation("PreviousEdition", fields: [previousEventId], references: [id], onDelete: SetNull)
-  nextEvent         Event?          @relation("NextEdition", fields: [nextEventId], references: [id], onDelete: SetNull)
-  createdByUser     User            @relation(fields: [createdBy], references: [id], onDelete: Restrict)
-  
-  // Self-relation inversas para ediciones
-  previousEvents    Event[]         @relation("NextEdition")
-  nextEvents        Event[]         @relation("PreviousEdition")
-
-  @@index([status])
-  @@index([startDate])
-  @@index([isFeatured])
-  @@index([slug])
-  @@index([eventCategory])
-  @@index([previousEventId, nextEventId])
-  @@index([organizatorClubId])
-  @@map("events")
-  @@schema("public")
-} 

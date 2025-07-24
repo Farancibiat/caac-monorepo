@@ -1,15 +1,10 @@
 import { create } from 'zustand'
 import { supabaseClient } from './clients'
-import { signInWithGoogle as signInWithGoogleAction, signOut as signOutAction } from './actions'
 import type { AuthState, AuthUser, AuthSession } from './types'
-import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
+import { ROUTES } from '@/config/routes'
+import { Session, User } from '@supabase/supabase-js'
 
-let appRouter: AppRouterInstance | null = null
-export const setAppRouter = (router: AppRouterInstance) => {
-  appRouter = router
-}
-
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   session: null,
   loading: true,
@@ -18,151 +13,166 @@ export const useAuthStore = create<AuthState>((set) => ({
   profileCompleted: false,
   shouldCompleteProfile: false,
 
-  setUser: (user) => {
-    const profileCompleted = user?.user_metadata?.profileCompleted === true
-    const shouldCompleteProfile = user ? !profileCompleted : false
-    
-    set({ 
-      user, 
-      isAuthenticated: !!user,
-      profileCompleted,
-      shouldCompleteProfile
-    })
-    
-  },
-  
-  setSession: (session) => set({ session }),
-  setLoading: (loading) => set({ loading }),
-  setError: (error) => set({ error }),
-
   signInWithGoogle: async () => {
+    set({ loading: true, error: null })
     try {
-      set({ loading: true, error: null })
-      await signInWithGoogleAction();
+      const { error } = await supabaseClient.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}${ROUTES.AUTH.CALLBACK}`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+          scopes: 'openid email profile phone',
+        },
+      })
+
+      if (error) {
+        throw error
+      }
+
+      // No necesitamos hacer nada más aquí - el redirect se maneja automáticamente
     } catch (error) {
-      set({ error: error instanceof Error ? error.message : 'Error al iniciar sesión' })
-    } finally {
-      set({ loading: false })
+      const errorMessage = error instanceof Error ? error.message : 'Error al iniciar sesión con Google'
+      set({ error: errorMessage, loading: false })
+      throw error
     }
   },
 
   signInWithEmail: async (email: string, password: string) => {
+    set({ loading: true, error: null })
     try {
-      set({ loading: true, error: null })
       const { error } = await supabaseClient.auth.signInWithPassword({
         email,
         password,
       })
 
-      if (error) throw error;
+      if (error) {
+        throw error
+      }
     } catch (error) {
-      set({ error: error instanceof Error ? error.message : 'Error al iniciar sesión' })
+      const errorMessage = error instanceof Error ? error.message : 'Error al iniciar sesión'
+      set({ error: errorMessage, loading: false })
       throw error
-    } finally {
-      set({ loading: false })
     }
   },
 
   signUp: async (email: string, password: string, userData?: Partial<AuthUser>) => {
+    set({ loading: true, error: null })
     try {
-      set({ loading: true, error: null })
       const { error } = await supabaseClient.auth.signUp({
         email,
         password,
         options: {
-          data: {
-            profileCompleted: false, 
-            ...userData
-          }
+          emailRedirectTo: `${window.location.origin}${ROUTES.AUTH.CALLBACK}`,
+          data: userData || {}
         }
       })
 
-      if (error) throw error
-
+      if (error) {
+        throw error
+      }
     } catch (error) {
-      set({ error: error instanceof Error ? error.message : 'Error al registrarse' })
+      const errorMessage = error instanceof Error ? error.message : 'Error al registrar usuario'
+      set({ error: errorMessage, loading: false })
       throw error
-    } finally {
-      set({ loading: false })
     }
   },
 
   signOut: async () => {
-   
-    set({ 
-      user: null, 
-      session: null, 
-      isAuthenticated: false, 
-      loading: true, 
-      error: null,
-      profileCompleted: false,
-      shouldCompleteProfile: false
-    })
-
+    set({ loading: true, error: null })
     try {
-      await signOutAction()
+      const { error } = await supabaseClient.auth.signOut({ scope: 'global' })
       
-      if (appRouter) {
-        appRouter.push('/')
-      } else {
-        if (typeof window !== 'undefined') {
-          window.location.href = '/'
-        }
+      if (error) {
+        throw error
       }
-    } catch (error) {
-      set({ error: error instanceof Error ? error.message : 'Error al cerrar sesión' })
+
+      // Limpiar estado manualmente
       set({ 
         user: null, 
         session: null, 
         isAuthenticated: false,
         profileCompleted: false,
-        shouldCompleteProfile: false
+        shouldCompleteProfile: false,
+        loading: false 
       })
-      
-      if (typeof window !== 'undefined' && !appRouter) {
-         window.location.href = '/'; 
-      }
-    } finally {
-      set({ loading: false })
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Error al cerrar sesión'
+      set({ error: errorMessage, loading: false })
+      throw error
     }
-  }
+  },
+
+  // Internal setters
+  setUser: (user: AuthUser | null) => {
+    const profileCompleted = user?.user_metadata?.profileCompleted === true
+    set({ 
+      user, 
+      isAuthenticated: !!user,
+      profileCompleted,
+      shouldCompleteProfile: !!user && !profileCompleted
+    })
+  },
+
+  setSession: (session: AuthSession | null) => set({ session }),
+  setLoading: (loading: boolean) => set({ loading }),
+  setError: (error: string | null) => set({ error })
 }))
 
-let authInitialized = false
+/**
+ * Intenta obtener una sesión válida de forma directa
+ */
+const getValidSession = async (): Promise<{ user: User; session: Session } | null> => {
+  try {
+    const [userResult, sessionResult] = await Promise.all([
+      supabaseClient.auth.getUser(),
+      supabaseClient.auth.getSession()
+    ])
+    
+    const { data: { user }, error: userError } = userResult
+    const { data: { session }, error: sessionError } = sessionResult
+    
+    if (!userError && !sessionError && user && session?.access_token) {
+      return { user, session }
+    }
+    
+    return null
+  } catch {
+    return null
+  }
+}
 
 const refreshUserState = async () => {
   try {
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser()
-    const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession()
+    const result = await getValidSession()
     
-    if (userError || sessionError) {
-      useAuthStore.getState().setUser(null)
-      useAuthStore.getState().setSession(null)
-      useAuthStore.getState().setError(null)
-    } else if (user && session) {
-      useAuthStore.getState().setUser(user as AuthUser)
-      useAuthStore.getState().setSession(session as AuthSession)
-      useAuthStore.getState().setError(null)
+    const authStore = useAuthStore.getState()
+    
+    if (result) {
+      const { user, session } = result
+      authStore.setUser(user as AuthUser)
+      authStore.setSession(session as AuthSession)
+      authStore.setError(null)
     } else {
-      useAuthStore.getState().setUser(null)
-      useAuthStore.getState().setSession(null)
-      useAuthStore.getState().setError(null)
+      authStore.setUser(null)
+      authStore.setSession(null)
+      authStore.setError(null)
     }
-  } catch {
-    useAuthStore.getState().setUser(null)
-    useAuthStore.getState().setSession(null)
-    useAuthStore.getState().setError(null)
+  } catch (error) {
+    console.warn('Error en refreshUserState:', error)
+    const authStore = useAuthStore.getState()
+    authStore.setUser(null)
+    authStore.setSession(null)
+    authStore.setError(null)
   } finally {
     useAuthStore.getState().setLoading(false)
   }
 }
 
+// Listener para cambios de estado de autenticación
 supabaseClient.auth.onAuthStateChange(async (event, session) => {
-  
-  if (!authInitialized) {
-    authInitialized = true
-  }
-  
   const authStore = useAuthStore.getState()
   
   try {
@@ -181,23 +191,25 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
         authStore.setSession(null)
       }
       authStore.setLoading(false)
-    } else {
-      authStore.setLoading(false)
     }
-  } catch {
-    authStore.setError(null)
+  } catch (error) {
+    console.warn('Error en onAuthStateChange:', error)
+    authStore.setError('Error de autenticación')
     authStore.setLoading(false)
   }
 })
 
+// Inicializar el estado de autenticación
 const initializeAuth = async () => {
-  await new Promise(resolve => setTimeout(resolve, 100))
-  
-  if (!authInitialized) {
-    await refreshUserState()
-    authInitialized = true
-  }
+  await refreshUserState()
 }
+
+// Función para forzar actualización del estado de auth
+export const forceAuthRefresh = async () => {
+  await refreshUserState()
+}
+
+// Inicializar cuando se carga el módulo
 if (typeof window !== 'undefined') {
   initializeAuth()
 }

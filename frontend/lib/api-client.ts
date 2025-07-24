@@ -1,4 +1,5 @@
-import { useAuthStore } from '@/stores/auth/store'
+import { forceAuthRefresh } from '@/stores/auth/store'
+import { supabaseClient } from '@/stores/auth/clients'
 
 // Base URL de la API desde variables de entorno
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
@@ -9,6 +10,7 @@ export interface ApiClientOptions {
   body?: any
   headers?: Record<string, string>
   requireAuth?: boolean
+  retryAuth?: boolean
 }
 
 export interface ApiResponse<T = unknown> {
@@ -20,7 +22,7 @@ export interface ApiResponse<T = unknown> {
 
 /**
  * Cliente API genérico para uso en componentes client-side
- * Utiliza el store de auth para obtener automáticamente el token de sesión
+ * Utiliza el cliente de Supabase directamente para obtener tokens actualizados
  */
 export const requestClient = async <T = unknown>(
   endpoint: string,
@@ -30,7 +32,8 @@ export const requestClient = async <T = unknown>(
     method = 'GET',
     body,
     headers: customHeaders = {},
-    requireAuth = true
+    requireAuth = true,
+    retryAuth = true
   } = options
 
   // Construir URL completa
@@ -42,48 +45,103 @@ export const requestClient = async <T = unknown>(
     ...customHeaders
   }
 
-  // Obtener token de autenticación si es requerido
-  if (requireAuth) {
-    const { session } = useAuthStore.getState()
+  // Función para obtener el token de autenticación directamente de Supabase
+  const getAuthToken = async (attemptRefresh: boolean = false): Promise<string | null> => {
+    if (!requireAuth) return null
     
-    if (session?.access_token) {
-      headers.Authorization = `Bearer ${session.access_token}`
+    try {
+      // Obtener sesión directamente del cliente de Supabase
+      const { data: { session }, error } = await supabaseClient.auth.getSession()
+      
+      if (error) {
+        console.warn('Error obteniendo sesión:', error.message)
+        return null
+      }
+      
+      // Si tenemos sesión válida, retornar el token
+      if (session?.access_token) {
+        return session.access_token
+      }
+      
+      // Si no hay sesión y se permite retry, intentar refrescar
+      if (attemptRefresh) {
+        try {
+          const { data: { session: refreshedSession }, error: refreshError } = await supabaseClient.auth.refreshSession()
+          
+          if (!refreshError && refreshedSession?.access_token) {
+            // Actualizar el store con la nueva sesión
+            await forceAuthRefresh()
+            return refreshedSession.access_token
+          }
+        } catch (refreshErr) {
+          console.warn('Error refrescando sesión:', refreshErr)
+        }
+      }
+      
+      return null
+    } catch (err) {
+      console.warn('Error en getAuthToken:', err)
+      return null
     }
   }
 
-  // Configurar opciones de fetch
-  const fetchOptions: RequestInit = {
-    method,
-    headers,
-    ...(body && method !== 'GET' && { body: JSON.stringify(body) })
-  }
+  // Función para realizar la request
+  const makeRequest = async (token: string | null): Promise<ApiResponse<T>> => {
+    // Agregar token de autorización si está disponible
+    if (token) {
+      headers.Authorization = `Bearer ${token}`
+    }
 
-  try {
-    const response = await fetch(url, fetchOptions)
-    
-    let data: T | undefined
-    
-    // Intentar parsear JSON si hay contenido
-    if (response.headers.get('content-type')?.includes('application/json')) {
-      try {
-        data = await response.json()
-      } catch {
-        // Si falla el parseo JSON, continuamos sin data
+    // Configurar opciones de fetch
+    const fetchOptions: RequestInit = {
+      method,
+      headers,
+      ...(body && method !== 'GET' && { body: JSON.stringify(body) })
+    }
+
+    try {
+      const response = await fetch(url, fetchOptions)
+      
+      let data: T | undefined
+      
+      // Intentar parsear JSON si hay contenido
+      if (response.headers.get('content-type')?.includes('application/json')) {
+        try {
+          data = await response.json()
+        } catch {
+          // Si falla el parseo JSON, continuamos sin data
+        }
+      }
+
+      return {
+        data,
+        status: response.status,
+        ok: response.ok,
+        error: response.ok ? undefined : `HTTP ${response.status}: ${response.statusText}`
+      }
+    } catch (error) {
+      return {
+        error: error instanceof Error ? error.message : 'Network error',
+        status: 0,
+        ok: false
       }
     }
+  }
 
-    return {
-      data,
-      status: response.status,
-      ok: response.ok
-    }
-  } catch (error) {
-    return {
-      error: error instanceof Error ? error.message : 'Network error',
-      status: 0,
-      ok: false
+  // Primer intento
+  let token = await getAuthToken(false)
+  let response = await makeRequest(token)
+
+  // Si la request falló por autenticación y se permite retry
+  if (!response.ok && response.status === 401 && retryAuth && requireAuth) {
+    // Intentar refrescar el token y hacer la request nuevamente
+    token = await getAuthToken(true)
+    if (token) {
+      response = await makeRequest(token)
     }
   }
+
+  return response
 }
 
 // Función helper para llamadas más simples

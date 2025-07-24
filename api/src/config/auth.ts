@@ -78,7 +78,7 @@ export const protect = async (req: Request, res: Response, next: NextFunction): 
     };
 
     next();
-  } catch {
+  } catch (e) {
     sendMessage(res, 'AUTH_TOKEN_INVALID');
   }
 };

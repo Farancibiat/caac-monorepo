@@ -1,11 +1,69 @@
 import { Request, Response } from 'express';
-import prisma from '@/config/db';
+import prisma, { testConnection } from '@/config/db';
 import { sendMessage } from '@/utils/responseHelper';
 import { AuthenticatedRequest } from '@/config/auth';
 
+// Función helper para manejar errores de base de datos
+const handleDatabaseError = (error: any, res: Response) => {
+  console.error('Database error:', {
+    name: error.name,
+    message: error.message,
+    code: error.code,
+    stack: error.stack
+  });
+
+  // Errores específicos de Prisma/PostgreSQL
+  if (error.code === 'P1001') {
+    console.error('❌ Cannot reach database server');
+    sendMessage(res, 'DATABASE_CONNECTION_ERROR');
+    return;
+  }
+  
+  if (error.code === 'P1002') {
+    console.error('❌ Database server timeout');
+    sendMessage(res, 'DATABASE_TIMEOUT_ERROR');
+    return;
+  }
+  
+  if (error.code === 'P1003') {
+    console.error('❌ Database does not exist');
+    sendMessage(res, 'DATABASE_NOT_FOUND_ERROR');
+    return;
+  }
+  
+  if (error.code === 'P1008') {
+    console.error('❌ Database operation timeout');
+    sendMessage(res, 'DATABASE_TIMEOUT_ERROR');
+    return;
+  }
+  
+  if (error.code === 'P1010') {
+    console.error('❌ Database access denied');
+    sendMessage(res, 'DATABASE_ACCESS_DENIED_ERROR');
+    return;
+  }
+
+  if (error.message?.includes('Authentication error')) {
+    console.error('❌ Database authentication failed');
+    sendMessage(res, 'DATABASE_AUTH_ERROR');
+    return;
+  }
+
+  // Error genérico de base de datos
+  console.error('❌ Generic database error');
+  sendMessage(res, 'CLUB_FETCH_ERROR');
+};
 
 export const getAllClubs = async (_req: Request, res: Response): Promise<void> => {
   try {
+    // Verificar conexión antes de hacer la consulta
+    const isConnected = await testConnection();
+    if (!isConnected) {
+      console.error('❌ Database connection test failed');
+      sendMessage(res, 'DATABASE_CONNECTION_ERROR');
+      return;
+    }
+
     const clubs = await prisma.club.findMany({
       where: {
         isActive: true,
@@ -18,12 +76,12 @@ export const getAllClubs = async (_req: Request, res: Response): Promise<void> =
         nombre: 'asc',
       },
     });
+    
     sendMessage(res, 'CLUB_LIST_RETRIEVED', clubs);
   } catch (error) {
-    sendMessage(res, 'CLUB_FETCH_ERROR');
+    handleDatabaseError(error, res);
   }
 };
-
 
 export const getClubById = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -45,10 +103,9 @@ export const getClubById = async (req: Request, res: Response): Promise<void> =>
     
     sendMessage(res, 'CLUB_RETRIEVED', club);
   } catch (error) {
-    sendMessage(res, 'CLUB_FETCH_ERROR');
+    handleDatabaseError(error, res);
   }
 };
-
 
 export const createClub = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
@@ -74,10 +131,9 @@ export const createClub = async (req: AuthenticatedRequest, res: Response): Prom
     });
     sendMessage(res, 'CLUB_CREATED', newClub);
   } catch (error) {
-    sendMessage(res, 'CLUB_CREATE_ERROR');
+    handleDatabaseError(error, res);
   }
 };
-
 
 export const updateClub = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
@@ -132,7 +188,7 @@ export const updateClub = async (req: AuthenticatedRequest, res: Response): Prom
     });
     sendMessage(res, 'CLUB_UPDATED', updatedClub);
   } catch (error) {
-    sendMessage(res, 'CLUB_UPDATE_ERROR');
+    handleDatabaseError(error, res);
   }
 };
 
@@ -161,6 +217,6 @@ export const deleteClub = async (req: AuthenticatedRequest, res: Response): Prom
     
     sendMessage(res, 'CLUB_DELETED');
   } catch (error) {
-    sendMessage(res, 'CLUB_DELETE_ERROR');
+    handleDatabaseError(error, res);
   }
 }; 

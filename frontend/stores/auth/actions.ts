@@ -6,13 +6,14 @@ import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { cookies } from 'next/headers'
 import { ROUTES } from '@/config/routes'
+
 export const signInWithGoogle = async () => {
   const supabase = await supabaseServer()
   const headersList = await headers()
   const origin = headersList.get('origin') || process.env.NEXT_PUBLIC_SITE_URL
 
   if (!origin) {
-    throw new Error('Origin header is missing')
+    throw new Error('Could not determine origin for OAuth redirect')
   }
 
   const { data, error } = await supabase.auth.signInWithOAuth({

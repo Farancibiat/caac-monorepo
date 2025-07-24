@@ -1,9 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { useAuthStore } from './store'
-import { useRouting } from '@/hooks/useRouting'
-
 
 /**
  * Hook para validar si el usuario está autenticado
@@ -22,44 +19,17 @@ export const useAuth = () => {
 }
 
 /**
- * Hook para proteger rutas que requieren autenticación
+ * Hook para verificar si el usuario requiere autenticación
+ * Solo expone el estado - no maneja redirects (eso lo hace el middleware/AuthProvider)
  */
 export const useRequireAuth = () => {
   const { user, session, loading, isAuthenticated } = useAuthStore()
-  const { redirectAfterAuth } = useRouting();
-  const [shouldRedirect, setShouldRedirect] = useState(false);
-
-  useEffect(() => {
-    // Solo redirigir si claramente no hay usuario
-    if (!loading && !isAuthenticated) {
-      setShouldRedirect(true);
-      redirectAfterAuth();
-    } else {
-      setShouldRedirect(false);
-    }
-  }, [isAuthenticated, loading, redirectAfterAuth])
 
   return {
     user,
     session,
     loading,
     isAuthenticated,
-    shouldRedirect
+    isLoading: loading
   }
-}
-
-/**
- * Hook para manejar redirecciones después del login
- */
-export const useAuthRedirect = () => {
-  const { user, session, loading, isAuthenticated } = useAuthStore()
-  const { redirectAfterAuth } = useRouting();
-
-  useEffect(() => {
-    if (!loading && isAuthenticated) {
-      redirectAfterAuth();
-    }
-  }, [isAuthenticated, loading, redirectAfterAuth])
-
-  return { user, session, loading, isAuthenticated }
 } 

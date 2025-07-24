@@ -41,6 +41,50 @@ const clearSupabaseCookies = (request: NextRequest, response: NextResponse) => {
 }
 
 
+const isFromOAuthRedirect = (request: NextRequest): boolean => {
+  const referer = request.headers.get('referer') || ''
+  const isGoogleRedirect = referer.includes('accounts.google.com')
+
+  const hasSupabaseCookies = request.cookies.getAll().some(cookie => 
+    cookie.name.startsWith('sb-') && cookie.value.length > 0
+  )
+  return isGoogleRedirect || hasSupabaseCookies
+}
+
+
+const hasValidAuthCookies = (request: NextRequest): boolean => {
+  const cookies = request.cookies.getAll()
+  const authCookies = cookies.filter(c => c.name.startsWith('sb-'))
+  return authCookies.length > 0 && authCookies.every(c => c.value.length > 10)
+}
+
+
+const getUserWithRetry = async (supabase: ReturnType<typeof createMiddlewareSupabaseClient>, request: NextRequest): Promise<{ user: unknown; error: unknown }> => {
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser()
+    
+    // Si obtenemos un usuario válido, retornamos inmediatamente
+    if (user) {
+      return { user, error: null }
+    }
+    
+    // Si hay error y no hay cookies válidas, no hacer retry
+    if (error && !hasValidAuthCookies(request)) {
+      return { user: null, error }
+    }
+    
+    // Solo hacer un retry inmediato si hay cookies válidas pero falla la primera llamada
+    if (hasValidAuthCookies(request) && !user) {
+      const { data: { user: retryUser }, error: retryError } = await supabase.auth.getUser()
+      return { user: retryUser, error: retryError }
+    }
+    
+    return { user, error }
+  } catch (err) {
+    return { user: null, error: err }
+  }
+}
+
 const addSecurityHeaders = (response: NextResponse, request: NextRequest) => {
 
   if (isAdminRoute(request.nextUrl.pathname)) {
@@ -58,11 +102,21 @@ const addSecurityHeaders = (response: NextResponse, request: NextRequest) => {
 export const middleware = async (request: NextRequest) => {
   const { pathname } = request.nextUrl
 
+  // Verificar si hay código OAuth en la raíz - redirigir al callback apropiado
+  if (pathname === '/' && request.nextUrl.searchParams.has('code')) {
+    const callbackUrl = new URL(ROUTES.AUTH.CALLBACK, request.url)
+    // Preservar todos los parámetros de query
+    request.nextUrl.searchParams.forEach((value, key) => {
+      callbackUrl.searchParams.set(key, value)
+    })
+    return NextResponse.redirect(callbackUrl)
+  }
+
   // Optimización: verificación directa para rutas /app/
   const isProtectedRoute = pathname.startsWith('/app/')
   const isAuthRouteCheck = isAuthRoute(pathname)
   const isCompleteProfileRouteCheck = pathname.startsWith('/app/complete-profile')
-
+  const isOAuthRedirect = isFromOAuthRedirect(request)
 
   let response = NextResponse.next({
     request: {
@@ -81,21 +135,30 @@ export const middleware = async (request: NextRequest) => {
   try {
     const supabase = createMiddlewareSupabaseClient(request)
   
-    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    // Usar retry logic si detectamos OAuth redirect
+    const { user, error: userError } = await getUserWithRetry(supabase, request)
     
-    if (userError) {
+    if (userError && !isOAuthRedirect) {
       clearSupabaseCookies(request, response)
     }
 
     if (isProtectedRoute) {
       if (!user) {
+        // Si es un OAuth redirect y no encontramos usuario, ser más tolerante
+        if (isOAuthRedirect) {
+          response.headers.set('X-Auth-Required', 'oauth-pending')
+          return response
+        }
+        
         const loginUrl = new URL(ROUTES.AUTH.LOGIN, request.url);
         loginUrl.searchParams.set(ROUTES.PARAMS.REDIRECT_TO, pathname);
         loginUrl.searchParams.set(ROUTES.PARAMS.REASON, 'authentication_required');
         return NextResponse.redirect(loginUrl)
       }
 
-      if (!user.email_confirmed_at) {
+      const supabaseUser = user as { email_confirmed_at?: string; user_metadata?: Record<string, unknown> }
+
+      if (!supabaseUser.email_confirmed_at) {
         const resendConfirmationUrl = new URL(ROUTES.AUTH.RESEND_CONFIRMATION, request.url);
         resendConfirmationUrl.searchParams.set(ROUTES.PARAMS.REDIRECT_TO, pathname);
         resendConfirmationUrl.searchParams.set(ROUTES.PARAMS.REASON, 'email_not_confirmed');
@@ -103,7 +166,7 @@ export const middleware = async (request: NextRequest) => {
       }
 
       if (!isCompleteProfileRouteCheck) {
-        const userMetadata = user.user_metadata || {}
+        const userMetadata = supabaseUser.user_metadata || {}
         const profileCompleted = userMetadata.profileCompleted === true
         
         if (!profileCompleted) {
@@ -129,6 +192,12 @@ export const middleware = async (request: NextRequest) => {
 
   } catch {
     if (isProtectedRoute) {
+      // Si es OAuth redirect y hay error, permitir que pase para manejo client-side
+      if (isOAuthRedirect) {
+        response.headers.set('X-Auth-Required', 'oauth-error')
+        return response
+      }
+      
       const loginUrl = new URL(ROUTES.AUTH.LOGIN, request.url);
       loginUrl.searchParams.set(ROUTES.PARAMS.REDIRECT_TO, pathname);
       loginUrl.searchParams.set(ROUTES.PARAMS.REASON, 'middleware_error');
