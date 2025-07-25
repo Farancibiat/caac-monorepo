@@ -91,6 +91,22 @@ export const upsertProfile = async (req: AuthenticatedRequest, res: Response): P
       return;
     }
 
+    // Validar que el club existe y está activo
+    try {
+      const club = await prisma.club.findUnique({
+        where: { id: Number(clubId) }
+      });
+
+      if (!club || !club.isActive) {
+        sendMessage(res, 'PROFILE_INVALID_CLUB');
+        return;
+      }
+    } catch (error) {
+      console.error('Error validating club:', error);
+      sendMessage(res, 'PROFILE_UPDATE_ERROR');
+      return;
+    }
+
     const profileData = {
       nombre,
       primerApellido,
@@ -101,7 +117,7 @@ export const upsertProfile = async (req: AuthenticatedRequest, res: Response): P
       comuna,
       region,
       sexo: sexoMap[sexo as keyof typeof sexoMap],
-      clubId,
+      clubId: Number(clubId),
       updatedAt: new Date()
     };
 

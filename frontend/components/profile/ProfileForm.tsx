@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -40,6 +40,11 @@ import type { ProfileApiData } from '@/types/api-responses/profile';
 import type { ClubSimple } from '@/types/models/club';
 import type { ApiResponse } from '@/types/api';
 
+const CLUBS_FALLBACK = [
+  { id: 1, nombre: 'Sin Club' },
+  { id: 2, nombre: 'Otro' }
+];
+
 const profileSchema = yup.object({
   nombre: yup.string().required('El nombre es obligatorio').min(2, 'El nombre debe tener al menos 2 caracteres'),
   primerApellido: yup.string().required('El primer apellido es obligatorio').min(2, 'El primer apellido debe tener al menos 2 caracteres'),
@@ -63,7 +68,6 @@ const profileSchema = yup.object({
 });
 
 type ProfileSchemaType = yup.InferType<typeof profileSchema>;
-
 const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) => {
   const { user, setUser } = useAuthStore();
   
@@ -93,9 +97,20 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
   const regionOptions = getRegiones();
   const comunaOptions = selectedRegion ? getComunasByRegion(selectedRegion) : [];
   
-  const clubOptions = clubs.length > 0 
-    ? clubs.map(club => club.nombre)
-    : ['Sin Club', 'Otro'];
+
+  
+  const clubOptions = React.useMemo(() => {
+    const otherClubs = [];
+    if(clubs.length){
+    for (const club of clubs) {
+      if (!(club.nombre === 'Sin Club' || club.nombre === 'Otro')) 
+        otherClubs.push(club);
+    }
+
+    otherClubs.sort((a, b) => a.nombre.localeCompare(b.nombre));
+  }
+    return [...CLUBS_FALLBACK, ...otherClubs].map(club => club.nombre);
+  }, [clubs]);
   
   useEffect(() => {
     const fetchClubes = async () => {
@@ -146,8 +161,9 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
           const profileData = response.data as ProfileApiData;
           
           // Convertir clubId a nombre del club para el formulario
+          const allClubs = clubs.length > 0 ? clubs : CLUBS_FALLBACK;
           const clubName = profileData.clubId 
-            ? clubs.find(club => club.id === profileData.clubId)?.nombre || ''
+            ? allClubs.find(club => club.id === profileData.clubId)?.nombre || ''
             : '';
           
           const formData: ProfileSchemaType = {
@@ -181,7 +197,9 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
     try {
       let clubId: number | null = null;
       if (data.club) {
-        const selectedClub = clubs.find(club => club.nombre === data.club);
+        // Buscar primero en clubs cargados, luego en fallback
+        const allClubs = clubs.length > 0 ? clubs : CLUBS_FALLBACK;
+        const selectedClub = allClubs.find(club => club.nombre === data.club);
         clubId = selectedClub ? selectedClub.id : null;
       }
 
