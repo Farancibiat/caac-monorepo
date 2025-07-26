@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirmación de Mensaje Recibido</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #e0f2fe; /* ocean-100 */
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 600px;
+      background-color: #fafafa; /* neutral-50 */
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: 0 4px 12px rgba(23, 23, 23, 0.1); /* neutral-900 con opacidad */
+    }
+    .header {
+      text-align: center;
+      padding-bottom: 30px;
+      border-bottom: 2px solid #0d9488; /* primary-600 */
+      margin-bottom: 30px;
+    }
+    .header h1 {
+      color: #0d9488; /* primary-600 */
+      font-size: 28px;
+      margin: 0 0 10px 0;
+    }
+    .header p {
+      color: #737373; /* neutral-500 */
+      font-size: 16px;
+      margin: 0;
+    }
+    .content {
+      background-color: #ffffff;
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 8px rgba(23, 23, 23, 0.05);
+    }
+    .content h2 {
+      color: #0d9488; /* primary-600 */
+      font-size: 24px;
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+    .confirmation-message {
+      background-color: #f0fdf4; /* green-50 */
+      border-left: 4px solid #16a34a; /* green-600 */
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .confirmation-message h3 {
+      margin-top: 0;
+      color: #16a34a; /* green-600 */
+      font-size: 20px;
+    }
+    .confirmation-message p {
+      color: #404040; /* neutral-700 */
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .message-summary {
+      background-color: #f0fdfa; /* primary-50 */
+      border-left: 4px solid #0d9488; /* primary-600 */
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .summary-table td {
+      padding: 8px 0;
+      border-bottom: 1px solid #e5e7eb; /* neutral-200 */
+    }
+    .summary-table td:first-child {
+      font-weight: bold;
+      color: #404040; /* neutral-700 */
+      width: 30%;
+    }
+    .summary-table td:last-child {
+      color: #525252; /* neutral-600 */
+    }
+    .message-text {
+      background-color: #ffffff;
+      padding: 15px;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      line-height: 1.6;
+      color: #404040; /* neutral-700 */
+      border: 1px solid #e5e7eb; /* neutral-200 */
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .next-steps {
+      background-color: #fef3c7; /* yellow-100 */
+      border-left: 4px solid #f59e0b; /* yellow-500 */
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+    .next-steps h3 {
+      margin-top: 0;
+      color: #f59e0b; /* yellow-500 */
+      font-size: 18px;
+    }
+    .next-steps ul {
+      color: #404040; /* neutral-700 */
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+    .next-steps li {
+      margin-bottom: 8px;
+    }
+    .contact-info {
+      text-align: center;
+      margin: 30px 0;
+      padding: 20px;
+      background-color: #f8fafc; /* neutral-50 */
+      border-radius: 8px;
+    }
+    .contact-info h4 {
+      color: #0d9488; /* primary-600 */
+      margin-bottom: 10px;
+    }
+    .contact-info p {
+      color: #525252; /* neutral-600 */
+      margin: 5px 0;
+    }
+    .contact-info a {
+      color: #0d9488; /* primary-600 */
+      text-decoration: none;
+    }
+    .contact-info a:hover {
+      text-decoration: underline;
+    }
+    .footer {
+      text-align: center;
+      padding-top: 30px;
+      border-top: 1px solid #e5e7eb; /* neutral-200 */
+      color: #737373; /* neutral-500 */
+      font-size: 14px;
+    }
+    .footer p {
+      margin: 5px 0;
+    }
+    .footer a {
+      color: #0d9488; /* primary-600 */
+      text-decoration: none;
+    }
+    .footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>Club de Aguas Abiertas Chiloé</h1>
+      <p>Confirmación de Mensaje Recibido</p>
+    </div>
+
+    <!-- Confirmation Message -->
+    <div class="content">
+      <div class="confirmation-message">
+        <h3>¡Gracias por contactarnos, {{nombre}}!</h3>
+        <p>Hemos recibido tu mensaje correctamente y nos pondremos en contacto contigo a la brevedad.</p>
+      </div>
+
+      <h2>Resumen de tu mensaje</h2>
+      
+      <div class="message-summary">
+        <table class="summary-table">
+          <tr>
+            <td>Fecha de envío:</td>
+            <td>{{fecha}}</td>
+          </tr>
+          <tr>
+            <td>Asunto:</td>
+            <td style="font-weight: bold; color: #0d9488;">{{asunto}}</td>
+          </tr>
+          <tr>
+            <td>Email de contacto:</td>
+            <td>{{email}}</td>
+          </tr>
+          {{#telefono}}
+          <tr>
+            <td>Teléfono:</td>
+            <td>{{telefono}}</td>
+          </tr>
+          {{/telefono}}
+        </table>
+      </div>
+
+      <h3>Tu mensaje:</h3>
+      <div class="message-text">{{mensaje}}</div>
+
+      <!-- Next Steps -->
+      <div class="next-steps">
+        <h3>¿Qué sigue?</h3>
+        <ul>
+          <li>Te contactaremos al email <strong>{{email}}</strong> o al teléfono proporcionado</li>
+          <li>Si es urgente, puedes llamarnos directamente al +56 9 4290 6301</li>
+        </ul>
+      </div>
+
+      <!-- Contact Info -->
+      <div class="contact-info">
+        <h4>Información de contacto</h4>
+        <p>Email: <a href="mailto:contacto@aguasabiertaschiloe.cl">contacto@aguasabiertaschiloe.cl</a></p>
+        <p>Teléfono: <a href="tel:+56942906301">+56 9 4290 6301</a></p>
+        <p>Sitio web: <a href="https://www.aguasabiertaschiloe.cl" target="_blank">www.aguasabiertaschiloe.cl</a></p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p>Este es un email automático de confirmación. No es necesario responder a este mensaje.</p>
+      <p>&copy; 2024 Club de Aguas Abiertas Chiloé by <a href="https://www.farancibiat.cl" target="_blank">Farancibiat</a></p>
+    </div>
+  </div>
+</body>
+</html> 

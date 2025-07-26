@@ -55,8 +55,26 @@ const Footer = () => {
           </div>
         </div>
 
+        {/* Legal Links Section */}
+        <div className="border-t border-neutral-800 mt-6 pt-4">
+          <div className="flex flex-wrap justify-center gap-6 text-sm">
+            <Link 
+              href="/politica-privacidad" 
+              className="text-neutral-400 hover:text-primary-400 transition-colors"
+            >
+              Política de Privacidad
+            </Link>
+            <Link 
+              href="/terminos-servicio" 
+              className="text-neutral-400 hover:text-primary-400 transition-colors"
+            >
+              Términos de Servicio
+            </Link>
+          </div>
+        </div>
+
         {/* Bottom Section */}
-        <div className="border-t border-neutral-800 mt-8 pt-6 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+        <div className="border-t border-neutral-800 mt-4 pt-6 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
           <div className="text-sm text-neutral-400">
             © {currentYear} Club de Aguas Abiertas Chiloé.
           </div>

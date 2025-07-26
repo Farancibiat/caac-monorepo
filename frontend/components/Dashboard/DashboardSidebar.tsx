@@ -84,7 +84,7 @@ const DashboardSidebar = () => {
           ? 'fixed -translate-x-full lg:relative lg:translate-x-0 lg:w-20 w-80' 
           : 'fixed translate-x-0 lg:relative w-80 lg:w-72'
         }
-        fixed top-0 left-0 h-screen z-50 lg:relative lg:top-auto lg:left-auto lg:h-screen lg:z-auto
+        fixed top-0 left-0 h-screen z-50 lg:relative lg:top-auto lg:left-auto lg:h-full lg:z-auto
       `}>
         <div className="flex flex-col h-full overflow-hidden">
           {/* Header */}
@@ -230,25 +230,37 @@ const DashboardSidebar = () => {
           </nav>
 
           {/* User Info */}
-          {!sidebarCollapsed && user && (
-            <div className="p-4 border-t border-neutral-200">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                  <span className="text-sm font-medium text-primary-700">
-                    {user.user_metadata?.full_name?.charAt(0) || user.email?.charAt(0)?.toUpperCase() || 'U'}
-                  </span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-neutral-900 truncate">
-                    {user.user_metadata?.full_name || 'Usuario'}
-                  </p>
-                  <p className="text-xs text-neutral-500 truncate">
-                    {user.email}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
+          {user && (
+  <div className="p-4 border-t border-neutral-200">
+    {sidebarCollapsed ? (
+      // Versión colapsada - solo ícono centrado
+      <div className="flex justify-center">
+        <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+          <span className="text-sm font-medium text-primary-700">
+            {user.user_metadata?.full_name?.charAt(0) || user.email?.charAt(0)?.toUpperCase() || 'U'}
+          </span>
+        </div>
+      </div>
+    ) : (
+      // Versión expandida - información completa
+      <div className="flex items-center space-x-3">
+        <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+          <span className="text-sm font-medium text-primary-700">
+            {user.user_metadata?.full_name?.charAt(0) || user.email?.charAt(0)?.toUpperCase() || 'U'}
+          </span>
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-neutral-900 truncate">
+            {user.user_metadata?.full_name || 'Usuario'}
+          </p>
+          <p className="text-xs text-neutral-500 truncate">
+            {user.email}
+          </p>
+        </div>
+      </div>
+    )}
+  </div>
+)}
         </div>
       </aside>
     </>

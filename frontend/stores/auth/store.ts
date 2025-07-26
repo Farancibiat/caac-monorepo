@@ -4,7 +4,7 @@ import type { AuthState, AuthUser, AuthSession } from './types'
 import { ROUTES } from '@/config/routes'
 import { Session, User } from '@supabase/supabase-js'
 
-export const useAuthStore = create<AuthState>((set, get) => ({
+export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   session: null,
   loading: true,

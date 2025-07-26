@@ -42,12 +42,13 @@ const RootLayout = ({
   return (
     <html lang="es">
       <body className={inter.className}>
+      {process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID && (
+            <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID} />
+          )}
         <AuthProvider>
           {children}
           <Toaster />
-          {process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID && (
-            <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID} />
-          )}
+
         </AuthProvider>
       </body>
     </html>

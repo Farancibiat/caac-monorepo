@@ -146,14 +146,16 @@ export const sendContactMessage = async (req: Request, res: Response): Promise<v
   try {
     const contactData: SendContactMessageData = req.body;
 
-    // Enviar email al equipo del club
-    const emailSent = await sendContactEmail(contactData);
+    // Enviar emails: confirmación al usuario y notificación al club
+    const emailsSent = await sendContactEmail(contactData);
 
-    if (!emailSent) {
+    if (!emailsSent) {
+      console.error('Error al enviar emails de contacto para:', contactData.email);
       sendMessage(res, 'EMAIL_SEND_ERROR');
       return;
     }
 
+    console.log('Emails de contacto enviados exitosamente para:', contactData.email);
     sendMessage(res, 'CONTACT_MESSAGE_SENT');
   } catch (error) {
     console.error('Error al enviar mensaje de contacto:', error);

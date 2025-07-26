@@ -25,13 +25,7 @@ const CompleteProfilePage = () => {
   // Si el perfil ya está completo, redirigir al dashboard
   if (profileCompleted) {
     redirect(routes.DASHBOARD);
-    return (
-      <RedirectMsj 
-        message="Perfil ya completado"
-        location="dashboard"
-        variant="success"
-      />
-    )
+    return null;
   }
 
   return (

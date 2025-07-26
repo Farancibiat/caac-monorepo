@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { useAuthStore } from '@/stores/auth/store'
+import { reqClient } from '@/lib/api-client'
+import { toast } from 'sonner'
 
 interface AuthProviderProps {
   children: React.ReactNode
@@ -12,7 +14,26 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isHydrated, setIsHydrated] = useState(false)
 
   useEffect(() => {
-    // Marcar como hidratado una vez que el componente se monta en el cliente
+    const wakeUpServer = async () => {
+      try {
+        const response = await reqClient.get('/health')
+        
+        if (!response.ok) {
+          toast.error('Tuvimos un problema al iniciar el servidor.', {
+            description: 'Acceda nuevamente en 2 minutos.'
+          })
+        }
+      } catch (error) {
+        console.error('Ocurrió un error al iniciar el servidor.', error)
+        toast.error('Tuvimos un problema al iniciar el servidor.', {
+          description: 'Acceda nuevamente en 2 minutos.'
+        })
+      }
+    }
+
+    // Llamada para iniciar el servidor
+    wakeUpServer()
+
     setIsHydrated(true)
   }, [])
 
