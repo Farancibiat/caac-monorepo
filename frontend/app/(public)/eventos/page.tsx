@@ -88,7 +88,7 @@ const EventosPage = () => {
           
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {proximosEventos.map((evento) => (
-              <Card key={evento.id} className="border-primary-200 shadow-lg hover:shadow-xl transition-shadow">
+              <Card key={evento.id} className="border-primary-200 shadow-lg hover:shadow-xl transition-shadow flex flex-col">
                 <CardHeader>
                   <div className="flex justify-between items-start">
                     <CardTitle className="text-primary-800 text-xl">
@@ -102,8 +102,8 @@ const EventosPage = () => {
                     {evento.descripcion}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
+                <CardContent className="space-y-4 flex-grow flex flex-col">
+                  <div className="space-y-2 flex-grow">
                     <div className="flex items-center text-sm text-neutral-700">
                       <Calendar className="h-4 w-4 mr-2 text-primary-600" />
                       {evento.fecha}
@@ -140,8 +140,11 @@ const EventosPage = () => {
                     </div>
                   )}
                   
-                  <Button className="w-full bg-primary-600 hover:bg-primary-700 text-white">
-                    Ver Detalles
+                  <Button 
+                    disabled 
+                    className="w-full bg-neutral-300 text-neutral-500 cursor-not-allowed hover:bg-neutral-300"
+                  >
+                    Próximamente
                   </Button>
                 </CardContent>
               </Card>
@@ -181,12 +184,9 @@ const EventosPage = () => {
           <p className="text-primary-100 mb-6 max-w-2xl mx-auto">
             Únete al Club de Aguas Abiertas Chiloé y participa en nuestras increíbles travesías y competencias
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex justify-center">
             <Button className="bg-accent-400 hover:bg-accent-500 text-accent-900 font-semibold">
               Quiero ser Socio
-            </Button>
-            <Button variant="outline" className="border-white text-white hover:bg-white hover:text-primary-700">
-              Más Información
             </Button>
           </div>
         </section>
