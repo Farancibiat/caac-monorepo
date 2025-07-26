@@ -3,6 +3,57 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Calendar, MapPin, Users, Clock } from "lucide-react"
 import { Metadata } from "next"
 
+const proximosEventos = [
+  {
+    id: 1,
+    titulo: "3° Desafío Unión de las Islas",
+    fecha: "7 de Diciembre, 2025",
+    ubicacion: "Quinched, Chiloé",
+    participantes: 100,
+    hora: "08:00 AM",
+    descripcion: "Travesía de aguas abiertas conectando las islas de Quinched",
+    estado: "Inscripciones próximamente",
+    distancia: "Iniciación | 0,5k | 1k | 3,5k"
+  },
+  {
+    id: 2,
+    titulo: "2° Feria de Aguas Abiertas",
+    fecha: "7 de Diciembre, 2025",
+    ubicacion: "Quinched, Chiloé",
+    participantes: 150,
+    tipo: "Recreativo",
+    descripcion: "Feria de aguas abiertas con equipamiento y expositores nacionales",
+    estado: "Abierto a público",
+  },
+  {
+    id: 3,
+    titulo: "2° Clínica de Aguas Abiertas",
+    fecha: "6 de Diciembre, 2025",
+    ubicacion: "Laguna Millán, Chiloé",
+    participantes: 100,
+    tipo: "Formativo",
+    descripcion: "Clínica de aguas abiertas con especialistas",
+    estado: "Inscripciones próximamente",
+  }
+]
+
+const eventosAnteriores = [
+  {
+    id: 4,
+    titulo: "1° Desafío Unión de las Islas",
+    fecha: "30 de Noviembre, 2023",
+    participantes: 70,
+    resultado: "Completado exitosamente"
+  },
+  {
+    id: 5,
+    titulo: "2° Desafío Unión de las Islas",
+    fecha: "30 de Noviembre, 2024",
+    participantes: 22,
+    resultado: "Excelentes condiciones"
+  }
+]
+
 export const metadata: Metadata = {
   title: 'Eventos',
   description: 'Calendario de eventos de natación en aguas abiertas del Club de Aguas Abiertas Chiloé',
@@ -11,58 +62,7 @@ export const metadata: Metadata = {
 
 const EventosPage = () => {
   // Mock data para eventos
-  const proximosEventos = [
-    {
-      id: 1,
-      titulo: "3° Desafío Unión de las Islas",
-      fecha: "15 de Marzo, 2024",
-      hora: "08:00 AM",
-      ubicacion: "Quinchao, Chiloé",
-      participantes: 45,
-      descripcion: "Travesía de aguas abiertas conectando las islas de Quinchao",
-      estado: "Próximo",
-      distancia: "2.5 km"
-    },
-    {
-      id: 2,
-      titulo: "Natación Nocturna Castro",
-      fecha: "22 de Marzo, 2024",
-      hora: "19:30 PM",
-      ubicacion: "Castro, Chiloé",
-      participantes: 25,
-      descripcion: "Experiencia única de natación nocturna en las aguas de Castro",
-      estado: "Inscripciones Abiertas",
-      distancia: "1 km"
-    },
-    {
-      id: 3,
-      titulo: "Copa Chiloé de Aguas Abiertas",
-      fecha: "5 de Abril, 2024",
-      hora: "09:00 AM",
-      ubicacion: "Ancud, Chiloé",
-      participantes: 80,
-      descripcion: "Competencia anual oficial del club con múltiples categorías",
-      estado: "Próximamente",
-      distancia: "1.5 km - 5 km"
-    }
-  ]
-
-  const eventosAnteriores = [
-    {
-      id: 4,
-      titulo: "2° Desafío Unión de las Islas",
-      fecha: "12 de Febrero, 2024",
-      participantes: 38,
-      resultado: "Completado exitosamente"
-    },
-    {
-      id: 5,
-      titulo: "Travesía de Verano",
-      fecha: "20 de Enero, 2024",
-      participantes: 22,
-      resultado: "Excelentes condiciones"
-    }
-  ]
+ 
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-ocean-50 to-accent-50">
@@ -108,10 +108,12 @@ const EventosPage = () => {
                       <Calendar className="h-4 w-4 mr-2 text-primary-600" />
                       {evento.fecha}
                     </div>
-                    <div className="flex items-center text-sm text-neutral-700">
-                      <Clock className="h-4 w-4 mr-2 text-primary-600" />
-                      {evento.hora}
-                    </div>
+                    {evento.hora && (
+                      <div className="flex items-center text-sm text-neutral-700">
+                        <Clock className="h-4 w-4 mr-2 text-primary-600" />
+                        {evento.hora}
+                      </div>
+                    )}
                     <div className="flex items-center text-sm text-neutral-700">
                       <MapPin className="h-4 w-4 mr-2 text-primary-600" />
                       {evento.ubicacion}
@@ -120,13 +122,23 @@ const EventosPage = () => {
                       <Users className="h-4 w-4 mr-2 text-primary-600" />
                       {evento.participantes} inscritos
                     </div>
+                    {evento.tipo && (
+                      <div className="flex items-center text-sm text-neutral-700">
+                        <span className="w-4 h-4 mr-2 flex items-center justify-center">
+                          <div className="w-2 h-2 bg-primary-600 rounded-full"></div>
+                        </span>
+                        Tipo: {evento.tipo}
+                      </div>
+                    )}
                   </div>
                   
-                  <div className="border-t pt-4">
-                    <span className="text-sm font-medium text-primary-700">
-                      Distancia: {evento.distancia}
-                    </span>
-                  </div>
+                  {evento.distancia && (
+                    <div className="border-t pt-4">
+                      <span className="text-sm font-medium text-primary-700">
+                        Distancia: {evento.distancia}
+                      </span>
+                    </div>
+                  )}
                   
                   <Button className="w-full bg-primary-600 hover:bg-primary-700 text-white">
                     Ver Detalles
