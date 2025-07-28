@@ -55,7 +55,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'yearly' as const,
       priority: 0.3,
     },
-    // Páginas de autenticación (públicas)
     {
       url: `${baseUrl}/login`,
       lastModified: new Date(),
