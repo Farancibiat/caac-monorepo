@@ -1,13 +1,13 @@
-// Estructura base para todas las respuestas de la API
+
 export interface ApiResponse<T = unknown> {
-  success: boolean;
+  status: number;
+  ok: boolean;
   message?: string;
   error?: string;
   data?: T;
-  details?: string;
 }
 
 // Utilidades para manejar errores y respuestas exitosas
-export type ApiError = Pick<ApiResponse, 'success' | 'error' | 'message' | 'details'>;
-export type ApiSuccess<T> = Required<Pick<ApiResponse<T>, 'success' | 'data'>> & 
-  Pick<ApiResponse<T>, 'message'>; 
+export type ApiError = Pick<ApiResponse, 'error' | 'message' | 'status' | 'ok'>;
+export type ApiSuccess<T> = Required<Pick<ApiResponse<T>, 'data' | 'ok'>> & 
+  Pick<ApiResponse<T>, 'message' | 'status'>; 

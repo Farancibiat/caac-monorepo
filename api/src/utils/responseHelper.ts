@@ -8,18 +8,15 @@ type AllMessageCategories = {
 export const sendMessage = <T extends AllMessageCategories>(
   res: Response,
   category: T,
-  data?: any,
-  details?: string
+  data?: any
 ): Response => {
   const statusCode = findStatusCodeForCategory(category);
   const message = MESSAGES[statusCode][category as keyof typeof MESSAGES[typeof statusCode]];
   const isError = statusCode >= 400;
   
   return res.status(statusCode).json({
-    success: !isError,
     [isError ? 'error' : 'message']: message, 
     ...(data && { data }),
-    ...(details && { details }),
   });
 };
 

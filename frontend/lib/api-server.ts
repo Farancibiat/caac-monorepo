@@ -1,4 +1,5 @@
 import { supabaseServer } from '@/stores/auth/server'
+import type { ApiResponse } from '@/types/api'
 
 // Base URL de la API desde variables de entorno
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
@@ -11,12 +12,7 @@ export interface ApiServerOptions {
   requireAuth?: boolean
 }
 
-export interface ApiResponse<T = unknown> {
-  data?: T
-  error?: string
-  status: number
-  ok: boolean
-}
+
 
 /**
  * Cliente API genérico para uso en server-side (SSR, API routes, Server Components)
@@ -65,28 +61,24 @@ export const requestServ = async <T = unknown>(
 
   try {
     const response = await fetch(url, fetchOptions)
-    
-    let data: T | undefined
-    
-    // Intentar parsear JSON si hay contenido
+    let apiResponse: Pick<ApiResponse<T>, 'message' | 'error' | 'data'> | null = null
     if (response.headers.get('content-type')?.includes('application/json')) {
-      try {
-        data = await response.json()
-      } catch {
-        // Si falla el parseo JSON, continuamos sin data
-      }
+        apiResponse = await response.json()
     }
 
+
     return {
-      data,
       status: response.status,
-      ok: response.ok
+      ok: response.ok,
+      message: apiResponse?.message,
+      error: apiResponse?.error || (!response.ok ? `HTTP ${response.status}: ${response.statusText}` : undefined),
+      data: apiResponse?.data as T 
     }
   } catch (error) {
     return {
-      error: error instanceof Error ? error.message : 'Network error',
       status: 0,
-      ok: false
+      ok: false,
+      error: error instanceof Error ? error.message : 'Network error'
     }
   }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -29,22 +29,13 @@ import { useAuthStore } from '@/stores/auth/store';
 import { supabaseClient } from '@/stores/auth/clients';
 import { reqClient } from '@/lib/api-client';
 import BirthPicker from '../ui/birthPicker';
-import { 
-  getRegiones, 
-  getComunasByRegion, 
-  isValidComunaForRegion 
-} from '@/lib/regiones-comunas-helper';
+import { useClubs } from '@/hooks/useClubs';
+import { useProfileData } from '@/hooks/useProfileData';
+import { useRegionComuna } from '@/hooks/useRegionComuna';
 
 import type { ProfileFormData, ProfileFormProps } from '@/types/forms/profile-form';
-import type { ProfileApiData } from '@/types/api-responses/profile';
-import type { ClubSimple } from '@/types/models/club';
-import type { ApiResponse } from '@/types/api';
 
-const CLUBS_FALLBACK = [
-  { id: 1, nombre: 'Sin Club' },
-  { id: 2, nombre: 'Otro' }
-];
-
+// Schema de validación optimizado
 const profileSchema = yup.object({
   nombre: yup.string().required('El nombre es obligatorio').min(2, 'El nombre debe tener al menos 2 caracteres'),
   primerApellido: yup.string().required('El primer apellido es obligatorio').min(2, 'El primer apellido debe tener al menos 2 caracteres'),
@@ -52,24 +43,26 @@ const profileSchema = yup.object({
   fechaNacimiento: yup.date().required('La fecha de nacimiento es obligatoria').max(new Date(), 'La fecha de nacimiento no es válida').typeError('Por favor, introduce una fecha válida'),
   telefono: yup.string().required('El teléfono es obligatorio').matches(/^[+]?[0-9\s-()]*$/, 'Formato de teléfono inválido'),
   direccion: yup.string().required('La dirección es obligatoria'),
-  comuna: yup.string()
-    .required('La comuna es obligatoria')
-    .test('comuna-matches-region', 'La comuna debe corresponder a la región seleccionada', 
-      function(value) {
-        const { region } = this.parent;
-        return value && region ? isValidComunaForRegion(value, region) : true;
-      }
-    ),
-  region: yup.string()
-    .required('La región es obligatoria')
-    .oneOf(getRegiones(), 'Selecciona una región válida'),
+  comuna: yup.string().required('La comuna es obligatoria'),
+  region: yup.string().required('La región es obligatoria'),
   sexo: yup.string().required('El sexo es obligatorio').oneOf(['masculino', 'femenino', 'otro'] as const, 'Selecciona un sexo válido'),
   club: yup.string().required('Debes seleccionar una opción para el club'),
 });
 
 type ProfileSchemaType = yup.InferType<typeof profileSchema>;
-const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) => {
+
+const ProfileForm: React.FC<ProfileFormProps> = ({ mode, onSuccess }) => {
   const { user, setUser } = useAuthStore();
+  
+  // Hooks especializados
+  const { clubOptions, isLoading: isLoadingClubs, getClubIdByName, getClubNameById } = useClubs();
+
+  const { 
+    isLoading: isLoadingProfile, 
+    loadProfile, 
+    transformApiToForm, 
+    transformFormToApi 
+  } = useProfileData();  
   
   const form = useForm<ProfileSchemaType>({
     resolver: yupResolver(profileSchema),
@@ -88,136 +81,51 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
   });
 
   const { handleSubmit, control, reset, formState: { isSubmitting }, watch, setValue } = form;
-
   const selectedRegion = watch('region');
+  const selectedComuna = watch('comuna');
   
-  const [clubs, setClubes] = useState<ClubSimple[]>([]);
-  const [isLoadingClubes, setIsLoadingClubes] = useState(true);
-  
-  const regionOptions = getRegiones();
-  const comunaOptions = selectedRegion ? getComunasByRegion(selectedRegion) : [];
-  
+  // Hook para región-comuna con validación automática
+  const { regionOptions, comunaOptions, shouldResetComuna } = useRegionComuna(selectedRegion);
 
-  
-  const clubOptions = React.useMemo(() => {
-    const otherClubs = [];
-    if(clubs.length){
-    for (const club of clubs) {
-      if (!(club.nombre === 'Sin Club' || club.nombre === 'Otro')) 
-        otherClubs.push(club);
-    }
-
-    otherClubs.sort((a, b) => a.nombre.localeCompare(b.nombre));
-  }
-    return [...CLUBS_FALLBACK, ...otherClubs].map(club => club.nombre);
-  }, [clubs]);
-  
+  // Efecto para resetear comuna cuando cambia región
   useEffect(() => {
-    const fetchClubes = async () => {
-      try {
-        setIsLoadingClubes(true);
-        const response = await reqClient.get('/api/clubes');
-        
-        if (response.ok && response.data) {
-          const clubsResponse = response.data as ApiResponse<ClubSimple[]>;
-          if (clubsResponse.data) {
-            setClubes(clubsResponse.data);
-          }
-        } else {
-          setClubes([]);
-        }
-      } catch (error) {
-        console.error('Error al cargar clubs:', error);
-        setClubes([]);
-      } finally {
-        setIsLoadingClubes(false);
-      }
-    };
-
-    fetchClubes();
-  }, []);
-
-  useEffect(() => {
-    if (selectedRegion) {
-      const currentComuna = watch('comuna');
-      if (currentComuna && !isValidComunaForRegion(currentComuna, selectedRegion)) {
-        setValue('comuna', '');
-      }
-    } else {
+    if (selectedRegion && selectedComuna && shouldResetComuna(selectedComuna, selectedRegion)) {
       setValue('comuna', '');
     }
-  }, [selectedRegion, setValue, watch]);
+  }, [selectedRegion, selectedComuna, shouldResetComuna, setValue]);
 
+  // Cargar y establecer datos del perfil en modo edición
   useEffect(() => {
-    if (mode === 'edicion' && clubs.length > 0) {
-      const fetchProfileData = async () => {
-        try {
-          const response = await reqClient.get('/api/user/profile');
-          
-          if (!response.ok) {
-            throw new Error(response.error || 'No se pudo cargar el perfil');
-          }
-          
-          const profileData = response.data as ProfileApiData;
-          
-          // Convertir clubId a nombre del club para el formulario
-          const allClubs = clubs.length > 0 ? clubs : CLUBS_FALLBACK;
-          const clubName = profileData.clubId 
-            ? allClubs.find(club => club.id === profileData.clubId)?.nombre || ''
-            : '';
-          
-          const formData: ProfileSchemaType = {
-            nombre: profileData.nombre,
-            primerApellido: profileData.primerApellido,
-            segundoApellido: profileData.segundoApellido,
-            fechaNacimiento: new Date(profileData.fechaNacimiento),
-            telefono: profileData.telefono,
-            direccion: profileData.direccion,
-            comuna: profileData.comuna,
-            region: profileData.region,
-            sexo: profileData.sexo as 'masculino' | 'femenino' | 'otro',
-            club: clubName
-          };
-          
-          reset(formData);
-          toast.success('Datos del perfil cargados.');
-        } catch (error) {
-          let errorMessage = 'No se pudieron cargar los datos del perfil.';
-          if (error instanceof Error) {
-            errorMessage = error.message;
-          }
-          toast.error(errorMessage);
-        }
-      };
-      fetchProfileData();
+    const loadAndSetProfile = async () => {
+      if (mode === 'edicion' && !isLoadingClubs) {
+      try {
+          const {data} = await loadProfile();
+          console.log('data', data);
+          const formData = transformApiToForm(data, getClubNameById);
+        reset(formData);
+        toast.success('Datos del perfil cargados.');
+      } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Error al cargar el perfil';
+        toast.error(errorMessage);
+      }
     }
-  }, [mode, reset, userId, clubs]);
+    };
 
+    loadAndSetProfile();
+  }, [mode, isLoadingClubs, loadProfile, transformApiToForm, getClubNameById, reset]);
+
+  // Función de envío optimizada
   const onSubmit = async (data: ProfileSchemaType) => {
     try {
-      let clubId: number | null = null;
-      if (data.club) {
-        // Buscar primero en clubs cargados, luego en fallback
-        const allClubs = clubs.length > 0 ? clubs : CLUBS_FALLBACK;
-        const selectedClub = allClubs.find(club => club.nombre === data.club);
-        clubId = selectedClub ? selectedClub.id : null;
-      }
-
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { club, ...restData } = data;
-      const submitData = {
-        ...restData,
-        fechaNacimiento: data.fechaNacimiento,
-        sexo: data.sexo,
-        clubId
-      };
-
+      const submitData = transformFormToApi(data, getClubIdByName);
+      
       const response = await reqClient.put('/api/user/profile', submitData);
       
       if (!response.ok) {
         throw new Error(response.error || 'Error al guardar el perfil');
       }
       
+      // Manejar metadata para modo registro
       if (mode === 'registro' && user) {
         try {
           const { error: updateError } = await supabaseClient.auth.updateUser({
@@ -248,7 +156,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
             icon: <AlertTriangle className="h-5 w-5 text-red-500" />,
             description: 'Los datos se guardaron pero hay un problema con el estado de completitud. Intenta nuevamente.'
           });
-          
           return;
         }
       }
@@ -273,14 +180,12 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
           description = 'Problema de conexión. Verifica tu internet e intenta nuevamente.';
         } else if (error.message.includes('validation')) {
           description = 'Algunos datos no son válidos. Revisa el formulario.';
-        } else if (error.message.includes('Supabase') || error.message.includes('metadata')) {
-          description = 'Error en la autenticación. Intenta cerrar sesión y volver a entrar.';
         }
       }
       
       toast.error(errorMessage, {
         icon: <AlertTriangle className="h-5 w-5 text-red-500" />,
-        description: description,
+        description,
         duration: 6000
       });
     }
@@ -303,6 +208,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
               </FormItem>
             )}
           />
+          
           <FormField
             control={control}
             name="primerApellido"
@@ -316,6 +222,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
               </FormItem>
             )}
           />
+          
           <FormField
             control={control}
             name="segundoApellido"
@@ -348,6 +255,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
               </FormItem>
             )}
           />
+          
           <FormField
             control={control}
             name="telefono"
@@ -361,6 +269,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
               </FormItem>
             )}
           />
+          
           <FormField
             control={control}
             name="direccion"
@@ -374,6 +283,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
               </FormItem>
             )}
           />
+          
           <FormField
             control={control}
             name="region"
@@ -394,6 +304,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
               </FormItem>
             )}
           />
+          
           <FormField
             control={control}
             name="comuna"
@@ -415,6 +326,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
               </FormItem>
             )}
           />
+          
           <FormField
             control={control}
             name="sexo"
@@ -437,6 +349,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
               </FormItem>
             )}
           />
+          
           <FormField
             control={control}
             name="club"
@@ -448,9 +361,9 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
                     options={clubOptions}
                     value={field.value || ''}
                     onValueChange={field.onChange}
-                    placeholder={isLoadingClubes ? "Cargando clubs..." : "Selecciona tu club"}
+                    placeholder={isLoadingClubs ? "Cargando clubs..." : "Selecciona tu club"}
                     searchPlaceholder="Buscar club..."
-                    disabled={isLoadingClubes}
+                    disabled={isLoadingClubs}
                     emptyText="No se encontraron clubs."
                   />
                 </FormControl>
@@ -463,10 +376,12 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, userId, onSuccess }) =>
         <div className="flex justify-center md:justify-end">
           <Button 
             type="submit" 
-            disabled={isSubmitting} 
+            disabled={isSubmitting || isLoadingProfile} 
             className="w-full md:w-auto bg-primary-600 hover:bg-primary-700 text-white h-12 text-base font-medium"
           >
-            {isSubmitting ? 'Guardando...' : (mode === 'registro' ? 'Completar Registro' : 'Guardar Cambios')}
+            {isSubmitting ? 'Guardando...' : 
+             isLoadingProfile ? 'Cargando...' :
+             (mode === 'registro' ? 'Completar Registro' : 'Guardar Cambios')}
           </Button>
         </div>
       </form>

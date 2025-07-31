@@ -42,7 +42,7 @@ export const getProfile = async (req: AuthenticatedRequest, res: Response): Prom
       direccion: profile.direccion,
       comuna: profile.comuna,
       region: profile.region,
-      sexo: profile.sexo,
+      sexo: profile.sexo.toLowerCase(),
       clubId: profile.clubId
     };
 
@@ -78,20 +78,7 @@ export const upsertProfile = async (req: AuthenticatedRequest, res: Response): P
       clubId
     } = req.body;
 
-    // Mapear valores de sexo del frontend al enum de Prisma
-    const sexoMap = {
-      'masculino': 'MASCULINO',
-      'femenino': 'FEMENINO', 
-      'otro': 'OTRO'
-    } as const;
 
-    // Validar que el sexo sea válido
-    if (!sexoMap[sexo as keyof typeof sexoMap]) {
-      sendMessage(res, 'PROFILE_INVALID_SEXO');
-      return;
-    }
-
-    // Validar que el club existe y está activo
     try {
       const club = await prisma.club.findUnique({
         where: { id: Number(clubId) }
@@ -116,7 +103,7 @@ export const upsertProfile = async (req: AuthenticatedRequest, res: Response): P
       direccion,
       comuna,
       region,
-      sexo: sexoMap[sexo as keyof typeof sexoMap],
+      sexo,
       clubId: Number(clubId),
       updatedAt: new Date()
     };

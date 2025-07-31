@@ -8,7 +8,7 @@ export interface ProfileApiData {
   direccion: string;
   comuna: string;
   region: string;
-  sexo: string;
+  sexo: 'masculino' | 'femenino' | 'otro';
   clubId: number | null;
 }
 

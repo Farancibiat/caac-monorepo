@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodSchema } from 'zod';
+import { sendMessage } from '@/utils/responseHelper';
 
 // Tipo para especificar qué partes del request validar
 type ValidationTarget = 'body' | 'params' | 'query';
@@ -37,11 +38,7 @@ export const validate = (schemas: ValidationSchemas) => {
 
     // Si hay errores, responder con formato estándar
     if (errors.length > 0) {
-      res.status(400).json({
-        success: false,
-        error: 'Datos de entrada inválidos',
-        details: errors
-      });
+      sendMessage(res, 'INVALID_QUERY_PARAMETERS', errors);
       return;
     }
 
