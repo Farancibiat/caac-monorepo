@@ -53,4 +53,5 @@ export {
   ToastProvider,
   ToastTitle,
   ToastViewport,
-} from './toast'; 
+} from './toast';
+export { SwimmingLoader } from './SwimmingLoader'; 

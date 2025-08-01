@@ -28,12 +28,13 @@ import {
 import { useAuthStore } from '@/stores/auth/store';
 import { supabaseClient } from '@/stores/auth/clients';
 import { reqClient } from '@/lib/api-client';
-import BirthPicker from '../ui/birthPicker';
+import BirthPicker from '@/components/ui/birthPicker';
 import { useClubs } from '@/hooks/useClubs';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useRegionComuna } from '@/hooks/useRegionComuna';
 
 import type { ProfileFormData, ProfileFormProps } from '@/types/forms/profile-form';
+import { SwimmingLoader } from '@/components/ui/SwimmingLoader';
 
 // Schema de validación optimizado
 const profileSchema = yup.object({
@@ -62,7 +63,10 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, onSuccess }) => {
     loadProfile, 
     transformApiToForm, 
     transformFormToApi 
-  } = useProfileData();  
+  } = useProfileData();
+  
+  // Determinar si debemos mostrar el loader basado en múltiples condiciones
+  const shouldShowLoader = mode === 'edicion' && (isLoadingClubs || isLoadingProfile);  
   
   const form = useForm<ProfileSchemaType>({
     resolver: yupResolver(profileSchema),
@@ -97,11 +101,11 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, onSuccess }) => {
   useEffect(() => {
     const loadAndSetProfile = async () => {
       if (mode === 'edicion' && !isLoadingClubs) {
-      try {
-        const {data} = await loadProfile();
-        const formData = transformApiToForm(data, getClubNameById);
-        reset(formData);
-        toast.success('Datos del perfil cargados.');
+        try {
+          const {data} = await loadProfile();
+          const formData = transformApiToForm(data, getClubNameById);
+          reset(formData);
+          toast.success('Datos del perfil cargados.');
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Error al cargar el perfil';
         toast.error(errorMessage);
@@ -188,6 +192,14 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, onSuccess }) => {
       });
     }
   };
+
+  if (shouldShowLoader) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <SwimmingLoader size={150} />
+      </div>
+    );
+  }
 
   return (
     <Form {...form}>
