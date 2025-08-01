@@ -84,37 +84,35 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, onSuccess }) => {
   const selectedRegion = watch('region');
   const selectedComuna = watch('comuna');
   
-  // Hook para región-comuna con validación automática
+
   const { regionOptions, comunaOptions, shouldResetComuna } = useRegionComuna(selectedRegion);
 
-  // Efecto para resetear comuna cuando cambia región
+
   useEffect(() => {
     if (selectedRegion && selectedComuna && shouldResetComuna(selectedComuna, selectedRegion)) {
       setValue('comuna', '');
     }
   }, [selectedRegion, selectedComuna, shouldResetComuna, setValue]);
 
-  // Cargar y establecer datos del perfil en modo edición
   useEffect(() => {
     const loadAndSetProfile = async () => {
       if (mode === 'edicion' && !isLoadingClubs) {
       try {
-          const {data} = await loadProfile();
-          console.log('data', data);
-          const formData = transformApiToForm(data, getClubNameById);
+        const {data} = await loadProfile();
+        const formData = transformApiToForm(data, getClubNameById);
         reset(formData);
         toast.success('Datos del perfil cargados.');
       } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'Error al cargar el perfil';
+        const errorMessage = error instanceof Error ? error.message : 'Error al cargar el perfil';
         toast.error(errorMessage);
       }
     }
     };
 
     loadAndSetProfile();
-  }, [mode, isLoadingClubs, loadProfile, transformApiToForm, getClubNameById, reset]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, isLoadingClubs, loadProfile, transformApiToForm, reset]);
 
-  // Función de envío optimizada
   const onSubmit = async (data: ProfileSchemaType) => {
     try {
       const submitData = transformFormToApi(data, getClubIdByName);
@@ -125,7 +123,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, onSuccess }) => {
         throw new Error(response.error || 'Error al guardar el perfil');
       }
       
-      // Manejar metadata para modo registro
+
       if (mode === 'registro' && user) {
         try {
           const { error: updateError } = await supabaseClient.auth.updateUser({
