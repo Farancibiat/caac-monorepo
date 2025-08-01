@@ -21,9 +21,9 @@ model Profile {
 }
 
 enum Sexo {
-  MASCULINO @map("masculino")
-  FEMENINO  @map("femenino")
-  OTRO      @map("otro")
+  masculino @map("masculino")
+  femenino  @map("femenino")
+  otro      @map("otro")
 
   @@schema("public")
 }
