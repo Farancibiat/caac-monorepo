@@ -43,11 +43,14 @@ export const useProfileData = (): UseProfileDataReturn => {
     apiData: ProfileApiData, 
     getClubNameById: (id: number) => string
   ): ProfileFormData => {
+    const dateString = apiData.fechaNacimiento.split('T')[0];
+    const [year, month, day] = dateString.split('-').map(Number);
+    
     return {
       nombre: apiData.nombre,
       primerApellido: apiData.primerApellido,
       segundoApellido: apiData.segundoApellido,
-      fechaNacimiento: new Date(apiData.fechaNacimiento),
+      fechaNacimiento: new Date(year, month - 1, day),
       telefono: apiData.telefono,
       direccion: apiData.direccion,
       comuna: apiData.comuna,
