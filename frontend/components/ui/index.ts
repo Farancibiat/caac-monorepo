@@ -54,4 +54,3 @@ export {
   ToastTitle,
   ToastViewport,
 } from './toast';
-export { SwimmingLoader } from './SwimmingLoader'; 

@@ -34,7 +34,7 @@ import { useProfileData } from '@/hooks/useProfileData';
 import { useRegionComuna } from '@/hooks/useRegionComuna';
 
 import type { ProfileFormData, ProfileFormProps } from '@/types/forms/profile-form';
-import { SwimmingLoader } from '@/components/ui/SwimmingLoader';
+import SwimmingLoader from '@/components/ui/SwimmingLoader';
 
 // Schema de validación optimizado
 const profileSchema = yup.object({
