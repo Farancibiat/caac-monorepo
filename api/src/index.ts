@@ -24,7 +24,7 @@ import eventRoutes from '@/routes/eventRoutes';
 // Inicializar express
 const app = express();
 const PORT = process.env.PORT || 3000;
-
+app.set('trust proxy', true);
 // Middleware
 app.use(securityHeaders);
 app.use(cors({
