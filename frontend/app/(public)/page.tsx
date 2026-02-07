@@ -13,32 +13,32 @@ const Home = () => {
   const proximosEventos = [
     {
       titulo: "3° Desafío Unión de las Islas",
-      fecha: "7 de Diciembre, 2025",
+      fecha: "5 de Abril, 2026",
       ubicacion: "Quinched, Chiloé",
-      participantes: 100,
+      participantes: "100 cupos",
       tipo: "Competencia",
       distancia: "Iniciación | 0,5k | 1k | 3,5k"
     },
     {
       titulo: "2° Feria de Aguas Abiertas",
-      fecha: "7 de Diciembre, 2025",
+      fecha: "5 de Abril, 2026",
       ubicacion: "Quinched, Chiloé",
-      participantes: 150,
+      participantes: "Abierto a todo público",
       tipo: "Recreativo",
       distancia: "Expositores Nacionales"
     },
     {
       titulo: "2° Clínica de Aguas Abiertas",
-      fecha: "6 de Diciembre, 2025",
+      fecha: "4 de Abril, 2026",
       ubicacion: "Laguna Millán, Chiloé",
-      participantes: 100,
+      participantes: "100 cupos",
       tipo: "Formativo",
       distancia: "Iniciación"
     }
   ]
 
   const estadisticas = [
-    { numero: "50+", texto: "Socios Activos", icono: <Users className="h-6 w-6" /> },
+    { numero: "30+", texto: "Socios Activos", icono: <Users className="h-6 w-6" /> },
     { numero: "40+", texto: "Presencia en eventos ", icono: <Calendar className="h-6 w-6" /> },
     { numero: "4", texto: "Años de Historia", icono: <Trophy className="h-6 w-6" /> },
    
@@ -124,13 +124,14 @@ const Home = () => {
                   
                   <p className="text-lg text-neutral-700 leading-relaxed">
                     El evento más esperado del año está de regreso. Una travesía épica que conecta 
-                    las islas de Quinched en una experiencia única de natación en aguas abiertas.
+                    las islas de Quinched en una experiencia única de natación en aguas abiertas. <br /><br />
+                    Este año vuelven la clínica y una nueva feria de aguas abiertas, ¡No te lo pierdas!.
                   </p>
                   
                   <div className="space-y-3 text-neutral-700">
                     <div className="flex items-center">
                       <Calendar className="h-5 w-5 mr-3 text-accent-600" />
-                      <span className="font-semibold">7 de Diciembre 2025</span>
+                      <span className="font-semibold">4 y 5 de Abril 2026</span>
                     </div>
                     <div className="flex items-center">
                       <MapPin className="h-5 w-5 mr-3 text-accent-600" />
@@ -283,7 +284,7 @@ const Home = () => {
                     </div>
                     <div className="flex items-center">
                       <Users className="h-4 w-4 mr-2 text-primary-600" />
-                      {evento.participantes} inscritos
+                      {evento.participantes} 
                     </div>
                     <div className="flex items-center">
                       <Waves className="h-4 w-4 mr-2 text-primary-600" />
@@ -291,7 +292,7 @@ const Home = () => {
                     </div>
                   </div>
                   
-                  <div className="pt-2">
+                  {/* <div className="pt-2">
                     <Link href={ROUTES.EVENTOS}>
                       <Button 
                         variant="outline" 
@@ -301,7 +302,7 @@ const Home = () => {
                         Ver Eventos
                       </Button>
                     </Link>
-                  </div>
+                  </div> */}
                 </CardContent>
               </Card>
             ))}

@@ -1,39 +1,44 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Calendar, MapPin, Users, Clock } from "lucide-react"
+import { ROUTES } from "@/config/routes"
+import { Calendar, MapPin, Users, Clock, ExternalLink } from "lucide-react"
+import Link from "next/link"
 import { Metadata } from "next"
 
 const proximosEventos = [
   {
     id: 1,
     titulo: "3° Desafío Unión de las Islas",
-    fecha: "7 de Diciembre, 2025",
+    fecha: "5 de Abril, 2026",
     ubicacion: "Quinched, Chiloé",
-    participantes: 100,
-    hora: "08:00 AM",
-    descripcion: "Travesía de aguas abiertas conectando las islas de Quinched",
-    estado: "Inscripciones próximamente",
-    distancia: "Iniciación | 0,5k | 1k | 3,5k"
+    participantes: "100 cupos",
+    hora: "10:00 AM",
+    descripcion: "Travesía de aguas abiertas conectando las islas de Quinched, Chiloé",
+    estado: "Inscripciones Abiertas",
+    distancia: "Iniciación | 0,5k | 1k | 3,5k",
+    detallePath: ROUTES.EVENTO_DESAFIO_2026,
   },
   {
     id: 2,
+    // detallePath: null as string | null,
     titulo: "2° Feria de Aguas Abiertas",
-    fecha: "7 de Diciembre, 2025",
+    fecha: "5 de Abril, 2026",
     ubicacion: "Quinched, Chiloé",
-    participantes: 150,
+    participantes: "Abierto a todo público",
     tipo: "Recreativo",
     descripcion: "Feria de aguas abiertas con equipamiento y expositores nacionales",
     estado: "Abierto a público",
   },
   {
     id: 3,
+    // detallePath: ROUTES.INSCRIPCIONES2026,
     titulo: "2° Clínica de Aguas Abiertas",
-    fecha: "6 de Diciembre, 2025",
+    fecha: "4 de Abril, 2026",
     ubicacion: "Laguna Millán, Chiloé",
-    participantes: 100,
+    participantes: "100 cupos",
     tipo: "Formativo",
     descripcion: "Clínica de aguas abiertas con especialistas",
-    estado: "Inscripciones próximamente",
+    estado: "Inscripciones Abiertas",
   }
 ]
 
@@ -43,14 +48,16 @@ const eventosAnteriores = [
     titulo: "1° Desafío Unión de las Islas",
     fecha: "30 de Noviembre, 2023",
     participantes: 70,
-    resultado: "Completado exitosamente"
+    resultado: "Completado exitosamente",
+    fotosUrl: ROUTES.REDIRECTS.GALERIA1, // Reemplazar con URL de álbum específico si lo tienes (ej. Google Fotos)
   },
   {
     id: 5,
     titulo: "2° Desafío Unión de las Islas",
     fecha: "30 de Noviembre, 2024",
     participantes: 22,
-    resultado: "Excelentes condiciones"
+    resultado: "Excelentes condiciones",
+    fotosUrl: ROUTES.REDIRECTS.GALERIA2, // Reemplazar con URL de álbum específico si lo tienes
   }
 ]
 
@@ -140,12 +147,18 @@ const EventosPage = () => {
                     </div>
                   )}
                   
-                  <Button 
-                    disabled 
-                    className="w-full bg-neutral-300 text-neutral-500 cursor-not-allowed hover:bg-neutral-300"
-                  >
-                    Próximamente
-                  </Button>
+                  {'detallePath' in evento && evento.detallePath ? (
+                    <Button asChild className="w-full bg-accent-400 hover:bg-accent-500 text-accent-900 font-semibold">
+                      <Link href={evento.detallePath}>Inscripciones</Link>
+                    </Button>
+                  ) : (
+                    <Button 
+                      disabled 
+                      className="w-full bg-neutral-300 text-neutral-500 cursor-not-allowed hover:bg-neutral-300"
+                    >
+                      Inscribiendose en el desafío
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             ))}
@@ -158,20 +171,40 @@ const EventosPage = () => {
           
           <div className="grid gap-6 md:grid-cols-2">
             {eventosAnteriores.map((evento) => (
-              <Card key={evento.id} className="border-neutral-200 shadow-md">
-                <CardContent className="p-6">
-                  <div className="flex justify-between items-start">
+              <Card
+                key={evento.id}
+                className="border-primary-200 bg-white shadow-lg hover:shadow-xl transition-shadow overflow-hidden"
+              >
+                <div className="h-1 w-full bg-club-gradient" />
+                <CardContent className="p-6 flex flex-col gap-4">
+                  <div className="flex justify-between items-start gap-3">
                     <div>
-                      <h3 className="text-lg font-semibold text-neutral-800">{evento.titulo}</h3>
-                      <p className="text-neutral-600 text-sm">{evento.fecha}</p>
-                      <p className="text-sm text-neutral-500 mt-1">
+                      <h3 className="text-lg font-semibold text-primary-800">
+                        {evento.titulo}
+                      </h3>
+                      <p className="text-primary-600 text-sm mt-0.5">{evento.fecha}</p>
+                      <p className="text-sm text-neutral-600 mt-1">
                         {evento.participantes} participantes
                       </p>
                     </div>
-                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+                    <span className="bg-primary-100 text-primary-800 px-2.5 py-1 rounded-full text-xs font-medium shrink-0">
                       ✓ {evento.resultado}
                     </span>
                   </div>
+                  <Button
+                    asChild
+                    size="sm"
+                    className="w-fit bg-accent-400 hover:bg-accent-500 text-accent-900 font-semibold"
+                  >
+                    <a
+                      href={evento.fotosUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Ver fotos
+                      <ExternalLink className="ml-2 h-3.5 w-3.5" />
+                    </a>
+                  </Button>
                 </CardContent>
               </Card>
             ))}
@@ -182,7 +215,7 @@ const EventosPage = () => {
         <section className="text-center bg-gradient-to-r from-primary-600 to-ocean-600 rounded-xl p-8 text-white">
           <h2 className="text-2xl font-bold mb-4">¿Quieres participar en nuestros eventos?</h2>
           <p className="text-primary-100 mb-6 max-w-2xl mx-auto">
-            Únete al Club de Aguas Abiertas Chiloé y participa en nuestras increíbles travesías y competencias
+            Únete al Club de Aguas Abiertas Chiloé para obtener descuentos en eventos, tener acceso a nuestros entrenamientos y ser parte de la familia del Club.
           </p>
           <div className="flex justify-center">
             <Button className="bg-accent-400 hover:bg-accent-500 text-accent-900 font-semibold">

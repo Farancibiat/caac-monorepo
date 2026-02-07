@@ -12,6 +12,10 @@ dotenv.config();
 // Importar configuración de Supabase (esto ejecutará la inicialización)
 import '@/config/supabase';
 
+// Importar Prisma y inicializar contenedor de servicios
+import prisma from '@/config/db';
+import { initializeServiceContainer } from '@/config/container';
+
 // Importar rutas
 import authRoutes from '@/routes/authRoutes';
 import scheduleRoutes from '@/routes/scheduleRoutes';
@@ -20,6 +24,9 @@ import userRoutes from '@/routes/userRoutes';
 import emailRoutes from '@/routes/emailRoutes';
 import clubRoutes from '@/routes/clubRoutes';
 import eventRoutes from '@/routes/eventRoutes';
+
+// Inicializar contenedor de servicios
+initializeServiceContainer(prisma);
 
 // Inicializar express
 const app = express();

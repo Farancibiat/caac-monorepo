@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Camera, Calendar, Users, Image as ImageIcon, Construction, Clock } from "lucide-react"
+import { Camera, Calendar, Users, Image as ImageIcon, Construction } from "lucide-react"
 import { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -59,7 +59,7 @@ const GaleriaPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-ocean-50 to-accent-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
+
         {/* Header */}
         <div className="text-center space-y-4 mb-12">
           <h1 className="text-4xl font-bold text-primary-800 text-club-shadow">
@@ -80,14 +80,14 @@ const GaleriaPage = () => {
                 Galería en Desarrollo
               </h2>
               <p className="text-amber-700 text-lg mb-6 max-w-2xl mx-auto">
-                Estamos trabajando en una experiencia increíble para compartir las mejores fotos 
-                de nuestros eventos y entrenamientos. Pronto podrás ver y descargar todas las 
+                Estamos trabajando en una experiencia increíble para compartir las mejores fotos
+                de nuestros eventos y entrenamientos. Pronto podrás ver y descargar todas las
                 imágenes de nuestra comunidad.
               </p>
-              <div className="flex items-center justify-center space-x-2 text-amber-600">
+              {/* <div className="flex items-center justify-center space-x-2 text-amber-600">
                 <Clock className="h-5 w-5" />
                 <span className="font-medium">Lanzamiento estimado: Abril 2024</span>
-              </div>
+              </div> */}
             </CardContent>
           </Card>
         </div>

@@ -1,30 +1,30 @@
 import { Response } from 'express';
-import prisma from '@/config/db';
-import { Role } from '@prisma/client';
 import { sendMessage } from '@/utils/responseHelper';
-import { supabaseAdmin } from '@/config/supabase';
 import { AuthenticatedRequest } from '@/config/auth';
+import { getUserService } from '@/config/container';
+
+/**
+ * CONTROLADOR DE USUARIOS - Patrón CSR
+ * 
+ * Cambios principales:
+ * - Eliminado acceso directo a Prisma y Supabase
+ * - Toda la lógica movida a UserService
+ * - Solo HTTP handling
+ * - Consistente con arquitectura CSR
+ */
 
 export const getUsers = async (_req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
-    const users = await prisma.user.findMany({
-      select: {
-        id: true,
-        auth_id: true,
-        email: true,
-        name: true,
-        phone: true,
-        role: true,
-        isActive: true,
-        avatar_url: true,
-        provider: true,
-        profileCompleted: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
+    const userService = getUserService();
     
-    sendMessage(res, 'USER_LIST_RETRIEVED', users);
+    const result = await userService.getAllUsers();
+    
+    if (!result.success) {
+      sendMessage(res, result.errorCode!);
+      return;
+    }
+    
+    sendMessage(res, 'USER_LIST_RETRIEVED', result.data);
   } catch (error) {
     sendMessage(res, 'USER_FETCH_ERROR');
   }
@@ -33,32 +33,16 @@ export const getUsers = async (_req: AuthenticatedRequest, res: Response): Promi
 export const getUserById = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
+    const userService = getUserService();
     
-    const user = await prisma.user.findUnique({
-      where: { id: Number(id) },
-      select: {
-        id: true,
-        auth_id: true,
-        email: true,
-        name: true,
-        phone: true,
-        role: true,
-        isActive: true,
-        avatar_url: true,
-        provider: true,
-        profileCompleted: true,
-        createdAt: true,
-        updatedAt: true,
-        reservations: true,
-      },
-    });
+    const result = await userService.getUserById(Number(id));
     
-    if (!user) {
-      sendMessage(res, 'USER_NOT_FOUND');
+    if (!result.success) {
+      sendMessage(res, result.errorCode!);
       return;
     }
     
-    sendMessage(res, 'USER_RETRIEVED', user);
+    sendMessage(res, 'USER_RETRIEVED', result.data);
   } catch (error) {
     sendMessage(res, 'USER_FETCH_ERROR');
   }
@@ -67,61 +51,22 @@ export const getUserById = async (req: AuthenticatedRequest, res: Response): Pro
 export const createUser = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const { email, name, password, phone, role } = req.body;
+    const userService = getUserService();
     
-    // Verificar si el email ya existe en nuestra base de datos
-    const existingUser = await prisma.user.findUnique({
-      where: { email }
-    });
-
-    if (existingUser) {
-      sendMessage(res, 'USER_EMAIL_ALREADY_EXISTS');
-      return;
-    }
-    
-    // Crear usuario en Supabase Auth primero
-    const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
+    const result = await userService.createUser({
       email,
+      name,
       password,
-      user_metadata: {
-        full_name: name,
-      },
-      email_confirm: true, // Auto-confirmar email para usuarios creados por admin
+      phone,
+      role,
     });
-
-    if (authError || !authUser.user) {
-      sendMessage(res, 'USER_CREATE_ERROR');
+    
+    if (!result.success) {
+      sendMessage(res, result.errorCode!);
       return;
     }
     
-    // Crear registro en nuestra base de datos
-    const newUser = await prisma.user.create({
-      data: {
-        auth_id: authUser.user.id,
-        email,
-        name,
-        phone: phone || null,
-        role: role || Role.USER,
-        isActive: true,
-        provider: 'email',
-        profileCompleted: !!(name && phone),
-      },
-      select: {
-        id: true,
-        auth_id: true,
-        email: true,
-        name: true,
-        phone: true,
-        role: true,
-        isActive: true,
-        avatar_url: true,
-        provider: true,
-        profileCompleted: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
-    
-    sendMessage(res, 'USER_CREATED', newUser);
+    sendMessage(res, 'USER_CREATED', result.data);
   } catch (error) {
     sendMessage(res, 'USER_CREATE_ERROR');
   }
@@ -130,31 +75,17 @@ export const createUser = async (req: AuthenticatedRequest, res: Response): Prom
 // Obtener perfil del usuario autenticado
 export const getProfile = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
-    const user = await prisma.user.findUnique({
-      where: { auth_id: req.user.auth_id },
-      select: {
-        id: true,
-        auth_id: true,
-        email: true,
-        name: true,
-        phone: true,
-        role: true,
-        isActive: true,
-        avatar_url: true,
-        provider: true,
-        profileCompleted: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
+    const userService = getUserService();
     
-    if (!user) {
-      sendMessage(res, 'USER_NOT_FOUND');
+    const result = await userService.getUserProfile(req.user.auth_id);
+    
+    if (!result.success) {
+      sendMessage(res, result.errorCode!);
       return;
     }
     
-    sendMessage(res, 'USER_PROFILE_RETRIEVED', user);
+    sendMessage(res, 'USER_PROFILE_RETRIEVED', result.data);
   } catch (error) {
     sendMessage(res, 'USER_FETCH_ERROR');
   }
-}; 
+};

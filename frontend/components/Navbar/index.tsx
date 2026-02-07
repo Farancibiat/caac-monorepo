@@ -48,7 +48,7 @@ const NavBar = () => {
   const navigation = [
     { name: 'Inicio', href: ROUTES.HOME },
     { name: 'Eventos', href: ROUTES.EVENTOS },
-    { name: 'Galería', href: ROUTES.GALERIA },
+    // { name: 'Galería', href: ROUTES.GALERIA },
     { name: 'Nosotros', href: ROUTES.NOSOTROS },
     { name: 'Contacto', href: ROUTES.CONTACTO },
   ]

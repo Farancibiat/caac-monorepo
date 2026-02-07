@@ -1,63 +1,28 @@
 import { Response, Request } from 'express';
-import { sendReservationConfirmation as sendReservationEmail, sendReservationReminder as sendReminderEmail, testConfiguration, sendContactMessage as sendContactEmail } from '@/services/email';
 import { sendMessage } from '@/utils/responseHelper';
-import prisma from '@/config/db';
 import { AuthenticatedRequest } from '@/config/auth';
-import { SendContactMessageData } from '@/schemas/contact';
+import { getEmailService } from '@/config/container';
+
+/**
+ * CONTROLADOR DE EMAILS - Patrón CSR
+ * 
+ * Cambios principales:
+ * - Eliminado acceso directo a Prisma y utils/email
+ * - Toda la lógica movida a EmailService
+ * - Solo HTTP handling
+ * - Consistente con arquitectura CSR
+ */
 
 // Enviar comprobante de reserva
 export const sendReservationConfirmation = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const { reservationId } = req.body;
+    const emailService = getEmailService();
 
-    if (!reservationId) {
-      sendMessage(res, 'RESERVATION_ID_REQUIRED');
-      return;
-    }
+    const result = await emailService.sendReservationConfirmation(reservationId);
 
-    // Obtener datos de la reserva desde la base de datos
-    const reservation = await prisma.reservation.findUnique({
-      where: { id: reservationId },
-      include: {
-        user: {
-          select: {
-            email: true,
-            name: true,
-          },
-        },
-        schedule: {
-          select: {
-            startTime: true,
-            endTime: true,
-            dayOfWeek: true,
-          },
-        },
-      },
-    });
-
-    if (!reservation) {
-      sendMessage(res, 'RESERVATION_NOT_FOUND');
-      return;
-    }
-
-    // Formatear datos para el email
-    const reservationDetails = {
-      id: reservation.id,
-      date: reservation.date.toLocaleDateString('es-CL'),
-      time: reservation.schedule.startTime.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' }),
-      service: 'Natación libre', // O el servicio específico
-      duration: `${reservation.schedule.startTime.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })} - ${reservation.schedule.endTime.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })}`,
-      cost: 'Por confirmar', // Se puede agregar campo de precio después
-    };
-
-    // Enviar email
-    const emailSent = await sendReservationEmail(
-      reservation.user.email!,
-      reservationDetails
-    );
-
-    if (!emailSent) {
-      sendMessage(res, 'EMAIL_SEND_ERROR');
+    if (!result.success) {
+      sendMessage(res, result.errorCode!);
       return;
     }
 
@@ -71,52 +36,12 @@ export const sendReservationConfirmation = async (req: AuthenticatedRequest, res
 export const sendReservationReminder = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const { reservationId } = req.body;
+    const emailService = getEmailService();
 
-    if (!reservationId) {
-      sendMessage(res, 'RESERVATION_ID_REQUIRED');
-      return;
-    }
+    const result = await emailService.sendReservationReminder(reservationId);
 
-    // Obtener datos de la reserva
-    const reservation = await prisma.reservation.findUnique({
-      where: { id: reservationId },
-      include: {
-        user: {
-          select: {
-            email: true,
-            name: true,
-          },
-        },
-        schedule: {
-          select: {
-            startTime: true,
-            dayOfWeek: true,
-          },
-        },
-      },
-    });
-
-    if (!reservation) {
-      sendMessage(res, 'RESERVATION_NOT_FOUND');
-      return;
-    }
-
-    // Formatear datos para el recordatorio
-    const reservationDetails = {
-      id: reservation.id,
-      date: reservation.date.toLocaleDateString('es-CL'),
-      time: reservation.schedule.startTime.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' }),
-      service: 'Natación libre',
-    };
-
-    // Enviar recordatorio
-    const emailSent = await sendReminderEmail(
-      reservation.user.email!,
-      reservationDetails
-    );
-
-    if (!emailSent) {
-      sendMessage(res, 'EMAIL_SEND_ERROR');
+    if (!result.success) {
+      sendMessage(res, result.errorCode!);
       return;
     }
 
@@ -126,16 +51,19 @@ export const sendReservationReminder = async (req: AuthenticatedRequest, res: Re
   }
 };
 
-// Endpoint para probar la configuración de emails
+// Probar configuración de email
 export const testEmailConfiguration = async (_req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
-    const isConfigured = await testConfiguration();
-    
-    if (isConfigured) {
-      sendMessage(res, 'EMAIL_CONFIG_VALID');
-    } else {
-      sendMessage(res, 'EMAIL_CONFIG_INVALID');
+    const emailService = getEmailService();
+
+    const result = await emailService.testEmailConfiguration();
+
+    if (!result.success) {
+      sendMessage(res, result.errorCode!);
+      return;
     }
+
+    sendMessage(res, 'EMAIL_CONFIG_VALID');
   } catch (error) {
     sendMessage(res, 'EMAIL_CONFIG_ERROR');
   }
@@ -144,21 +72,18 @@ export const testEmailConfiguration = async (_req: AuthenticatedRequest, res: Re
 // Enviar mensaje de contacto (endpoint público)
 export const sendContactMessage = async (req: Request, res: Response): Promise<void> => {
   try {
-    const contactData: SendContactMessageData = req.body;
+    const contactData = req.body;
+    const emailService = getEmailService();
 
-    // Enviar emails: confirmación al usuario y notificación al club
-    const emailsSent = await sendContactEmail(contactData);
+    const result = await emailService.sendContactMessage(contactData);
 
-    if (!emailsSent) {
-      console.error('Error al enviar emails de contacto para:', contactData.email);
-      sendMessage(res, 'EMAIL_SEND_ERROR');
+    if (!result.success) {
+      sendMessage(res, result.errorCode!);
       return;
     }
 
-    console.log('Emails de contacto enviados exitosamente para:', contactData.email);
     sendMessage(res, 'CONTACT_MESSAGE_SENT');
   } catch (error) {
-    console.error('Error al enviar mensaje de contacto:', error);
     sendMessage(res, 'EMAIL_SEND_ERROR');
   }
-}; 
+};

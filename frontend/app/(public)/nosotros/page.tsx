@@ -1,8 +1,12 @@
 import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Waves, Heart, Target, Users, Trophy, Mail } from "lucide-react"
+// import { Button } from "@/components/ui/button"
+// import { Waves, Heart, Target, Users, Trophy, Mail } from "lucide-react"
+import { Waves, Heart, Target, Users, Trophy} from "lucide-react"
 import { Metadata } from "next"
 import Image from "next/image"
+import perfilFelipe from "@/assets/perfil_felipe.png"
+import perfilNadita from "@/assets/perfil_nadita.jpg"
+import perfilConni from "@/assets/perfil_conni.jpg"
 
 export const metadata: Metadata = {
   title: 'Sobre Nosotros',
@@ -10,32 +14,39 @@ export const metadata: Metadata = {
   keywords: ['club', 'historia', 'natación', 'aguas abiertas', 'chiloé', 'nosotros'],
 }
 
+/** Miembro del equipo: imagen opcional (StaticImageData desde import o path en public) */
+type MiembroEquipo = {
+  nombre: string
+  cargo: string
+  experiencia: string
+  descripcion: string
+  imagen?: typeof perfilFelipe | string
+}
+
 const NosotrosPage = () => {
-  const equipoDirectivo = [
+  const equipoDirectivo: MiembroEquipo[] = [
     {
       nombre: "Felipe Arancibia Torres",
       cargo: "Presidente",
       experiencia: "Nadador amateur de aguas abiertas y piscina hace 4 años",
-      descripcion: "Fanático de las largas distancias"
+      descripcion: "Fanático de las largas distancias",
+      imagen: perfilFelipe,
     },
     {
-      nombre: "Nicole Arenas Ibarra",
+      nombre: "Nadinne Cárdenas ",
       cargo: "Secretaria",
-      experiencia: "Nadadora amateur de aguas abiertas y piscina hace 2",
-      descripcion: "Nadadora recreativa, el esqueleto de la organización"
+      experiencia: "Nadadora de aguas abiertas incursionando en triatlón",
+      descripcion: "Energía infinita, ¡que alguien la detenga!",
+      imagen:perfilNadita
     },
     {
       nombre: "Constanza Zambrano Conejeros",
       cargo: "Tesorera",
       experiencia: "2 años de natación en aguas abiertas y piscina",
-      descripcion: "Nadadora de travesías, metódica, ordenada y siempre disponible."
+      descripcion: "Siempre disponible, ",
+      imagen:perfilConni
     },
-    {
-      nombre: "Miguel Barrientos",
-      cargo: "Presidente Suplente",
-      experiencia: "Nadador 4x4 de compentencia, travesías y recreación",
-      descripcion: "Siempre disponible, consejero y un amigo para cada asunto."
-    }
+
   ]
 
   const valores = [
@@ -224,12 +235,22 @@ const NosotrosPage = () => {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {equipoDirectivo.map((miembro, index) => (
               <Card key={index} className="border-primary-200 shadow-lg text-center">
                 <CardContent className="p-6 space-y-4">
-                  <div className="w-20 h-20 bg-gradient-to-br from-primary-200 to-ocean-200 rounded-full mx-auto flex items-center justify-center">
-                    <Users className="h-10 w-10 text-primary-600" />
+                  <div className="w-24 h-24 rounded-full mx-auto overflow-hidden flex-shrink-0 bg-gradient-to-br from-primary-200 to-ocean-200 flex items-center justify-center">
+                    {miembro.imagen ? (
+                      <Image
+                        src={miembro.imagen}
+                        alt={miembro.nombre}
+                        width={96}
+                        height={96}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <Users className="h-10 w-10 text-primary-600" />
+                    )}
                   </div>
                   <div>
                     <h4 className="text-lg font-bold text-primary-800">{miembro.nombre}</h4>
@@ -246,7 +267,7 @@ const NosotrosPage = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="text-center bg-gradient-to-r from-primary-600 to-ocean-600 rounded-xl p-8 text-white">
+        {/* <section className="text-center bg-gradient-to-r from-primary-600 to-ocean-600 rounded-xl p-8 text-white">
           <h2 className="text-2xl font-bold mb-4">¿Quieres ser parte de nuestra historia?</h2>
           <p className="text-primary-100 mb-6 max-w-2xl mx-auto">
             Únete a una comunidad que comparte la pasión por la natación y el amor por las aguas de Chiloé
@@ -261,7 +282,7 @@ const NosotrosPage = () => {
               Contáctanos
             </Button>
           </div>
-        </section>
+        </section> */}
       </div>
     </div>
   )

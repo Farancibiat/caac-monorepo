@@ -27,4 +27,4 @@ function findStatusCodeForCategory(category: AllMessageCategories): keyof typeof
     }
   }
   throw new Error(`Category "${category}" not found in any status code`);
-} 
+}
