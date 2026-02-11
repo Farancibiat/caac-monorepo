@@ -1,11 +1,11 @@
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ROUTES } from '@/config/routes'
 import { Calendar, MapPin, Users, Clock, ExternalLink, FileText } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Metadata } from 'next'
-import imagenDesafioAguas from '@/assets/DSC_0666.JPG'
+import imagenDesafioAguas from '@/assets/DSC_0666.JPG';
 
 const eventoDesafio2026 = {
   titulo: '3er Desafío Unión de las Islas de Quinched',
@@ -49,7 +49,7 @@ const eventoDesafio2026 = {
     'Distancias: 100 m (iniciación), 500 m, 1.300 m y 3.500 m. Boya y gafas obligatorias.',
     'Reglamento: tiempos límite por tramo, charla de seguridad obligatoria, embarcaciones de apoyo.',
   ],
-  /** Imágenes grandes: primera desde assets, segunda desde public. */
+
   imagenes: [
     { src: imagenDesafioAguas, alt: 'Competencia de aguas abiertas con nadadores, boyas de seguridad y embarcaciones de apoyo' },
     { src: '/assets/partida desafio.webp', alt: 'Partida del Desafío Unión de las Islas en Quinched' },

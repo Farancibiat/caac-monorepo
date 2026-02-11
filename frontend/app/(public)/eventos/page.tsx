@@ -49,7 +49,7 @@ const eventosAnteriores = [
     fecha: "30 de Noviembre, 2023",
     participantes: 70,
     resultado: "Completado exitosamente",
-    fotosUrl: ROUTES.REDIRECTS.GALERIA1, // Reemplazar con URL de álbum específico si lo tienes (ej. Google Fotos)
+    fotosUrl: ROUTES.REDIRECTS.GALERIA1, 
   },
   {
     id: 5,
@@ -57,7 +57,7 @@ const eventosAnteriores = [
     fecha: "30 de Noviembre, 2024",
     participantes: 22,
     resultado: "Excelentes condiciones",
-    fotosUrl: ROUTES.REDIRECTS.GALERIA2, // Reemplazar con URL de álbum específico si lo tienes
+    fotosUrl: ROUTES.REDIRECTS.GALERIA2,
   }
 ]
 
@@ -68,8 +68,6 @@ export const metadata: Metadata = {
 }
 
 const EventosPage = () => {
-  // Mock data para eventos
- 
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-ocean-50 to-accent-50">
