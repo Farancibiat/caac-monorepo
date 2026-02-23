@@ -29,7 +29,7 @@ const NosotrosPage = () => {
       nombre: "Felipe Arancibia Torres",
       cargo: "Presidente",
       experiencia: "Nadador amateur de aguas abiertas y piscina hace 4 años",
-      descripcion: "Fanático de las largas distancias",
+      descripcion: "Fanático de las largas distancias.",
       imagen: perfilFelipe,
     },
     {
@@ -43,7 +43,7 @@ const NosotrosPage = () => {
       nombre: "Constanza Zambrano Conejeros",
       cargo: "Tesorera",
       experiencia: "2 años de natación en aguas abiertas y piscina",
-      descripcion: "Siempre disponible, ",
+      descripcion: "No hay travesía que no pueda superar.",
       imagen:perfilConni
     },
 
@@ -105,7 +105,7 @@ const NosotrosPage = () => {
                 </p>
                 <p>
                   Desde nuestros inicios con apenas 12 miembros, hemos crecido hasta convertirnos en una 
-                  comunidad de más de 50 socio activos y una red de nadadores amigos a nivel nacional e internacional,
+                  comunidad de más de 50 socios activos y una red de nadadores amigos a nivel nacional e internacional,
                   organizando eventos que atraen participantes de todo el país y promoviendo el deporte acuático en la región.
                 </p>
               </div>
@@ -197,7 +197,7 @@ const NosotrosPage = () => {
                   <div>
                     <h4 className="text-lg font-semibold text-neutral-800 mb-3">Desarrollo y Colaboración</h4>
                     <p className="text-neutral-700 leading-relaxed">
-                      Propender el desarrollo de sus asociados y, para tal efecto, colaborar con las autoridades del estado, de la I. Municipalidad u otros Organismos Gubernamentales o privados sin fines de lucro.
+                      Propender el desarrollo de sus asociados y, para tal efecto, colaborar con las autoridades del estado, de la Municipalidad de Castro o otros Organismos Gubernamentales o privados sin fines de lucro.
                     </p>
                   </div>
                 </div>
