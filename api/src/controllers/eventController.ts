@@ -65,7 +65,8 @@ export const getEvents = async (req: Request, res: Response): Promise<void> => {
 // GET /api/events/:slug - Obtener evento por slug
 export const getEventBySlug = async (req: Request, res: Response): Promise<void> => {
   try {
-    const slug = req.params.slug;
+    const slugParam = req.params.slug;
+    const slug = typeof slugParam === 'string' ? slugParam : slugParam?.[0];
     if (!slug) {
       sendMessage(res, 'EVENT_INVALID_SLUG');
       return;
