@@ -6,7 +6,7 @@ import {
   updateEvent,
   deleteEvent,
   getEventEditions,
-  linkEventEdition,
+  linkEventEditions,
 } from '@/controllers/eventController';
 import { protect, authorize } from '@/config/auth';
 import { Role } from '@prisma/client';
@@ -62,7 +62,7 @@ router.put('/:id/link-edition',
   authorize([Role.ADMIN]),
   validateParams(eventSchemas.params.id),
   validateBody(eventSchemas.linkEdition),
-  withAuthAndRole(linkEventEdition)
+  withAuthAndRole(linkEventEditions)
 );
 
 export default router; 

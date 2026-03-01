@@ -1,6 +1,6 @@
 import { Profile } from '@prisma/client';
 import { ServiceResult } from '../common';
-import { ProfileData, ProfileWithRelations } from './IProfileRepository';
+import { ProfileData } from './IProfileRepository';
 
 /**
  * Tipo para respuesta de perfil formateada
@@ -8,14 +8,14 @@ import { ProfileData, ProfileWithRelations } from './IProfileRepository';
 export type ProfileResponse = {
   nombre: string;
   primerApellido: string;
-  segundoApellido?: string;
+  segundoApellido?: string | undefined;
   fechaNacimiento: Date;
   telefono: string;
   direccion: string;
   comuna: string;
   region: string;
   sexo: string;
-  clubId?: number;
+  clubId?: number | undefined;
 };
 
 /**

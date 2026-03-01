@@ -70,12 +70,11 @@ export const createUserService = (userRepo: IUserRepository): IUserService => ({
         return ServiceResultHelper.error('USER_CREATE_ERROR');
       }
       
-      // Crear registro en nuestra base de datos
       const newUser = await userRepo.create({
         auth_id: authUser.user.id,
         email,
         name,
-        phone: phone || undefined,
+        ...(phone !== undefined && phone !== '' && { phone }),
         role: (role as Role) || Role.USER,
         isActive: true,
         provider: 'email',

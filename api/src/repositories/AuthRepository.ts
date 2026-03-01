@@ -10,20 +10,6 @@ export const createAuthRepository = (prisma: PrismaClient): IAuthRepository => (
   async findByAuthId(authId: string): Promise<User | null> {
     return await prisma.user.findUnique({
       where: { auth_id: authId },
-      select: {
-        id: true,
-        auth_id: true,
-        email: true,
-        name: true,
-        phone: true,
-        role: true,
-        isActive: true,
-        avatar_url: true,
-        provider: true,
-        profileCompleted: true,
-        createdAt: true,
-        updatedAt: true,
-      },
     });
   },
 
@@ -31,20 +17,6 @@ export const createAuthRepository = (prisma: PrismaClient): IAuthRepository => (
     return await prisma.user.update({
       where: { auth_id: authId },
       data,
-      select: {
-        id: true,
-        auth_id: true,
-        email: true,
-        name: true,
-        phone: true,
-        role: true,
-        isActive: true,
-        avatar_url: true,
-        provider: true,
-        profileCompleted: true,
-        createdAt: true,
-        updatedAt: true,
-      },
     });
   },
 

@@ -96,7 +96,11 @@ export const createEventService = (eventRepo: IEventRepository): IEventService =
         return ServiceResultHelper.error('EVENT_INVALID_COST');
       }
 
-      const newEvent = await eventRepo.create(data);
+      const createdBy = (data as Record<string, unknown>).createdBy;
+      if (typeof createdBy !== 'number' || !Number.isInteger(createdBy)) {
+        return ServiceResultHelper.error('INVALID_QUERY_PARAMETERS');
+      }
+      const newEvent = await eventRepo.create({ ...data, createdBy });
       return ServiceResultHelper.success(newEvent);
     } catch (error) {
       return ServiceResultHelper.error('EVENT_CREATE_ERROR');
@@ -124,8 +128,8 @@ export const createEventService = (eventRepo: IEventRepository): IEventService =
       }
 
       // Validar fechas si se están actualizando
-      const startDate = data.start_date || existingEvent.start_date;
-      const endDate = data.end_date || existingEvent.end_date;
+      const startDate = data.start_date ?? existingEvent.startDate;
+      const endDate = data.end_date ?? existingEvent.endDate;
       
       if (endDate && new Date(startDate) > new Date(endDate)) {
         return ServiceResultHelper.error('EVENT_INVALID_DATES');
@@ -190,8 +194,8 @@ export const createEventService = (eventRepo: IEventRepository): IEventService =
       );
       
       const sortedEvents = childEvents
-        .filter(event => event !== null)
-        .sort((a, b) => new Date(a!.start_date).getTime() - new Date(b!.start_date).getTime());
+        .filter((event): event is Event => event !== null)
+        .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
 
       if (sortedEvents.length !== childEventIds.length) {
         return ServiceResultHelper.error('EVENT_INVALID_EDITION_ORDER');

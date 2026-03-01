@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc && tsc-alias && npm run copy-templates",
-    "copy-templates": "cp -r src/services/email/templates dist/services/email/",
+    "copy-templates": "node scripts/copy-templates.js",
     "start": "node dist/index.js",
     "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/index.ts",
     "validate-messages": "node scripts/validate-messages.js",

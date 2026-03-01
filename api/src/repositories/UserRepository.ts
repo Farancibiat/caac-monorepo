@@ -8,42 +8,13 @@ import { IUserRepository } from '@/types';
 export const createUserRepository = (prisma: PrismaClient): IUserRepository => ({
 
   async findAll(): Promise<User[]> {
-    return await prisma.user.findMany({
-      select: {
-        id: true,
-        auth_id: true,
-        email: true,
-        name: true,
-        phone: true,
-        role: true,
-        isActive: true,
-        avatar_url: true,
-        provider: true,
-        profileCompleted: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
+    return await prisma.user.findMany();
   },
 
   async findById(id: number): Promise<User | null> {
     return await prisma.user.findUnique({
       where: { id },
-      select: {
-        id: true,
-        auth_id: true,
-        email: true,
-        name: true,
-        phone: true,
-        role: true,
-        isActive: true,
-        avatar_url: true,
-        provider: true,
-        profileCompleted: true,
-        createdAt: true,
-        updatedAt: true,
-        reservations: true,
-      },
+      include: { reservations: true },
     });
   },
 
@@ -56,20 +27,6 @@ export const createUserRepository = (prisma: PrismaClient): IUserRepository => (
   async findByAuthId(authId: string): Promise<User | null> {
     return await prisma.user.findUnique({
       where: { auth_id: authId },
-      select: {
-        id: true,
-        auth_id: true,
-        email: true,
-        name: true,
-        phone: true,
-        role: true,
-        isActive: true,
-        avatar_url: true,
-        provider: true,
-        profileCompleted: true,
-        createdAt: true,
-        updatedAt: true,
-      },
     });
   },
 
@@ -77,7 +34,7 @@ export const createUserRepository = (prisma: PrismaClient): IUserRepository => (
     auth_id: string;
     email: string;
     name: string;
-    phone?: string;
+    phone?: string | undefined;
     role?: Role;
     isActive?: boolean;
     provider?: string;
@@ -88,25 +45,11 @@ export const createUserRepository = (prisma: PrismaClient): IUserRepository => (
         auth_id: data.auth_id,
         email: data.email,
         name: data.name,
-        phone: data.phone || null,
-        role: data.role || Role.USER,
+        ...(data.phone !== undefined && { phone: data.phone }),
+        role: data.role ?? Role.USER,
         isActive: data.isActive ?? true,
-        provider: data.provider || 'email',
+        provider: data.provider ?? 'email',
         profileCompleted: data.profileCompleted ?? !!(data.name && data.phone),
-      },
-      select: {
-        id: true,
-        auth_id: true,
-        email: true,
-        name: true,
-        phone: true,
-        role: true,
-        isActive: true,
-        avatar_url: true,
-        provider: true,
-        profileCompleted: true,
-        createdAt: true,
-        updatedAt: true,
       },
     });
   },

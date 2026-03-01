@@ -1,18 +1,18 @@
-import { Event, Prisma, EventStatus, EventMainType, EventLocationType, EventCategory } from '@prisma/client';
+import { Event, EventStatus, EventMainType, EventLocationType, EventCategory } from '@prisma/client';
 
 /**
- * Tipo para filtros de eventos
+ * Tipo para filtros de eventos (undefined permitido por exactOptionalPropertyTypes)
  */
 export type EventFilters = {
-  page?: number;
-  limit?: number;
-  status?: EventStatus;
-  event_main_type?: EventMainType;
-  event_location_type?: EventLocationType;
-  event_category?: EventCategory;
-  is_featured?: boolean;
-  search?: string;
-  year?: number;
+  page?: number | undefined;
+  limit?: number | undefined;
+  status?: EventStatus | undefined;
+  event_main_type?: EventMainType | undefined;
+  event_location_type?: EventLocationType | undefined;
+  event_category?: EventCategory | undefined;
+  is_featured?: boolean | undefined;
+  search?: string | undefined;
+  year?: number | undefined;
 };
 
 /**
@@ -47,7 +47,7 @@ export type IEventRepository = {
   findMany(filters: EventFilters): Promise<{ events: Event[]; total: number }>;
   findBySlug(slug: string): Promise<Event | null>;
   findById(id: number): Promise<Event | null>;
-  create(data: CreateEventData): Promise<Event>;
+  create(data: CreateEventData & { createdBy: number }): Promise<Event>;
   update(id: number, data: UpdateEventData): Promise<Event>;
   delete(id: number): Promise<void>;
   linkEditions(parentEventId: number, childEventIds: number[]): Promise<void>;

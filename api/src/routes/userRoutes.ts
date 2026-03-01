@@ -1,6 +1,6 @@
 import express, { Router } from 'express';
 import { getUsers, getUserById, createUser } from '@/controllers/userController';
-import { getProfile, upsertProfile, deleteProfile } from '@/controllers/profileController';
+import { getProfile, updateProfile, deleteProfile } from '@/controllers/profileController';
 import { protect, authorize } from '@/config/auth';
 import { Role } from '@prisma/client';
 import { schemas, validateBody, validateParams, validateQuery, cleanEmptyStrings } from '@/schemas';
@@ -10,7 +10,7 @@ const router: Router = express.Router();
 
 // Rutas de perfil (para usuarios autenticados) - usando ProfileController
 router.get('/profile', protect, withAuth(getProfile));
-router.put('/profile', protect, cleanEmptyStrings, validateBody(schemas.user.updateProfile), withAuth(upsertProfile));
+router.put('/profile', protect, cleanEmptyStrings, validateBody(schemas.user.updateProfile), withAuth(updateProfile));
 router.delete('/profile', protect, withAuth(deleteProfile));
 
 // Solo administradores pueden ver y crear usuarios

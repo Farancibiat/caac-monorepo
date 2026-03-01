@@ -1,4 +1,4 @@
-import { PrismaClient, Profile } from '@prisma/client';
+import { PrismaClient, Profile, Prisma, Sexo } from '@prisma/client';
 import { IProfileRepository, ProfileWithRelations, ProfileData } from '@/types';
 
 /**
@@ -41,15 +41,35 @@ export const createProfileRepository = (prisma: PrismaClient): IProfileRepositor
     return await prisma.profile.create({
       data: {
         userId,
-        ...data,
+        nombre: data.nombre,
+        primerApellido: data.primerApellido,
+        segundoApellido: data.segundoApellido ?? '',
+        fechaNacimiento: data.fechaNacimiento,
+        telefono: data.telefono,
+        direccion: data.direccion,
+        comuna: data.comuna,
+        region: data.region,
+        sexo: data.sexo.toLowerCase() as Sexo,
+        ...(data.clubId !== undefined && { clubId: data.clubId }),
       },
     });
   },
 
   async update(userId: number, data: Partial<ProfileData>): Promise<Profile> {
+    const updatePayload: Prisma.ProfileUpdateInput = {};
+    if (data.nombre !== undefined) updatePayload.nombre = data.nombre;
+    if (data.primerApellido !== undefined) updatePayload.primerApellido = data.primerApellido;
+    if (data.segundoApellido !== undefined) updatePayload.segundoApellido = data.segundoApellido;
+    if (data.fechaNacimiento !== undefined) updatePayload.fechaNacimiento = data.fechaNacimiento;
+    if (data.telefono !== undefined) updatePayload.telefono = data.telefono;
+    if (data.direccion !== undefined) updatePayload.direccion = data.direccion;
+    if (data.comuna !== undefined) updatePayload.comuna = data.comuna;
+    if (data.region !== undefined) updatePayload.region = data.region;
+    if (data.sexo !== undefined) updatePayload.sexo = data.sexo.toLowerCase() as Sexo;
+    if (data.clubId !== undefined) updatePayload.club = { connect: { id: data.clubId } };
     return await prisma.profile.update({
       where: { userId },
-      data,
+      data: updatePayload,
     });
   },
 

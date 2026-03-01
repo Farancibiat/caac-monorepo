@@ -105,7 +105,7 @@ export const createEmailService = (emailRepo: IEmailRepository): IEmailService =
   async sendContactMessage(contactData: SendContactMessageData): Promise<ServiceResult<void>> {
     try {
       // Validar datos básicos
-      if (!contactData.name || !contactData.email || !contactData.subject || !contactData.message) {
+      if (!contactData.nombre || !contactData.email || !contactData.asunto || !contactData.mensaje) {
         return ServiceResultHelper.error('CONTACT_INVALID_DATA');
       }
 

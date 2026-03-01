@@ -1,4 +1,4 @@
-import { Reservation, ReservationStatus, PrismaClient } from '@prisma/client';
+import { Reservation, PrismaClient } from '@prisma/client';
 import { 
   IReservationService, 
   IReservationRepository, 

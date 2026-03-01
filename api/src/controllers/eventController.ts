@@ -45,7 +45,7 @@ export const getEvents = async (req: Request, res: Response): Promise<void> => {
       event_location_type: req.query.event_location_type as any,
       event_category: req.query.event_category as any,
       is_featured: req.query.is_featured === 'true' ? true : req.query.is_featured === 'false' ? false : undefined,
-      search: req.query.search as string,
+      search: req.query.search !== undefined && req.query.search !== '' ? String(req.query.search) : undefined,
       year: req.query.year ? Number(req.query.year) : undefined,
     };
 
@@ -65,7 +65,11 @@ export const getEvents = async (req: Request, res: Response): Promise<void> => {
 // GET /api/events/:slug - Obtener evento por slug
 export const getEventBySlug = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { slug } = req.params;
+    const slug = req.params.slug;
+    if (!slug) {
+      sendMessage(res, 'EVENT_INVALID_SLUG');
+      return;
+    }
     const eventService = getEventService();
 
     const result = await eventService.getEventBySlug(slug);
@@ -85,8 +89,8 @@ export const getEventBySlug = async (req: Request, res: Response): Promise<void>
 export const createEvent = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const eventService = getEventService();
-
-    const result = await eventService.createEvent(req.body);
+    const createdBy = parseInt(req.user.id, 10);
+    const result = await eventService.createEvent({ ...req.body, createdBy });
 
     if (!result.success) {
       sendMessage(res, result.errorCode!);

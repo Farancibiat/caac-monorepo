@@ -1,14 +1,14 @@
 import { ServiceResult } from '../common';
 
 /**
- * Tipo para datos de mensaje de contacto
+ * Tipo para datos de mensaje de contacto (debe coincidir con schemas/contact)
  */
 export type SendContactMessageData = {
-  name: string;
+  nombre: string;
   email: string;
-  phone?: string;
-  subject: string;
-  message: string;
+  telefono?: string;
+  asunto: string;
+  mensaje: string;
 };
 
 /**
