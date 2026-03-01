@@ -8,7 +8,6 @@
     "copy-templates": "node scripts/copy-templates.js",
     "start": "node dist/index.js",
     "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/index.ts",
-    "validate-messages": "node scripts/validate-messages.js",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
@@ -19,7 +18,9 @@
     "prisma",
     "express",
     "api",
-    "swimming",
+    "swimming club",
+    "open water swimming",
+    "chiloe",
     "pool",
     "reservations"
   ],

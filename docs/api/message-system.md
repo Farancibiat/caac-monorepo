@@ -91,17 +91,3 @@ export const register = async (req: Request, res: Response) => {
   }
 };
 ```
-
-## Validación
-
-```bash
-npm run validate-messages
-```
-
-Resultado:
-```
-🔍 Validando sistema de mensajes HTTP...
-📝 Mensajes definidos: 62
-🔍 Categorías encontradas en código: 21
-✅ Sistema HTTP completamente implementado!
-``` 
