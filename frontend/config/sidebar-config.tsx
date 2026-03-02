@@ -13,16 +13,7 @@ export const sidebarConfig: SidebarConfig = {
     title: "Reservas",
     base: "/app/reservas",
     icon: <Calendar className="h-5 w-5" />,
-    submenus: [
-      {
-        label: "Mis Reservas",
-        path: ""
-      },
-      {
-        label: "Nueva Reserva", 
-        path: "/nueva"
-      }
-    ]
+    path: ""
   },
 
   administracion: {
@@ -34,6 +25,10 @@ export const sidebarConfig: SidebarConfig = {
       {
         label: "Panel General",
         path: ""
+      },
+      {
+        label: "Registro Piscina",
+        path: "/registro-piscina"
       },
       {
         label: "Usuarios",
