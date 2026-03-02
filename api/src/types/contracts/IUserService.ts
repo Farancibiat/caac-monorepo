@@ -15,5 +15,8 @@ export type IUserService = {
     role?: string;
   }): Promise<ServiceResult<User>>;
   getUserProfile(authId: string): Promise<ServiceResult<User>>;
+
+  /** Solo ADMIN. Actualiza el campo socio del usuario (precio 2000 vs 3000). */
+  updateUserSocio(userId: number, socio: boolean): Promise<ServiceResult<User>>;
 };
 

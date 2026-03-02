@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reserva confirmada - Total a pagar</title>
+  <style>
+    body { font-family: 'Arial', sans-serif; background-color: #e0f2fe; margin: 0; padding: 20px; }
+    .container { max-width: 600px; background-color: #fafafa; border-radius: 12px; padding: 40px; box-shadow: 0 4px 12px rgba(23, 23, 23, 0.1); }
+    .header { text-align: center; padding-bottom: 30px; border-bottom: 2px solid #0d9488; margin-bottom: 30px; }
+    .header h1 { color: #0d9488; font-size: 28px; margin: 0 0 10px 0; }
+    .content { background-color: #fff; border-radius: 12px; padding: 30px; margin-bottom: 30px; box-shadow: 0 2px 8px rgba(23, 23, 23, 0.05); }
+    .content h2 { color: #16a34a; font-size: 24px; margin-top: 0; margin-bottom: 20px; }
+    .info { background-color: #f0fdf4; border-left: 4px solid #16a34a; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+    .total { font-size: 20px; font-weight: bold; color: #16a34a; margin-top: 16px; }
+    .instructions { background-color: #eff6ff; border-left: 4px solid #2563eb; border-radius: 8px; padding: 20px; margin: 20px 0; }
+    .footer { text-align: center; padding-top: 30px; border-top: 1px solid #e5e7eb; color: #737373; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>{{SITE_NAME}}</h1>
+      <p>Reserva confirmada</p>
+    </div>
+    <div class="content">
+      <h2>Hola {{userName}},</h2>
+      <p>Tu reserva ha sido registrada correctamente.</p>
+      <div class="info">
+        <p><strong>Fechas reservadas:</strong> {{datesList}}</p>
+        <p><strong>Cantidad de sesiones:</strong> {{sessionCount}}</p>
+        <p><strong>Valor por sesión:</strong> ${{pricePerSessionFormatted}} CLP</p>
+        {{#reembolsosDescontados}}
+        <p><strong>Reembolsos descontados:</strong> ${{reembolsosDescontados}} CLP</p>
+        {{/reembolsosDescontados}}
+        <p class="total">Total a transferir: ${{totalAmountFormatted}} CLP</p>
+      </div>
+      <div class="instructions">
+        <h3>Instrucciones de pago</h3>
+        <p>Realiza la transferencia por el monto indicado. Para consultas o solicitudes especiales, escribe al correo o WhatsApp del club.</p>
+      </div>
+    </div>
+    <div class="footer">
+      <p>&copy; {{CURRENT_YEAR}} {{SITE_NAME}}</p>
+    </div>
+  </div>
+</body>
+</html>

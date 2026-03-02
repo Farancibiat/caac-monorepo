@@ -18,5 +18,7 @@ export type IUserRepository = {
     provider?: string;
     profileCompleted?: boolean;
   }): Promise<User>;
+
+  updateSocio(id: number, socio: boolean): Promise<User>;
 };
 

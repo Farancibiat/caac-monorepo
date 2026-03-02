@@ -1,14 +1,15 @@
 model SwimmingSchedule {
-  id           Int           @id @default(autoincrement())
-  dayOfWeek    Int
-  startTime    DateTime
-  endTime      DateTime
-  maxCapacity  Int
-  laneCount    Int
-  isActive     Boolean       @default(true)
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
-  reservations Reservation[]
+  id                    Int                   @id @default(autoincrement())
+  dayOfWeek             Int
+  startTime             DateTime
+  endTime               DateTime
+  maxCapacity           Int
+  laneCount             Int
+  isActive              Boolean                @default(true)
+  createdAt             DateTime              @default(now()) @map("created_at")
+  updatedAt             DateTime              @updatedAt @map("updated_at")
+  reservations          Reservation[]
+  poolDayAvailabilities PoolDayAvailability[]
 
   @@map("swimming_schedules")
   @@schema("public")
@@ -31,20 +32,21 @@ model PaymentRecord {
 }
 
 model Reservation {
-  id                 Int               @id @default(autoincrement())
+  id                 Int                   @id @default(autoincrement())
   date               DateTime
-  userId             Int               @map("user_id")
-  scheduleId         Int               @map("schedule_id")
-  status             ReservationStatus @default(PENDING)
-  isPaid             Boolean           @default(false) @map("is_paid")
-  paymentDate        DateTime?         @map("payment_date")
-  paymentConfirmedBy Int?              @map("payment_confirmed_by")
-  createdAt          DateTime          @default(now()) @map("created_at")
-  updatedAt          DateTime          @updatedAt @map("updated_at")
+  userId             Int                   @map("user_id")
+  scheduleId         Int                   @map("schedule_id")
+  status             ReservationStatus     @default(PENDING)
+  isPaid             Boolean               @default(false) @map("is_paid")
+  paymentDate        DateTime?             @map("payment_date")
+  paymentConfirmedBy Int?                  @map("payment_confirmed_by")
+  createdAt          DateTime              @default(now()) @map("created_at")
+  updatedAt          DateTime              @updatedAt @map("updated_at")
   paymentRecords     PaymentRecord[]
-  treasurer          User?             @relation("PaymentConfirmations", fields: [paymentConfirmedBy], references: [id])
-  schedule           SwimmingSchedule  @relation(fields: [scheduleId], references: [id])
-  user               User              @relation(fields: [userId], references: [id])
+  cancellationRefund CancellationRefund?
+  treasurer          User?                 @relation("PaymentConfirmations", fields: [paymentConfirmedBy], references: [id])
+  schedule           SwimmingSchedule      @relation(fields: [scheduleId], references: [id])
+  user               User                  @relation(fields: [userId], references: [id])
 
   @@index([date, scheduleId])
   @@map("reservations")

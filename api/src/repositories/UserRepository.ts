@@ -54,5 +54,12 @@ export const createUserRepository = (prisma: PrismaClient): IUserRepository => (
     });
   },
 
+  async updateSocio(id: number, socio: boolean): Promise<User> {
+    return await prisma.user.update({
+      where: { id },
+      data: { socio },
+    });
+  },
+
 });
 

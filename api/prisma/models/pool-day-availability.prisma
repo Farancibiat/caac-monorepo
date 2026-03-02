@@ -1,0 +1,17 @@
+model PoolDayAvailability {
+  id              Int              @id @default(autoincrement())
+  date            DateTime         @db.Date
+  scheduleId      Int              @map("schedule_id")
+  isAvailable     Boolean          @default(true) @map("is_available")
+  capacityOverride Int?            @map("capacity_override")
+  createdById     Int              @map("created_by_id")
+  createdAt       DateTime         @default(now()) @map("created_at")
+
+  schedule  SwimmingSchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  createdBy User             @relation("PoolDayAvailabilityCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+
+  @@unique([date, scheduleId])
+  @@index([date])
+  @@map("pool_day_availabilities")
+  @@schema("public")
+}

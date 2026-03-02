@@ -14,6 +14,9 @@ export const reservationSchemas = {
       userId: z.coerce.number().positive().optional(),
       scheduleId: z.coerce.number().positive().optional(),
     }),
+    context: z.object({
+      monthYear: z.string().regex(/^\d{4}-\d{2}$/, 'monthYear debe ser YYYY-MM'),
+    }),
   },
 
   // Body para crear reserva
@@ -23,9 +26,36 @@ export const reservationSchemas = {
     notes: z.string().optional(),
   }),
 
+  // Body para crear reservas del mes siguiente (varias fechas)
+  createBatch: z.object({
+    dates: z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Cada fecha debe ser YYYY-MM-DD')).min(1, 'Selecciona al menos una fecha'),
+  }),
+
   // Body para cancelar reserva
   cancel: z.object({
     reason: z.string().min(1, 'Debe proporcionar una razón para la cancelación').optional(),
+  }),
+
+  // Body para liberar cupos (lista de IDs; solo fechas futuras, sin reembolso)
+  release: z.object({
+    reservationIds: z.array(z.number().positive()).min(1, 'Debe seleccionar al menos una reserva'),
+  }),
+
+  // Admin: aperturar mes siguiente
+  openMonth: z.object({
+    dates: z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).min(1, 'Selecciona al menos un día'),
+  }),
+
+  // Admin: cancelar días (genera reembolsos)
+  cancelDays: z.object({
+    dates: z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).min(1, 'Selecciona al menos un día'),
+  }),
+
+  // Admin: actualizar capacidad de un día
+  updateCapacity: z.object({
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    scheduleId: z.number().positive(),
+    capacityOverride: z.number().int().min(0),
   }),
 
   // Body para confirmar pago

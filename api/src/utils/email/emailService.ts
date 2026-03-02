@@ -111,6 +111,37 @@ export const sendReservationReminder = async (to: string, reservationDetails: an
   );
 };
 
+export interface NewReservationBatchEmailData {
+  userName: string;
+  datesList: string;
+  sessionCount: number;
+  pricePerSession: number;
+  totalAmount: number;
+  reembolsosDescontados?: number;
+}
+
+export const sendNewReservationBatchEmail = async (to: string, data: NewReservationBatchEmailData): Promise<boolean> => {
+  return sendEmail(
+    'reservationNewBatch',
+    to,
+    `Reserva confirmada - Total a pagar $${data.totalAmount.toLocaleString('es-CL')} - ${SITE_NAME}`,
+    {
+      ...data,
+      totalAmountFormatted: data.totalAmount.toLocaleString('es-CL'),
+      pricePerSessionFormatted: data.pricePerSession.toLocaleString('es-CL'),
+      reembolsosDescontados: data.reembolsosDescontados != null ? String(data.reembolsosDescontados) : '',
+    }
+  );
+};
+
+export const sendReleaseConfirmationEmail = async (to: string, data: { userName: string; datesList: string }): Promise<boolean> => {
+  return sendEmail(
+    'reservationRelease',
+    to,
+    `Cupos liberados - ${SITE_NAME}`,
+    data
+  );
+};
 
 export const sendContactMessage = async (contactData: SendContactMessageData): Promise<boolean> => {
   const emailData = {

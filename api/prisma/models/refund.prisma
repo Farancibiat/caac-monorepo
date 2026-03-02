@@ -1,0 +1,22 @@
+model CancellationRefund {
+  id            Int                  @id @default(autoincrement())
+  userId        Int                  @map("user_id")
+  reservationId Int                  @unique @map("reservation_id")
+  amount        Float
+  reason        String?
+  status        RefundStatus         @default(PENDING)
+  createdAt     DateTime             @default(now()) @map("created_at")
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Restrict)
+  reservation Reservation @relation(fields: [reservationId], references: [id], onDelete: Restrict)
+
+  @@map("cancellation_refunds")
+  @@schema("public")
+}
+
+enum RefundStatus {
+  PENDING
+  APPLIED
+
+  @@schema("public")
+}

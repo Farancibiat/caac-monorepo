@@ -11,6 +11,7 @@ model User {
   provider              String?         @default("email")
   provider_id           String?         @map("provider_id")
   profileCompleted      Boolean         @default(false) @map("profile_completed")
+  socio                 Boolean         @default(false) @map("socio")
   createdAt             DateTime        @default(now()) @map("created_at")
   updatedAt             DateTime        @updatedAt @map("updated_at")
   createdEvents         Event[]
@@ -18,6 +19,8 @@ model User {
   profile               Profile?
   confirmedReservations Reservation[]   @relation("PaymentConfirmations")
   reservations          Reservation[]
+  cancellationRefunds   CancellationRefund[]
+  poolDayAvailabilitiesCreated PoolDayAvailability[] @relation("PoolDayAvailabilityCreatedBy")
 
   @@map("users")
   @@schema("public")

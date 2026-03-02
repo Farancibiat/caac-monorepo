@@ -101,5 +101,17 @@ export const createUserService = (userRepo: IUserRepository): IUserService => ({
     }
   },
 
+  async updateUserSocio(userId: number, socio: boolean): Promise<ServiceResult<User>> {
+    try {
+      if (!userId || isNaN(userId) || userId <= 0) {
+        return ServiceResultHelper.error('USER_INVALID_ID');
+      }
+      const user = await userRepo.updateSocio(userId, socio);
+      return ServiceResultHelper.success(user);
+    } catch (error) {
+      return ServiceResultHelper.error('USER_UPDATE_ERROR');
+    }
+  },
+
 });
 

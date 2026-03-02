@@ -89,3 +89,23 @@ export const getProfile = async (req: AuthenticatedRequest, res: Response): Prom
     sendMessage(res, 'USER_FETCH_ERROR');
   }
 };
+
+/** Solo ADMIN. Actualiza el campo socio del usuario. */
+export const updateUserSocio = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { socio } = req.body as { socio: boolean };
+    const userService = getUserService();
+
+    const result = await userService.updateUserSocio(Number(id), socio);
+
+    if (!result.success) {
+      sendMessage(res, result.errorCode!);
+      return;
+    }
+
+    sendMessage(res, 'USER_SOCIO_UPDATED', result.data);
+  } catch (error) {
+    sendMessage(res, 'USER_UPDATE_ERROR');
+  }
+};

@@ -33,6 +33,11 @@ export const userSchemas = {
     'Debe proporcionar al menos un campo para actualizar'
   ),
 
+  // Actualización de campo socio (solo admin, vista simple)
+  updateSocio: z.object({
+    socio: z.boolean(),
+  }),
+
   // Actualización de perfil de usuario
   updateProfile: z.object({
     nombre: z.string().min(1, 'El nombre es requerido'),
@@ -51,6 +56,7 @@ export const userSchemas = {
 // Tipos inferidos
 export type CreateUserData = z.infer<typeof userSchemas.create>;
 export type UpdateUserData = z.infer<typeof userSchemas.update>;
+export type UpdateSocioData = z.infer<typeof userSchemas.updateSocio>;
 export type UpdateProfileData = z.infer<typeof userSchemas.updateProfile>;
 export type UserListQuery = z.infer<typeof userSchemas.query.list>;
 export type UserParamsId = z.infer<typeof userSchemas.params.id>; 

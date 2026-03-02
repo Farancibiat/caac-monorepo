@@ -1,5 +1,5 @@
 import express, { Router } from 'express';
-import { getUsers, getUserById, createUser } from '@/controllers/userController';
+import { getUsers, getUserById, createUser, updateUserSocio } from '@/controllers/userController';
 import { getProfile, updateProfile, deleteProfile } from '@/controllers/profileController';
 import { protect, authorize } from '@/config/auth';
 import { Role } from '@prisma/client';
@@ -16,6 +16,7 @@ router.delete('/profile', protect, withAuth(deleteProfile));
 // Solo administradores pueden ver y crear usuarios
 router.get('/', protect, authorize([Role.ADMIN]), validateQuery(schemas.user.query.list), withAuthAndRole(getUsers));
 router.get('/:id', protect, authorize([Role.ADMIN]), validateParams(schemas.user.params.id), withAuthAndRole(getUserById));
+router.patch('/:id/socio', protect, authorize([Role.ADMIN]), validateParams(schemas.user.params.id), validateBody(schemas.user.updateSocio), withAuthAndRole(updateUserSocio));
 router.post('/', protect, authorize([Role.ADMIN]), cleanEmptyStrings, validateBody(schemas.user.create), withAuthAndRole(createUser));
 
 export default router; 

@@ -39,6 +39,7 @@ export type {
 export type {
   CreateUserData,
   UpdateUserData,
+  UpdateSocioData,
   UserListQuery,
   UserParamsId
 } from './user';
