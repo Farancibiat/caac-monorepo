@@ -23,7 +23,6 @@ export const getReservationContext = async (req: AuthenticatedRequest, res: Resp
       return;
     }
 
-    const monthStart = new Date(y, m - 1, 1);
     const monthEnd = new Date(y, m, 0);
 
     const user = await prisma.user.findUnique({
@@ -69,7 +68,7 @@ export const getReservationContext = async (req: AuthenticatedRequest, res: Resp
         date: dateStr,
         dayOfWeek: dow,
         status: reservation ? (reservation.status === 'CANCELLED' ? 'CANCELLED' : 'RESERVED') : null,
-        reservationId: reservation?.id,
+        ...(reservation?.id !== undefined && { reservationId: reservation.id }),
       });
     }
 
@@ -334,7 +333,7 @@ export const createReservationBatch = async (req: AuthenticatedRequest, res: Res
       sessionCount: created.length,
       pricePerSession,
       totalAmount,
-      reembolsosDescontados: pendingRefunds > 0 ? pendingRefunds : undefined,
+      ...(pendingRefunds > 0 && { reembolsosDescontados: pendingRefunds }),
     });
 
     sendMessage(res, 'RESERVATION_CREATED', {
