@@ -1319,4 +1319,29 @@ describe('ReservationCalendar Component', () => {
 
 ---
 
-**🎉 Este sistema proporcionará una experiencia completa y profesional para la gestión de reservas de piscina, evolucionando desde la base sólida existente hacia una solución robusta que cubra todas las necesidades operacionales del club.**
+## 📌 Fuente de verdad del plan actual
+
+La especificación funcional y el plan de tareas en vigor están en:
+
+- **[reservas-especificacion.md](reservas-especificacion.md)** — Panel usuario (calendario, liberar cupos, nueva reserva, precios socio/no socio, reembolsos, emails de respaldo) y panel admin (Registro Piscina, apertura mes, cancelación con reembolsos, tesorero puede aperturar). Campo socio editable solo por admin.
+- **[reservas-plan-tareas.md](reservas-plan-tareas.md)** — Tareas API y frontend, endpoint de contexto, eliminación de `/app/reservas/nueva`.
+
+Lo que sigue en este documento y **no** está incorporado en ese plan queda como **ideas de desarrollo futuro**.
+
+---
+
+## 🔮 Ideas de desarrollo futuro (no incorporadas en el plan actual)
+
+Resumen de lo descrito en este documento que queda fuera del alcance actual; se puede retomar en fases posteriores:
+
+- **Períodos de reserva** (ReservationPeriod): ventanas configurables solo socios / socios + no socios; no se usa en el flujo actual (apertura por mes y precios fijos 2.000/3.000).
+- **Reservas en batch** con `batchId` y **acompañantes** (ReservationCompanion): reserva múltiple en una transacción con datos de terceros; el plan actual es reserva por días con monto único y sin acompañantes.
+- **Precios por horario** (memberPrice/nonMemberPrice en SwimmingSchedule): el plan usa precios fijos globales (socio/no socio).
+- **Bloqueo de fechas** (ScheduleBlockDate) con motivo: el plan usa “días disponibles por mes” y “cancelar día” con reembolsos, sin modelo de bloqueos con razón.
+- **Panel de pagos** avanzado: confirmación masiva por batch, exportación CSV/Excel con URLs temporales, edición manual de reservas; el plan contempla confirmación de pago y Registro Piscina, sin estos extras.
+- **Recordatorios automáticos** y notificaciones a administradores (envío programado, etc.); el plan incluye emails de respaldo al usuario (nueva reserva, liberación), no recordatorios ni notificaciones a admin.
+- **Validaciones de negocio** detalladas (horario de corte 20:00, máximo 3 reservas activas, 2 horas antes para cancelar, límite de acompañantes, validación de capacidad con acompañantes); el plan aplica reglas más simples (solo fechas futuras para liberar, mes siguiente abierto, etc.).
+- **Cache/Redis** e índices específicos de este documento: se implementarán según necesidad; el plan no los exige por defecto.
+- **Keep-alive** y optimizaciones de cold start: útiles en producción; fuera del alcance del plan de reservas actual.
+
+**🎉 El sistema actual se implementa según reservas-especificacion.md y reservas-plan-tareas.md. Este documento sirve como referencia técnica y banco de ideas para evoluciones futuras.**

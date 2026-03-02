@@ -115,26 +115,27 @@ aachiloe/
 
 ## 🏊‍♂️ **SISTEMA DE RESERVAS - EN DESARROLLO**
 
+### 📄 **Planificación actualizada (Marzo 2025)**
+- **Especificación funcional**: [reservas-especificacion.md](reservas-especificacion.md) — Panel usuario (calendario, liberar cupos, nueva reserva, precios socio/no socio, reembolsos) y panel admin (Registro Piscina, apertura mes, cancelación con reembolsos).
+- **Plan de tareas**: [reservas-plan-tareas.md](reservas-plan-tareas.md) — Tareas API y Frontend con inconsistencias detectadas y orden de implementación sugerido.
+
 ### ✅ **Base Implementada**
-- **Modelos de datos** completos
+- **Modelos de datos** completos (Reservation, SwimmingSchedule, PaymentRecord)
 - **Controllers básicos** para CRUD
 - **Validación de capacidad** por horario
 - **Control de reservas duplicadas**
 - **Estados de reserva** (PENDING, CONFIRMED, CANCELLED, COMPLETED)
 
 ### 🚧 **En Desarrollo (Fase 3)**
-- **Panel de usuario** para reservas
-- **Visualización de horarios** disponibles
-- **Creación de reservas** múltiples
-- **Historial de reservas** del usuario
-- **Integración completa** con API existente
+- **Panel de usuario** para reservas (calendario mensual, liberar cupos, nueva reserva según especificación)
+- **Registro Piscina** (admin): calendario cupos x/y, apertura mes siguiente, cancelación con reembolsos
+- **Integración** con API existente y nuevos endpoints según plan de tareas
 
-### 📋 **Pendiente (Fases 4-6)**
-- **Panel administrativo** de gestión
-- **Sistema de pagos** y confirmaciones
-- **Notificaciones automáticas** por email
-- **Calendario público** con eventos reales
-- **Galería completa** con Google Drive
+### 📋 **Pendiente (alineado a reservas-plan-tareas.md)**
+- Modelos: días disponibles por mes, reembolsos por cancelación admin, socio/no socio y precios
+- Endpoints: calendario usuario, can-reserve, liberar cupos, nueva reserva, calendario admin, apertura/cancelación mes
+- Frontend: página principal reservas, menú unificado, flujos con modales, página Registro Piscina
+- Email con detalle a pagar tras confirmar reserva
 
 ---
 

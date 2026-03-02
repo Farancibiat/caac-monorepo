@@ -55,6 +55,7 @@
    - Estado de pagos
    - Cancelación de reservas
    - Notificaciones de confirmación
+   - *Especificación detallada y plan de tareas*: ver `.cursor/reservas-especificacion.md` y `.cursor/reservas-plan-tareas.md`
 
 #### Panel de Administrador/Tesorero 🎯 *PRIORIDAD ALTA*
 1. **Gestión de Socios**
@@ -62,12 +63,13 @@
    - Gestionar usuarios activos
    - Roles y permisos
 
-2. **Gestión de Reservas** 🚀 *CRÍTICO*
+2. **Gestión de Reservas (Registro Piscina)** 🚀 *CRÍTICO*
    - Confirmar reservas de piscina
    - Gestionar pagos
    - Reportes de uso
-   - Dashboard de ocupación
-   - Gestión de horarios disponibles
+   - Dashboard de ocupación (cupos x/y por día)
+   - Apertura del mes siguiente y cancelación de días con reembolsos
+   - *Detalle*: `.cursor/reservas-especificacion.md` y `.cursor/reservas-plan-tareas.md`
 
 ## Modelo de Datos
 
