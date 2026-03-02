@@ -3,7 +3,10 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { ROUTES } from '@/config/routes'
 import { isAuthRoute, isAdminRoute } from '@/lib/route-utils'
 
-const createMiddlewareSupabaseClient = (request: NextRequest) => {
+/** Holder para la respuesta del middleware; setAll de Supabase la actualiza con cookies de sesión */
+type ResponseHolder = { current: NextResponse }
+
+const createMiddlewareSupabaseClient = (request: NextRequest, responseHolder: ResponseHolder) => {
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -12,13 +15,10 @@ const createMiddlewareSupabaseClient = (request: NextRequest) => {
         getAll() {
           return request.cookies.getAll()
         },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-          const newResponse = NextResponse.next({
-            request,
-          })
+        setAll(cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[]) {
+          responseHolder.current = NextResponse.next({ request })
           cookiesToSet.forEach(({ name, value, options }) =>
-            newResponse.cookies.set(name, value, options)
+            responseHolder.current.cookies.set(name, value, options)
           )
         },
       },
@@ -118,99 +118,104 @@ export const middleware = async (request: NextRequest) => {
   const isCompleteProfileRouteCheck = pathname.startsWith('/app/complete-profile')
   const isOAuthRedirect = isFromOAuthRedirect(request)
 
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  });
-  
-  response = addSecurityHeaders(response, request);
+  const responseHolder: ResponseHolder = {
+    current: NextResponse.next({ request }),
+  }
+  let response = responseHolder.current
+  response = addSecurityHeaders(response, request)
 
   // Si es una ruta pública (ni protegida ni de auth), permitir acceso directo
   if (!isProtectedRoute && !isAuthRouteCheck) {
-    return response;
+    return response
+  }
+
+  const copyCookiesToResponse = (target: NextResponse) => {
+    responseHolder.current.cookies.getAll().forEach((c) => {
+      target.cookies.set(c.name, c.value)
+    })
   }
 
   // Si es una ruta de autenticación, manejar lógica específica sin validación completa
   if (isAuthRouteCheck) {
     try {
-      const supabase = createMiddlewareSupabaseClient(request)
+      const supabase = createMiddlewareSupabaseClient(request, responseHolder)
       const { user } = await getUserWithRetry(supabase, request)
-      
-      // Si ya hay usuario autenticado, redirigir al dashboard
+      response = responseHolder.current
+      response = addSecurityHeaders(response, request)
+
       if (user) {
         const redirectTo = request.nextUrl.searchParams.get(ROUTES.PARAMS.REDIRECT_TO) || ROUTES.DASHBOARD
-        const redirectResponse = NextResponse.redirect(new URL(redirectTo, request.url));
-        return addSecurityHeaders(redirectResponse, request);
+        const redirectResponse = NextResponse.redirect(new URL(redirectTo, request.url))
+        copyCookiesToResponse(redirectResponse)
+        return addSecurityHeaders(redirectResponse, request)
       }
     } catch {
       // En caso de error en rutas de auth, permitir acceso de todos modos
     }
-    
-    // Permitir acceso a las rutas de autenticación
     return response
   }
 
   // Para rutas protegidas, hacer validación completa
   if (isProtectedRoute) {
     try {
-      const supabase = createMiddlewareSupabaseClient(request)
-    
-      // Usar retry logic si detectamos OAuth redirect
+      const supabase = createMiddlewareSupabaseClient(request, responseHolder)
       const { user, error: userError } = await getUserWithRetry(supabase, request)
-      
+      response = responseHolder.current
+      response = addSecurityHeaders(response, request)
+
       if (userError && !isOAuthRedirect) {
         clearSupabaseCookies(request, response)
       }
 
       if (!user) {
-        // Si es un OAuth redirect y no encontramos usuario, ser más tolerante
         if (isOAuthRedirect) {
           response.headers.set('X-Auth-Required', 'oauth-pending')
           return response
         }
-        
-        const loginUrl = new URL(ROUTES.AUTH.LOGIN, request.url);
-        loginUrl.searchParams.set(ROUTES.PARAMS.REDIRECT_TO, pathname);
-        loginUrl.searchParams.set(ROUTES.PARAMS.REASON, 'authentication_required');
-        return NextResponse.redirect(loginUrl)
+        const loginUrl = new URL(ROUTES.AUTH.LOGIN, request.url)
+        loginUrl.searchParams.set(ROUTES.PARAMS.REDIRECT_TO, pathname)
+        loginUrl.searchParams.set(ROUTES.PARAMS.REASON, 'authentication_required')
+        const redirectResponse = NextResponse.redirect(loginUrl)
+        copyCookiesToResponse(redirectResponse)
+        return addSecurityHeaders(redirectResponse, request)
       }
 
       const supabaseUser = user as { email_confirmed_at?: string; user_metadata?: Record<string, unknown> }
 
       if (!supabaseUser.email_confirmed_at) {
-        const resendConfirmationUrl = new URL(ROUTES.AUTH.RESEND_CONFIRMATION, request.url);
-        resendConfirmationUrl.searchParams.set(ROUTES.PARAMS.REDIRECT_TO, pathname);
-        resendConfirmationUrl.searchParams.set(ROUTES.PARAMS.REASON, 'email_not_confirmed');
-        return NextResponse.redirect(resendConfirmationUrl);
+        const resendConfirmationUrl = new URL(ROUTES.AUTH.RESEND_CONFIRMATION, request.url)
+        resendConfirmationUrl.searchParams.set(ROUTES.PARAMS.REDIRECT_TO, pathname)
+        resendConfirmationUrl.searchParams.set(ROUTES.PARAMS.REASON, 'email_not_confirmed')
+        const redirectResponse = NextResponse.redirect(resendConfirmationUrl)
+        copyCookiesToResponse(redirectResponse)
+        return addSecurityHeaders(redirectResponse, request)
       }
 
       if (!isCompleteProfileRouteCheck) {
         const userMetadata = supabaseUser.user_metadata || {}
         const profileCompleted = userMetadata.profileCompleted === true
-        
         if (!profileCompleted) {
-          const completeProfileUrl = new URL(ROUTES.PROFILE.COMPLETE, request.url);
-          completeProfileUrl.searchParams.set(ROUTES.PARAMS.REDIRECT_TO, pathname);
-          completeProfileUrl.searchParams.set(ROUTES.PARAMS.REASON, 'profile_incomplete');
-          return NextResponse.redirect(completeProfileUrl);
+          const completeProfileUrl = new URL(ROUTES.PROFILE.COMPLETE, request.url)
+          completeProfileUrl.searchParams.set(ROUTES.PARAMS.REDIRECT_TO, pathname)
+          completeProfileUrl.searchParams.set(ROUTES.PARAMS.REASON, 'profile_incomplete')
+          const redirectResponse = NextResponse.redirect(completeProfileUrl)
+          copyCookiesToResponse(redirectResponse)
+          return addSecurityHeaders(redirectResponse, request)
         }
       }
-      
-      return response
 
+      return response
     } catch {
-      // Si es OAuth redirect y hay error, permitir que pase para manejo client-side
       if (isOAuthRedirect) {
         response.headers.set('X-Auth-Required', 'oauth-error')
         return response
       }
-      
-      const loginUrl = new URL(ROUTES.AUTH.LOGIN, request.url);
-      loginUrl.searchParams.set(ROUTES.PARAMS.REDIRECT_TO, pathname);
-      loginUrl.searchParams.set(ROUTES.PARAMS.REASON, 'middleware_error');
-      const errorResponse = NextResponse.redirect(loginUrl);
-      return addSecurityHeaders(errorResponse, request);
+      const loginUrl = new URL(ROUTES.AUTH.LOGIN, request.url)
+      loginUrl.searchParams.set(ROUTES.PARAMS.REDIRECT_TO, pathname)
+      loginUrl.searchParams.set(ROUTES.PARAMS.REASON, 'middleware_error')
+      const errorResponse = NextResponse.redirect(loginUrl)
+      copyCookiesToResponse(errorResponse)
+      return addSecurityHeaders(errorResponse, request)
     }
   }
 
