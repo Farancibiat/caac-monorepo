@@ -120,8 +120,11 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ mode, onSuccess }) => {
   const onSubmit = async (data: ProfileSchemaType) => {
     try {
       const submitData = transformFormToApi(data, getClubIdByName);
-      
-      const response = await reqClient.put('/api/user/profile', submitData);
+
+      const response =
+        mode === 'registro'
+          ? await reqClient.post('/api/user/profile', submitData)
+          : await reqClient.put('/api/user/profile', submitData);
       
       if (!response.ok) {
         throw new Error(response.error || 'Error al guardar el perfil');

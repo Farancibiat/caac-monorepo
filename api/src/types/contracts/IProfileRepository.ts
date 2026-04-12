@@ -8,6 +8,9 @@ export type ProfileWithRelations = Profile & {
   user: Pick<User, 'email' | 'name' | 'avatar_url'>;
 };
 
+/** Alineado con enum `Sexo` en Prisma y validación Zod del API */
+export type ProfileSexo = 'masculino' | 'femenino' | 'otro';
+
 /**
  * Tipo para datos de creación/actualización de perfil
  */
@@ -15,12 +18,13 @@ export type ProfileData = {
   nombre: string;
   primerApellido: string;
   segundoApellido?: string;
-  fechaNacimiento: Date;
+  /** ISO string (Zod) o Date según origen */
+  fechaNacimiento: Date | string;
   telefono: string;
   direccion: string;
   comuna: string;
   region: string;
-  sexo: 'MASCULINO' | 'FEMENINO' | 'OTRO';
+  sexo: ProfileSexo;
   clubId?: number;
 };
 
