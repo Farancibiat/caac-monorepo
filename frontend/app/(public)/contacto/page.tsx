@@ -20,8 +20,8 @@ const ContactoPage = () => {
     {
       icono: <Phone className="h-6 w-6 text-primary-600" />,
       titulo: "Teléfono",
-      detalle: "+56 9 4290 6301",
-      accion: "tel:+56942906301"
+      detalle: "+56 9 5783 1734",
+      accion: "tel:+56957831734"
     },
     {
       icono: <MapPin className="h-6 w-6 text-primary-600" />,

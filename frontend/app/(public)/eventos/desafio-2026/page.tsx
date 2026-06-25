@@ -5,8 +5,6 @@ import { Calendar, MapPin, Users, Clock, ExternalLink, FileText } from 'lucide-r
 import Image from 'next/image'
 import Link from 'next/link'
 import { Metadata } from 'next'
-import imagenDesafioAguas from '@/assets/DSC_0666.JPG';
-
 const eventoDesafio2026 = {
   titulo: '3er Desafío Unión de las Islas de Quinched',
   fecha: '4 y 5 de Abril, 2026',
@@ -51,7 +49,7 @@ const eventoDesafio2026 = {
   ],
 
   imagenes: [
-    { src: imagenDesafioAguas, alt: 'Competencia de aguas abiertas con nadadores, boyas de seguridad y embarcaciones de apoyo' },
+    { src: '/assets/DSC_0666.jpg', alt: 'Competencia de aguas abiertas con nadadores, boyas de seguridad y embarcaciones de apoyo' },
     { src: '/assets/partida desafio.webp', alt: 'Partida del Desafío Unión de las Islas en Quinched' },
   ] as const,
 }

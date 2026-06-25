@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600" role="img" aria-label="Sin imagen">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e0f2fe"/>
+      <stop offset="100%" style="stop-color:#dbeafe"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#g)"/>
+  <g fill="#64748b" font-family="system-ui,sans-serif" text-anchor="middle">
+    <text x="400" y="290" font-size="22">Imagen pr�ximamente</text>
+    <text x="400" y="330" font-size="14" opacity="0.8">01.webp / 02.webp / 03.webp en public/images/eventos/&lt;slug&gt;/</text>
+  </g>
+</svg>

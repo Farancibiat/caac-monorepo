@@ -1,98 +1,97 @@
 import Link from 'next/link'
-import { ROUTES } from '@/config/routes'
+import Image from 'next/image'
+import { MapPin, Mail } from 'lucide-react'
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="bg-neutral-900 text-neutral-300 py-8 mt-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Club Info */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-white">
-              Club de Aguas Abiertas Chiloé
-            </h3>
-            <p className="text-sm text-neutral-400">
-              Promoviendo la natación en aguas abiertas en el archipiélago de Chiloé.
-            </p>
-          </div>
+    <footer className="mt-auto text-neutral-300">
+      {/* Franja de acento superior */}
+      <div className="h-1 w-full bg-club-gradient" />
 
-          {/* Quick Links */}
-          <div className="space-y-4">
-            <h4 className="text-base font-semibold text-white">Enlaces Rápidos</h4>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link href={ROUTES.EVENTOS} className="hover:text-primary-400 transition-colors">
-                  Eventos
-                </Link>
-              </li>
-              <li>
-                <Link href={ROUTES.GALERIA} className="hover:text-primary-400 transition-colors">
-                  Galería
-                </Link>
-              </li>
-              <li>
-                <Link href={ROUTES.NOSOTROS} className="hover:text-primary-400 transition-colors">
-                  Nosotros
-                </Link>
-              </li>
-              <li>
-                <Link href={ROUTES.CONTACTO} className="hover:text-primary-400 transition-colors">
-                  Contacto
-                </Link>
-              </li>
-            </ul>
-          </div>
+      <div className="bg-gradient-to-b from-neutral-900 to-neutral-950 shadow-inner">
+        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
+            {/* Marca */}
+            <div className="space-y-4">
+              <div className="inline-block rounded-2xl bg-white/95 p-3 shadow-lg">
+                <Image
+                  src="/assets/logo.png"
+                  alt="Club de Aguas Abiertas Chiloé"
+                  width={88}
+                  height={88}
+                  className="h-20 w-20 object-contain"
+                />
+              </div>
+              <p className="max-w-md text-sm leading-relaxed text-neutral-400">
+                Promoviendo la natación en aguas abiertas en el archipiélago de Chiloé.
+                Una comunidad que entrena, compite y vive el mar del sur.
+              </p>
+            </div>
 
-          {/* Contact Info */}
-          <div className="space-y-4">
-            <h4 className="text-base font-semibold text-white">Contacto</h4>
-            <div className="text-sm text-neutral-400 space-y-1">
-              <p>Chiloé, Chile</p>
-              <p>Email: contacto@aguasabiertaschiloe.cl</p>
+            {/* Contacto */}
+            <div className="space-y-4 md:justify-self-end">
+              <h4 className="text-base font-semibold text-white">Contacto</h4>
+              <div className="space-y-3 text-sm">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-800 text-primary-400">
+                    <MapPin className="h-4 w-4" />
+                  </span>
+                  <span className="text-neutral-300">Chiloé, Chile</span>
+                </div>
+                <a
+                  href="mailto:contacto@aguasabiertaschiloe.cl"
+                  className="group flex items-center gap-3"
+                >
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-800 text-primary-400 transition-colors group-hover:bg-primary-600 group-hover:text-white">
+                    <Mail className="h-4 w-4" />
+                  </span>
+                  <span className="text-neutral-300 transition-colors group-hover:text-primary-400">
+                    contacto@aguasabiertaschiloe.cl
+                  </span>
+                </a>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Legal Links Section */}
-        <div className="border-t border-neutral-800 mt-6 pt-4">
-          <div className="flex flex-wrap justify-center gap-6 text-sm">
-            <Link 
-              href="/politica-privacidad" 
-              className="text-neutral-400 hover:text-primary-400 transition-colors"
-            >
-              Política de Privacidad
-            </Link>
-            <Link 
-              href="/terminos-servicio" 
-              className="text-neutral-400 hover:text-primary-400 transition-colors"
-            >
-              Términos de Servicio
-            </Link>
-          </div>
-        </div>
+          {/* Barra legal + crédito */}
+          <div className="mt-10 flex flex-col gap-4 border-t border-neutral-800 pt-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
+              <Link
+                href="/politica-privacidad"
+                className="text-neutral-400 transition-colors hover:text-primary-400"
+              >
+                Política de Privacidad
+              </Link>
+              <Link
+                href="/terminos-servicio"
+                className="text-neutral-400 transition-colors hover:text-primary-400"
+              >
+                Términos de Servicio
+              </Link>
+            </div>
 
-        {/* Bottom Section */}
-        <div className="border-t border-neutral-800 mt-4 pt-6 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
-          <div className="text-sm text-neutral-400">
-            © {currentYear} Club de Aguas Abiertas Chiloé.
+            <div className="text-sm text-neutral-500">
+              Desarrollado por{' '}
+              <Link
+                href="https://www.farancibiat.cl"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-primary-400 transition-colors hover:text-primary-300"
+              >
+                Farancibiat
+              </Link>
+            </div>
           </div>
-          
-          <div className="text-sm text-neutral-400">
-            Desarrollado por{' '}
-            <Link 
-              href="https://www.farancibiat.cl" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-primary-400 hover:text-primary-300 transition-colors font-medium"
-            >
-              Farancibiat
-            </Link>
-          </div>
+
+          <p className="mt-4 text-center text-xs text-neutral-600 sm:text-left">
+            © {currentYear} Club de Aguas Abiertas Chiloé. Todos los derechos reservados.
+          </p>
         </div>
       </div>
     </footer>
   )
-} 
-export default Footer;
+}
+
+export default Footer

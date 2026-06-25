@@ -1,0 +1,120 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+.container { padding: 1rem 0; }
+.filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.filter-btn { border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-secondary); padding: 5px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; transition: all 0.15s; }
+.filter-btn.active { background: var(--color-background-info); color: var(--color-text-info); border-color: var(--color-border-info); }
+.filter-btn:hover:not(.active) { background: var(--color-background-secondary); }
+.count-bar { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 1rem; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; padding: 0 10px 8px; text-align: left; border-bottom: 0.5px solid var(--color-border-tertiary); }
+tbody tr { border-bottom: 0.5px solid var(--color-border-tertiary); }
+tbody tr:hover { background: var(--color-background-secondary); }
+tbody td { padding: 9px 10px; vertical-align: top; color: var(--color-text-primary); line-height: 1.4; }
+td.fecha { white-space: nowrap; font-size: 12px; color: var(--color-text-secondary); min-width: 90px; }
+td.nombre { font-weight: 500; }
+td.nombre a { color: var(--color-text-info); text-decoration: none; }
+td.nombre a:hover { text-decoration: underline; }
+td.loc { color: var(--color-text-secondary); font-size: 12px; }
+.badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+.badge-aa { background: #E1F5EE; color: #0F6E56; }
+.badge-pi { background: #E6F1FB; color: #185FA5; }
+.badge-tri { background: #EEEDFE; color: #534AB7; }
+.badge-ge { background: #FAECE7; color: #993C1D; }
+.dist { font-size: 12px; color: var(--color-text-secondary); }
+.nota { font-size: 11px; color: var(--color-text-warning); margin-top: 2px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+</style>
+
+<h2 class="sr-only">Calendario de eventos de natación, aguas abiertas y triatlón 2026 — listado filtrable por tipo</h2>
+<div class="container">
+<div class="filters">
+  <button class="filter-btn active" data-filter="all">Todos</button>
+  <button class="filter-btn" data-filter="aa">🌊 Aguas Abiertas</button>
+  <button class="filter-btn" data-filter="pi">🏊 Piscina</button>
+  <button class="filter-btn" data-filter="tri">🚴 Triatlón</button>
+  <button class="filter-btn" data-filter="ge">🧊 Aguas Gélidas</button>
+</div>
+<div class="count-bar" id="count-bar">Mostrando <strong id="count">30</strong> eventos</div>
+<table>
+  <thead>
+    <tr>
+      <th>Fecha</th>
+      <th>Nombre del Evento</th>
+      <th>Ubicación</th>
+      <th>Tipo</th>
+      <th>Distancias</th>
+    </tr>
+  </thead>
+  <tbody id="tbody"></tbody>
+</table>
+</div>
+
+<script>
+const eventos = [
+  { fecha:"29 Jun 2026", nombre:"Campeonato Natación Castro", link:"https://www.instagram.com/deportesyjuventudcastro", loc:"Castro, Chiloé", tipo:"pi", badge:"Piscina", dist:"50m / 100m / 200m / Relevos", nota:"Recién publicado · @deportesyjuventudcastro" },
+  { fecha:"01–09 Ago 2026", nombre:"Winter Swimming World Cup – Glaciar Perito Moreno (IV Edición)", link:"https://nadando.org/producto/winter-swimming-world-cup-2026-glaciar-perito-moreno/", loc:"El Calafate, Argentina", tipo:"ge", badge:"Aguas Gélidas", dist:"50m / 100m / 200m / 500m crol y pecho + aguas abiertas en Lago Argentino", nota:"Agua ~0–3°C frente al glaciar · sin neopreno" },
+  { fecha:"23–26 Jul 2026", nombre:"Campeonato Nacional Master y Pre-Master Invierno 2026 (Fechida)", link:"https://registro.fechida.org/", loc:"Centro Acuático Kristel Köbrich, Santiago", tipo:"pi", badge:"Piscina", dist:"Piscina 50m cubierta", nota:"" },
+  { fecha:"01–05 Jul 2026", nombre:"Campeonato Nacional de Categorías Invierno 2026 (Fechida)", link:"https://fechida.cl/campeonatos-natacion/campeonato-info?id=412", loc:"Centro Acuático Kristel Köbrich, Santiago", tipo:"pi", badge:"Piscina", dist:"Piscina 50m", nota:"" },
+  { fecha:"21 Jun 2026", nombre:"Natación Aguas Frías – Lago Puyehue", link:"https://www.swimchile.cl/nuevo-calendario/", loc:"Lago Puyehue, Los Lagos", tipo:"aa", badge:"Aguas Abiertas", dist:"Por definir", nota:"ConquistaChile" },
+  { fecha:"13 Jun 2026", nombre:"VI Copa Santiago Deporte", link:"https://www.swimchile.cl/nuevo-calendario/", loc:"Santiago", tipo:"pi", badge:"Piscina", dist:"Piscina 50m", nota:"Santiago Deporte" },
+  { fecha:"18–21 Jun 2026", nombre:"Campeonato Nacional Infantil Invierno 2026 (Fechida)", link:"https://fechida.cl/campeonatos-natacion/campeonato-info?id=405", loc:"Centro Acuático Kristel Köbrich, Santiago", tipo:"pi", badge:"Piscina", dist:"Piscina 50m", nota:"" },
+  { fecha:"22 Ago 2026", nombre:"SEA MAN Open Water Concón 2026", link:"https://triatletas.cl/seaman-concon-2026/", loc:"Playa Amarilla, Concón, V Región", tipo:"aa", badge:"Aguas Abiertas", dist:"1.5K y 3K", nota:"Triatletas.cl" },
+  { fecha:"22 Ago 2026", nombre:"Natación Aguas Frías – San Pedro de La Paz", link:"https://www.swimchile.cl/nuevo-calendario/", loc:"San Pedro de La Paz", tipo:"aa", badge:"Aguas Abiertas", dist:"Por definir", nota:"ConquistaChile" },
+  { fecha:"23 Ago 2026", nombre:"Topman Concón 2026 – Triatlón", link:"https://triatletas.cl/topman-concon-2026/", loc:"Playa Amarilla, Concón, V Región", tipo:"tri", badge:"Triatlón", dist:"Sprint (0.75k/20k/5k) y Olímpico (1.5k/40k/10k)", nota:"Triatletas.cl" },
+  { fecha:"14–16 Ago 2026", nombre:"Campeonato Nacional de Desarrollo Invierno 2026 (Fechida)", link:"https://fechida.cl/campeonatos-natacion/campeonato-info?id=413", loc:"Centro Acuático Kristel Köbrich, Santiago", tipo:"pi", badge:"Piscina", dist:"Piscina 50m", nota:"" },
+  { fecha:"08 Ago 2026", nombre:"IV Copa del Maule (Master)", link:"https://www.swimchile.cl/nuevo-calendario/", loc:"Talca, Región del Maule", tipo:"pi", badge:"Piscina", dist:"Piscina 25m", nota:"FCHMN" },
+  { fecha:"22 Ago 2026", nombre:"VI Copa Master LQBLO", link:"https://www.swimchile.cl/nuevo-calendario/", loc:"Santiago", tipo:"pi", badge:"Piscina", dist:"Piscina 50m", nota:"LQBLO" },
+  { fecha:"05 Sep 2026", nombre:"VII Copa de Araucanía Natación Master", link:"https://www.swimchile.cl/nuevo-calendario/", loc:"Temuco, La Araucanía", tipo:"pi", badge:"Piscina", dist:"Piscina 25m", nota:"Master de Ñielol" },
+  { fecha:"05 Sep 2026", nombre:"SEA MAN Open Water Quillón 2026", link:"https://welcu.com/triatletas", loc:"Quillón, Región del Biobío", tipo:"aa", badge:"Aguas Abiertas", dist:"1.5K y 3K (aprox.)", nota:"Triatletas.cl" },
+  { fecha:"03–04 Oct 2026", nombre:"XVI Copa España Master", link:"https://www.swimchile.cl/nuevo-calendario/", loc:"Santiago (Estadio Español)", tipo:"pi", badge:"Piscina", dist:"Piscina 25m", nota:"" },
+  { fecha:"Oct 2026", nombre:"Tour Aguas Abiertas Calafquén", link:"https://www.swimchile.cl/nuevo-calendario/", loc:"Calafquén / Panguipulli", tipo:"aa", badge:"Aguas Abiertas", dist:"1K y 2.5K", nota:"@fullrunning · fecha exacta por confirmar" },
+  { fecha:"17 Oct 2026", nombre:"9ª Versión Aguas Abiertas (Aguas Abiertas Chile)", link:"https://www.swimchile.cl/nuevo-calendario/", loc:"Por definir", tipo:"aa", badge:"Aguas Abiertas", dist:"Por definir", nota:"" },
+  { fecha:"18 Oct 2026", nombre:"Topman Piedra Roja 2026 – Triatlón", link:"https://triatletas.cl/topman-piedra-roja-2026/", loc:"Chicureo, Región Metropolitana", tipo:"tri", badge:"Triatlón", dist:"51.0 y 25.5", nota:"Triatletas.cl" },
+  { fecha:"21–27 Oct 2026", nombre:"Campeonato Panamericano Master de Natación", link:"https://www.swimchile.cl/nuevo-calendario/", loc:"Buenos Aires, Argentina", tipo:"pi", badge:"Piscina", dist:"Piscina 50m cubierta", nota:"UANA" },
+  { fecha:"24 Oct 2026", nombre:"XIV Copa 4Estilos Master Providencia", link:"https://www.swimchile.cl/nuevo-calendario/", loc:"Santiago", tipo:"pi", badge:"Piscina", dist:"Piscina 50m", nota:"" },
+  { fecha:"31 Oct 2026", nombre:"SEA MAN Nocturno Rapel 2026", link:"https://triatletas.cl/seaman-nocturno-rapel-2026/", loc:"Rapel, Región de O'Higgins", tipo:"aa", badge:"Aguas Abiertas", dist:"2K (nocturno)", nota:"Triatletas.cl" },
+  { fecha:"Nov 2026", nombre:"Tour Aguas Abiertas Calafquén (2ª fecha)", link:"https://www.swimchile.cl/nuevo-calendario/", loc:"Calafquén / Panguipulli", tipo:"aa", badge:"Aguas Abiertas", dist:"1K y 2.5K", nota:"@fullrunning · fecha exacta por confirmar" },
+  { fecha:"01–02 Nov 2026", nombre:"Copa del Mundo de Triatlón San Pedro de la Paz 2026", link:"https://www.trichile.cl/calendario_nacional", loc:"San Pedro de la Paz, Biobío", tipo:"tri", badge:"Triatlón", dist:"Distancia olímpica", nota:"Fechitri" },
+  { fecha:"07 Nov 2026", nombre:"V Copa UC Master", link:"https://www.swimchile.cl/nuevo-calendario/", loc:"Santiago", tipo:"pi", badge:"Piscina", dist:"Piscina 50m", nota:"Universidad Católica" },
+  { fecha:"07–08 Nov 2026", nombre:"Copa del Mundo de Triatlón Iquique 2026", link:"https://www.trichile.cl/calendario_nacional", loc:"Iquique", tipo:"tri", badge:"Triatlón", dist:"Distancia olímpica", nota:"Fechitri" },
+  { fecha:"08 Nov 2026", nombre:"SEA MAN Open Water Zapallar 2026", link:"https://triatletas.cl/seaman-zapallar-2026/", loc:"Playa Zapallar, V Región", tipo:"aa", badge:"Aguas Abiertas", dist:"1.5K y 3K", nota:"Triatletas.cl" },
+  { fecha:"04–06 Dic 2026", nombre:"Natación Sin Fronteras", link:"https://www.swimchile.cl/nuevo-calendario/", loc:"Arica, Región de Arica y Parinacota", tipo:"pi", badge:"Piscina", dist:"Piscina 50m abierta", nota:"Mantarrayas de Arica" },
+  { fecha:"12 Dic 2026", nombre:"XII Copa Natación Recoleta", link:"https://www.swimchile.cl/nuevo-calendario/", loc:"Santiago", tipo:"pi", badge:"Piscina", dist:"Piscina 25m abierta", nota:"" },
+  { fecha:"19 Dic 2026", nombre:"SEA MAN Open Water Rapel 2026 (nocturno)", link:"https://triatletas.cl/seaman-nocturno-rapel-2026/", loc:"Rapel, Región de O'Higgins", tipo:"aa", badge:"Aguas Abiertas", dist:"2K", nota:"Triatletas.cl · 2ª fecha Rapel" },
+];
+
+const badgeClass = { aa:"badge-aa", pi:"badge-pi", tri:"badge-tri", ge:"badge-ge" };
+const tbody = document.getElementById("tbody");
+const countEl = document.getElementById("count");
+let current = "all";
+
+function render(filter){
+  const filtered = filter==="all" ? eventos : eventos.filter(e=>e.tipo===filter);
+  countEl.textContent = filtered.length;
+  tbody.innerHTML = filtered.map(e=>`
+    <tr data-tipo="${e.tipo}">
+      <td class="fecha">${e.fecha}</td>
+      <td class="nombre">
+        ${e.link ? `<a href="${e.link}" target="_blank">${e.nombre}</a>` : e.nombre}
+        ${e.nota ? `<div class="nota">${e.nota}</div>` : ""}
+      </td>
+      <td class="loc">${e.loc}</td>
+      <td><span class="badge ${badgeClass[e.tipo]}">${e.badge}</span></td>
+      <td class="dist">${e.dist}</td>
+    </tr>`).join("");
+}
+
+document.querySelectorAll(".filter-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    current = btn.dataset.filter;
+    render(current);
+  });
+});
+
+render("all");
+</script>
