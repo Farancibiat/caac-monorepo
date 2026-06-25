@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Trophy, Crown } from 'lucide-react'
 import { calcularRecordsQuinched, recordsGenerales, type RecordQuinched } from '@/lib/records-quinched'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button'
 import { distanciaRowClass, distanciaAccent, ordenCategoria } from '@/lib/distancia-estilos'
 import { cn } from '@/lib/shadcn-utils'
+import type { ResultadoDesafioFila } from '@/types/evento-historico'
 
 // Cards de records generales: de mayor a menor distancia
 const DISTANCIAS = ['3,5 km', '1,3 km', '0,5 km']
@@ -27,7 +28,23 @@ const RecordCard = ({ record }: { record?: RecordQuinched }) => {
 }
 
 const RecordsQuinched = () => {
-  const records = useMemo(() => calcularRecordsQuinched(), [])
+  // Datos por año desde la planilla (fallback: estáticos vía calcularRecordsQuinched()).
+  const [porAnio, setPorAnio] = useState<Record<string, ResultadoDesafioFila[]> | null>(null)
+
+  useEffect(() => {
+    let activo = true
+    fetch('/api/resultados')
+      .then((r) => r.json())
+      .then((data: { resultados?: Record<string, ResultadoDesafioFila[]> }) => {
+        if (activo && data.resultados) setPorAnio(data.resultados)
+      })
+      .catch(() => {/* se mantiene el fallback estático */})
+    return () => {
+      activo = false
+    }
+  }, [])
+
+  const records = useMemo(() => calcularRecordsQuinched(porAnio ?? undefined), [porAnio])
   const generales = useMemo(() => recordsGenerales(records), [records])
 
   const [distancia, setDistancia] = useState(TODOS)

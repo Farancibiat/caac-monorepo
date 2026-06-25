@@ -21,15 +21,22 @@ interface EntradaConAnio extends ResultadoDesafioFila {
   anio: number
 }
 
-export function calcularRecordsQuinched(): RecordQuinched[] {
-  const desafios: Array<{ id: '2023' | '2024' | '2026'; anio: number }> = [
-    { id: '2023', anio: 2023 },
-    { id: '2024', anio: 2024 },
-    { id: '2026', anio: 2026 },
-  ]
+/**
+ * Calcula los records. Recibe los resultados por año; si no se pasan, usa los
+ * datos estáticos (fallback) de 2023/2024/2026.
+ */
+export function calcularRecordsQuinched(
+  porAnio?: Record<string, ResultadoDesafioFila[]>
+): RecordQuinched[] {
+  const fuente: Record<string, ResultadoDesafioFila[]> =
+    porAnio ?? {
+      '2023': getResultadosPorDesafio('2023'),
+      '2024': getResultadosPorDesafio('2024'),
+      '2026': getResultadosPorDesafio('2026'),
+    }
 
-  const todos: EntradaConAnio[] = desafios.flatMap(({ id, anio }) =>
-    getResultadosPorDesafio(id).map((r) => ({ ...r, anio }))
+  const todos: EntradaConAnio[] = Object.entries(fuente).flatMap(([anio, filas]) =>
+    filas.map((r) => ({ ...r, anio: Number(anio) }))
   )
 
   // Mejor por (distancia, categoria, genero)

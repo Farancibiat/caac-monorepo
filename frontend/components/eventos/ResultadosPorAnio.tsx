@@ -1,18 +1,38 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { YearTabs } from '@/components/ui/YearTabs'
 import { ResultadosDesafioTable } from '@/components/eventos/ResultadosDesafioTable'
-import { getResultadosPorDesafio } from '@/data/resultados'
-import type { DesafioResultadosId } from '@/types/evento-historico'
+import { getResultadosPorDesafio, desafiosConResultados } from '@/data/resultados'
+import type { ResultadoDesafioFila } from '@/types/evento-historico'
 
-const ANIOS: DesafioResultadosId[] = ['2023', '2024', '2026']
+// Fallback estático (datos JSON) si la planilla no está disponible.
+const FALLBACK: { anios: string[]; resultados: Record<string, ResultadoDesafioFila[]> } = {
+  anios: [...desafiosConResultados],
+  resultados: Object.fromEntries(desafiosConResultados.map((a) => [a, getResultadosPorDesafio(a)])),
+}
 
 const ResultadosPorAnio = () => {
   const [anio, setAnio] = useState<string | null>(null)
+  const [fuente, setFuente] = useState(FALLBACK)
 
-  const tabs = ANIOS.map((a) => ({ key: a, label: a }))
-  const data = anio ? getResultadosPorDesafio(anio as DesafioResultadosId) : []
+  useEffect(() => {
+    let activo = true
+    fetch('/api/resultados')
+      .then((r) => r.json())
+      .then((data: { anios?: string[]; resultados?: Record<string, ResultadoDesafioFila[]> }) => {
+        if (activo && data.anios?.length && data.resultados) {
+          setFuente({ anios: data.anios, resultados: data.resultados })
+        }
+      })
+      .catch(() => {/* se mantiene el fallback */})
+    return () => {
+      activo = false
+    }
+  }, [])
+
+  const tabs = useMemo(() => fuente.anios.map((a) => ({ key: a, label: a })), [fuente])
+  const data = anio ? fuente.resultados[anio] ?? [] : []
 
   return (
     <YearTabs
