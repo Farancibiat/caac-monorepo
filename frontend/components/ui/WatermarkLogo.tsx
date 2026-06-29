@@ -9,7 +9,7 @@ interface WatermarkLogoProps {
 const WatermarkLogo = ({ className }: WatermarkLogoProps) => (
   // eslint-disable-next-line @next/next/no-img-element
   <img
-    src="/assets/logo.png"
+    src="/assets/circular-transparent.svg"
     alt=""
     aria-hidden="true"
     draggable={false}

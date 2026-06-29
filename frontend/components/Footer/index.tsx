@@ -17,7 +17,7 @@ const Footer = () => {
             <div className="space-y-4">
               <div className="inline-block rounded-2xl bg-white/95 p-3 shadow-lg">
                 <Image
-                  src="/assets/logo.png"
+                  src="/assets/circular-white.svg"
                   alt="Club de Aguas Abiertas Chiloé"
                   width={88}
                   height={88}

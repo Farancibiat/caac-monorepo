@@ -10,7 +10,7 @@ const PrivateNotFound = () => {
         <div className="flex flex-col items-center space-y-6 md:hidden">
           <div className="flex justify-center">
             <Image
-              src="/assets/logo.png"
+              src="/assets/circular-transparent.svg"
               alt="Club de Aguas Abiertas Chiloé"
               width={80}
               height={80}
@@ -46,7 +46,7 @@ const PrivateNotFound = () => {
           {/* Logo Section */}
           <div className="flex-shrink-0">
             <Image
-              src="/assets/logo.png"
+              src="/assets/circular-transparent.svg"
               alt="Club de Aguas Abiertas Chiloé"
               width={120}
               height={120}

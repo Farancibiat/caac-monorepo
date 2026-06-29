@@ -11,7 +11,7 @@ export const runtime = 'nodejs'
 let logoBuffer: Buffer | null = null
 const getLogo = () => {
   if (!logoBuffer) {
-    logoBuffer = readFileSync(path.join(process.cwd(), 'public', 'assets', 'logo.png'))
+    logoBuffer = readFileSync(path.join(process.cwd(), 'public', 'assets', 'circular-transparent.svg'))
   }
   return logoBuffer
 }

@@ -78,7 +78,7 @@ const NavBar = () => {
                   : "h-12 w-36 sm:h-14 sm:w-40 lg:h-16 lg:w-48"
               )}>
                 <Image
-                  src="/assets/logo horizontal.png"
+                  src="/assets/horizontal-white.svg"
                   alt="Club de Aguas Abiertas Chiloé"
                   fill
                   sizes="(max-width: 640px) 144px, (max-width: 1024px) 160px, 192px"

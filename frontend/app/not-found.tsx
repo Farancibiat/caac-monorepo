@@ -17,7 +17,7 @@ const PublicNotFound = () => {
           <div className="flex flex-col items-center space-y-8 md:hidden">
             <div className="flex justify-center">
               <Image
-                src="/assets/logo.png"
+                src="/assets/circular-transparent.svg"
                 alt="Club de Aguas Abiertas Chiloé"
                 width={120}
                 height={120}
@@ -53,7 +53,7 @@ const PublicNotFound = () => {
             {/* Logo Section */}
             <div className="flex-shrink-0">
               <Image
-                src="/assets/logo.png"
+                src="/assets/circular-transparent.svg"
                 alt="Club de Aguas Abiertas Chiloé"
                 width={200}
                 height={200}

@@ -7,7 +7,7 @@ const nextConfig = {
 
   // Asegura que el logo (leído por la ruta de descarga con watermark) se incluya en el bundle serverless.
   outputFileTracingIncludes: {
-    '/api/drive/download': ['./public/assets/logo.png'],
+    '/api/drive/download': ['./public/assets/circular-transparent.svg'],
   },
 
   images: {

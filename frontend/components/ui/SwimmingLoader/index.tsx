@@ -81,7 +81,7 @@ const SwimmingLoader: React.FC<SwimmingLoaderProps> = ({
           >
             <div className="animate-breathing">
               <Image
-                src="/assets/logo.png"
+                src="/assets/circular-transparent.svg"
                 alt="Loading..."
                 width={size}
                 height={size}

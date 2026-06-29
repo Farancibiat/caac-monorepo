@@ -114,7 +114,7 @@ const NosotrosPage = () => {
               <div className="relative">
                 <div className="w-80 h-80 bg-gradient-to-br from-primary-200 to-ocean-200 rounded-xl flex items-center justify-center">
                   <Image
-                    src="/assets/logo.png"
+                    src="/assets/circular-transparent.svg"
                     alt="Logo Club de Aguas Abiertas Chiloé"
                     width={200}
                     height={200}

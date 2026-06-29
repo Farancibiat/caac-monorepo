@@ -47,7 +47,7 @@ const Home = () => {
               {/* Scrim difuso para que el texto 'Chiloé' del logo resalte */}
               <div className="absolute h-32 w-32 rounded-full bg-black/30 blur-xl sm:h-36 sm:w-36" />
               <Image
-                src="/assets/logo.png"
+                src="/assets/circular-transparent.svg"
                 alt="Logo Club de Aguas Abiertas Chiloé"
                 width={120}
                 height={120}

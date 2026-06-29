@@ -15,6 +15,12 @@ export const metadata: Metadata = {
   description: 'Club de Aguas Abiertas Chiloé. Reserva tu horario de piscina y únete a nuestros eventos.',
   keywords: ['natación', 'aguas abiertas', 'chiloé', 'club', 'piscina', 'reservas'],
   authors: [{ name: 'Club de Aguas Abiertas Chiloé' }],
+  icons: {
+    icon: [
+      { url: '/assets/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico' }, // fallback navegadores sin soporte SVG
+    ],
+  },
   openGraph: {
     type: 'website',
     locale: 'es_CL',
