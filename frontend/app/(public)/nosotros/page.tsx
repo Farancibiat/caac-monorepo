@@ -112,7 +112,6 @@ const NosotrosPage = () => {
             </div>
             <div className="flex justify-center">
               <div className="relative">
-                <div className="w-80 h-80 bg-gradient-to-br from-primary-200 to-ocean-200 rounded-xl flex items-center justify-center">
                   <Image
                     src="/assets/circular-transparent.svg"
                     alt="Logo Club de Aguas Abiertas Chiloé"
@@ -120,10 +119,6 @@ const NosotrosPage = () => {
                     height={200}
                     className="h-48 w-48"
                   />
-                </div>
-                <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-accent-200 rounded-full flex items-center justify-center">
-                  <span className="text-2xl font-bold text-accent-800">2022</span>
-                </div>
               </div>
             </div>
           </div>

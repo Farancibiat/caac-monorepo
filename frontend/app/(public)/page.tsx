@@ -47,7 +47,7 @@ const Home = () => {
               {/* Scrim difuso para que el texto 'Chiloé' del logo resalte */}
               <div className="absolute h-32 w-32 rounded-full bg-black/30 blur-xl sm:h-36 sm:w-36" />
               <Image
-                src="/assets/circular-transparent.svg"
+                src="/assets/circular-white.svg"
                 alt="Logo Club de Aguas Abiertas Chiloé"
                 width={120}
                 height={120}
@@ -201,7 +201,7 @@ const Home = () => {
         </section>
 
         {/* Calendario de Eventos */}
-        <section>
+        {/* <section>
           <div className="text-center space-y-4 mb-12">
             <h2 className="text-4xl font-bold text-primary-800">
               Calendario de Eventos
@@ -211,7 +211,7 @@ const Home = () => {
             </p>
           </div>
           <CalendarioEventos />
-        </section>
+        </section> */}
 
       </div>
     </div>

@@ -48,6 +48,7 @@ const NavBar = () => {
   const navigation = [
     { name: 'Inicio', href: ROUTES.HOME },
     { name: 'Eventos', href: ROUTES.EVENTOS },
+    { name: 'Desafío Quinched', href: ROUTES.DESAFIO_QUINCHED },
     { name: 'Galería', href: ROUTES.GALERIA },
     { name: 'Nosotros', href: ROUTES.NOSOTROS },
     { name: 'Contacto', href: ROUTES.CONTACTO },

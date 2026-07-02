@@ -1,18 +1,16 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { ROUTES } from '@/config/routes'
-import { RecordsQuinched } from '@/components/eventos/RecordsQuinched'
-import { ResultadosPorAnio } from '@/components/eventos/ResultadosPorAnio'
 import { CalendarioEventos } from '@/components/home/CalendarioEventos'
-import { Calendar, MapPin, Users, Waves, BarChart2 } from 'lucide-react'
+import { Calendar, MapPin, Trophy, Users, Waves, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Eventos',
   description:
-    'Próximas competencias y clínicas del Club de Aguas Abiertas Chiloé, historial con fotos y resultados de desafíos en Quinched.',
-  keywords: ['eventos', 'natación', 'aguas abiertas', 'chiloé', 'competencias', 'desafío Quinched'],
+    'Próximas competencias, clínicas y calendario anual del Club de Aguas Abiertas Chiloé.',
+  keywords: ['eventos', 'natación', 'aguas abiertas', 'chiloé', 'competencias', 'calendario'],
 }
 
 const EventosPage = () => {
@@ -24,12 +22,19 @@ const EventosPage = () => {
             Eventos y competencias
           </h1>
           <p className="mx-auto max-w-3xl text-lg text-neutral-700">
-            Próximos eventos, calendario anual y resultados históricos de nuestros desafíos en aguas abiertas.
-            ¿Buscas las fotos? Visita la{' '}
+            Próximos eventos y calendario anual de nuestras competencias y clínicas en aguas abiertas.
+            ¿Buscas los tiempos y records del{' '}
+            <Link
+              href={ROUTES.DESAFIO_QUINCHED}
+              className="font-medium text-primary-700 underline underline-offset-2"
+            >
+              Desafío Quinched
+            </Link>
+            ? ¿O las fotos en la{' '}
             <Link href={ROUTES.GALERIA} className="font-medium text-primary-700 underline underline-offset-2">
               Galería
             </Link>
-            .
+            ?
           </p>
           <div className="mx-auto h-2 w-32 rounded-full bg-club-gradient" />
         </div>
@@ -96,18 +101,30 @@ const EventosPage = () => {
           <CalendarioEventos />
         </section>
 
-        {/* Resultados por año */}
+        {/* Enlace a tiempos y records del Desafío Quinched */}
         <section className="mb-20">
-          <div className="mb-8 flex items-center space-x-3">
-            <BarChart2 className="h-8 w-8 text-primary-600" />
-            <h2 className="text-3xl font-bold text-primary-800">Resultados por año</h2>
-          </div>
-          <ResultadosPorAnio />
-        </section>
-
-        {/* Records de Quinched */}
-        <section className="mb-20">
-          <RecordsQuinched />
+          <Link
+            href={ROUTES.DESAFIO_QUINCHED}
+            className="group flex flex-col items-start gap-4 rounded-2xl border border-primary-200 bg-white p-6 shadow-sm transition-all hover:border-primary-400 hover:shadow-md sm:flex-row sm:items-center sm:justify-between"
+          >
+            <div className="flex items-start gap-4">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-accent-100 text-accent-600">
+                <Trophy className="h-6 w-6" />
+              </span>
+              <div>
+                <h2 className="text-xl font-bold text-primary-800">
+                  Tiempos y records del Desafío Quinched
+                </h2>
+                <p className="mt-1 text-neutral-600">
+                  Mejores marcas históricas por distancia, categoría y género, y resultados de cada edición.
+                </p>
+              </div>
+            </div>
+            <span className="flex items-center gap-1 font-semibold text-primary-700 transition-transform group-hover:translate-x-1">
+              Ver records
+              <ArrowRight className="h-4 w-4" />
+            </span>
+          </Link>
         </section>
 
         {/* Banner CTA socios */}

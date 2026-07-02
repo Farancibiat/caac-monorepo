@@ -2,6 +2,8 @@ export const ROUTES = {
     // Rutas públicas
     HOME: '/',
     EVENTOS: '/eventos',
+    /** Página de tiempos y records históricos del Desafío Unión de las Islas de Quinched */
+    DESAFIO_QUINCHED: '/desafio-quinched',
     EVENTO_DESAFIO_2026: '/eventos/desafio-2026',
     GALERIA: '/galeria',
     NOSOTROS: '/nosotros',
